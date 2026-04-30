@@ -364,7 +364,7 @@
         <div class="adm-section">
           <div class="adm-section-title">Colaboradores</div>
           <table class="user-table">
-            <thead><tr><th style="width:42%">Nome</th><th style="width:28%">Setor</th><th style="width:30%"></th></tr></thead>
+            <thead><tr><th style="width:32%">Nome</th><th style="width:22%">Usuário</th><th style="width:28%">Setor</th><th style="width:18%"></th></tr></thead>
             <tbody id="userTableBody"></tbody>
           </table>
           <button class="btn-add" onclick="openAddUser()">+ Adicionar colaborador</button>
@@ -396,12 +396,11 @@
     </div>
   </div>
 
-  <!-- MODAL EDIT USER -->
+  <!-- MODAL EDIT SETOR -->
   <div class="modal-overlay" id="modalEditUser">
     <div class="modal">
-      <h3>Editar colaborador</h3>
-      <label>Nome</label>
-      <input type="text" id="editUserName" placeholder="Nome completo" />
+      <h3>Alterar setor</h3>
+      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:1rem;" id="editUserNomeDisplay"></div>
       <label>Setor</label>
       <select id="editUserSetor">
         <option value="prevenda">Pré-venda</option>
@@ -409,8 +408,6 @@
         <option value="mercado">Análise de Mercado</option>
         <option value="full">Full</option>
       </select>
-      <label>Senha</label>
-      <input type="text" id="editUserSenha" />
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeModal('modalEditUser')">Cancelar</button>
         <button class="btn-primary" onclick="saveEditUser()">Salvar</button>
@@ -631,18 +628,29 @@ function calcLucr() {
 }
 
 function calcPrecoMin(cmv) {
-  const cf=getCF()/100,imp=st.impostoPct/100,mkt=st.mktLucr;
-  const comPct=mkt==='ML'?getLComPct():mkt==='Amazon'?.15:0;
-  const modal=document.getElementById('l_modalidade_amazon').value||'DBA';
-  let p=cmv*1.5;
+  // Usa comissão % e frete EXATAMENTE como estão nos campos editáveis.
+  // Frete fixo (não recalcula por faixa) — mesmo frete usado no cálculo principal.
+  const cf=getCF()/100, imp=st.impostoPct/100, mkt=st.mktLucr;
+  const comPct = mkt==='ML' ? getLComPct() : mkt==='Amazon' ? .15 : 0;
+  const freteFixo = getLFrete(); // frete do campo editável
+
+  // Margem alvo: 3%
+  // lucro = p - p*comPct - freteFixo - cmv - p*cf - p*imp = p*0.03
+  // p*(1 - comPct - cf - imp - 0.03) = cmv + freteFixo
+  // Para Shopee comissão varia com p, então usamos iteração só nesses casos.
+  if (mkt !== 'Shopee') {
+    const divisor = 1 - comPct - cf - imp - 0.03;
+    if (divisor <= 0) return cmv; // inviável
+    return (cmv + freteFixo) / divisor;
+  }
+  // Shopee: comissão depende do preço, iterar
+  let p = cmv * 1.5;
   for(let i=0;i<400;i++){
-    let c=0,f=0;
-    if(mkt==='ML'){c=p*comPct;f=freteML(p);}
-    else if(mkt==='Shopee'){c=comShopee(p);f=freteShopee(p);}
-    else{c=p*comPct;f=freteAmazon(p,modal);}
-    const lucro=p-c-f-cmv-p*cf-p*imp,m=lucro/p;
-    if(Math.abs(m-.03)<.0005)break;
-    p+=m<.03?.25:-.05;
+    const c = comShopee(p);
+    const lucro = p - c - freteFixo - cmv - p*cf - p*imp;
+    const m = lucro/p;
+    if(Math.abs(m-.03)<.0005) break;
+    p += m<.03 ? .25 : -.05;
     if(p<cmv){p=cmv;break;}
   }
   return p;
