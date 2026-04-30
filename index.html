@@ -423,40 +423,40 @@
 <script>
 const SENHA_ADM = 'adm2024#';
 
-const DEFAULT_USERS = [
-  { nome: 'Ana Catarina', setor: 'adm', senha: 'adm2024#' },
-  { nome: 'Colaborador Anuncios', setor: 'anuncios', senha: 'gmc1234@' },
-  { nome: 'Colaborador Prevenda', setor: 'prevenda', senha: 'gmc1234@' },
+// Usuários fixos — senhas alteradas apenas via código
+const FIXED_USERS = [
+  { usuario: 'ecom19', nome: 'Giovanna',   setor: 'mercado',  senha: 'ecom19@gmc' },
+  { usuario: 'ecom15', nome: 'Elisangela', setor: 'anuncios', senha: 'ecom15@gmc' },
+  { usuario: 'ecom10', nome: 'Thiago',     setor: 'anuncios', senha: 'ecom10@gmc' },
+  { usuario: 'ecom6',  nome: 'Vitória',    setor: 'prevenda', senha: 'ecom6@gmc'  },
+  { usuario: 'ecom16', nome: 'Miguel',     setor: 'prevenda', senha: 'ecom16@gmc' },
+  { usuario: 'ecom2',  nome: 'Leonardo',   setor: 'full',     senha: 'ecom2@gmc'  },
 ];
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem('aclon_hub_state');
-    if (saved) return JSON.parse(saved);
-  } catch(e) {}
+function loadCfg() {
+  try { const s=localStorage.getItem('aclon_cfg'); if(s) return JSON.parse(s); } catch(e){}
   return null;
 }
-
-function saveState() {
-  try {
-    localStorage.setItem('aclon_hub_state', JSON.stringify({
-      custofixo: st.custofixo,
-      impostoPct: st.impostoPct,
-      users: st.users
-    }));
-  } catch(e) {}
+function saveCfg() {
+  try { localStorage.setItem('aclon_cfg', JSON.stringify({ custofixo: st.custofixo, impostoPct: st.impostoPct, setores: st.setores })); } catch(e){}
 }
 
-const saved = loadState();
+const cfg = loadCfg();
 
 let st = {
   isAdm: false, userName: '', userCnpj: 'GMC SP',
   mktPreco: 'ML', mktLucr: 'ML',
-  custofixo: saved ? saved.custofixo : { 'GMC SP': 5, 'GMC SC': 5, 'R4': 5 },
-  impostoPct: saved ? saved.impostoPct : 10,
+  custofixo: cfg ? cfg.custofixo : { 'GMC SP': 5, 'GMC SC': 5, 'R4': 5 },
+  impostoPct: cfg ? cfg.impostoPct : 10,
+  // setores editáveis pelo ADM: usuario -> setor
+  setores: cfg ? cfg.setores : {},
   ultimoPreco: null, ultimoCmv: null, ultimoMkt: null, ultimoAnuncio: null, ultimoComPct: 0.12,
-  users: saved ? saved.users : DEFAULT_USERS
 };
+
+// retorna lista de usuários com setores eventualmente editados pelo ADM
+function getUsers() {
+  return FIXED_USERS.map(u => ({ ...u, setor: st.setores[u.usuario] || u.setor }));
+}
 
 const fmt    = v => 'R$ ' + parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtPct = v => parseFloat(v).toFixed(2)+'%';
@@ -476,13 +476,17 @@ function doLogin() {
   const pass = document.getElementById('loginPass').value;
   const err  = document.getElementById('loginError');
   err.style.display = 'none';
-  if (!user) { err.textContent='Informe seu nome.'; err.style.display='block'; return; }
-  const masterAdm = pass === SENHA_ADM;
-  const found = st.users.find(u => u.nome.trim().toLowerCase()===user.trim().toLowerCase() && u.senha===pass);
-  if (!masterAdm && !found) { err.style.display='block'; return; }
-  st.isAdm = masterAdm || (found && found.setor==='adm');
-  st.userName = user; st.userCnpj = 'GMC SP';
-  document.getElementById('topUser').textContent = user;
+  if (!user) { err.textContent='Informe seu usuário.'; err.style.display='block'; return; }
+  const masterAdm = pass === SENHA_ADM && user.toLowerCase() === 'adm';
+  const found = getUsers().find(u =>
+    (u.usuario.toLowerCase()===user.toLowerCase() || u.nome.trim().toLowerCase()===user.trim().toLowerCase())
+    && u.senha===pass
+  );
+  if (!masterAdm && !found) { err.style.display='block'; err.textContent='Usuário ou senha incorretos.'; return; }
+  st.isAdm = masterAdm;
+  st.userName = masterAdm ? 'ADM' : found.nome;
+  st.userCnpj = 'GMC SP';
+  document.getElementById('topUser').textContent = st.userName;
   document.getElementById('topCnpjSelect').value = 'GMC SP';
   document.getElementById('tabAdm').style.display = st.isAdm ? '' : 'none';
   document.getElementById('loginScreen').style.display = 'none';
@@ -543,27 +547,23 @@ function freteAmazon(p,m){const t=m==='DBA'?[[30,4.5],[49.99,6.5],[78.99,6.75],[
 function comShopee(p){if(p<=7.99)return p*.18;if(p<=79.99)return p*.20;return p*.14;}
 function getFrete(p,mkt,modal){if(mkt==='ML')return freteML(p);if(mkt==='Shopee')return freteShopee(p);return freteAmazon(p,modal||'DBA');}
 
-/* ── TIPO ANÚNCIO → preenche % ── */
 function onAnuncioMLChange(side) {
-  const tipo = document.getElementById(side==='p'?'p_anuncio_ml':'l_anuncio_ml').value;
-  document.getElementById(side==='p'?'p_comissao_pct':'l_comissao_pct').value = tipo==='premium'?18:12;
-  side==='p' ? calcPreco() : calcLucr();
+  const tipo=document.getElementById(side==='p'?'p_anuncio_ml':'l_anuncio_ml').value;
+  document.getElementById(side==='p'?'p_comissao_pct':'l_comissao_pct').value=tipo==='premium'?18:12;
+  side==='p'?calcPreco():calcLucr();
 }
-
-/* ── FRETE AUTO ── */
 function autoFrete() {
-  const preco = parseFloat(document.getElementById('l_preco').value)||0;
-  if (!preco) return;
-  const modal = document.getElementById('l_modalidade_amazon').value||'DBA';
-  document.getElementById('l_frete_edit').value = getFrete(preco,st.mktLucr,modal).toFixed(2);
+  const preco=parseFloat(document.getElementById('l_preco').value)||0;
+  if(!preco)return;
+  document.getElementById('l_frete_edit').value=getFrete(preco,st.mktLucr,document.getElementById('l_modalidade_amazon').value||'DBA').toFixed(2);
 }
-function onLPrecoChange() { autoFrete(); calcLucr(); }
-function onLModalidadeChange() { autoFrete(); calcLucr(); }
+function onLPrecoChange(){autoFrete();calcLucr();}
+function onLModalidadeChange(){autoFrete();calcLucr();}
 
 /* ── CALC PRECIFICAÇÃO ── */
 function calcPreco() {
   const cmv=parseFloat(document.getElementById('p_cmv').value)||0; if(!cmv)return;
-  const base=cmv*1.35, cf=getCF()/100, imp=st.impostoPct/100, mkt=st.mktPreco;
+  const base=cmv*1.35,cf=getCF()/100,imp=st.impostoPct/100,mkt=st.mktPreco;
   let com=0,comPct=0,frete=0;
   if(mkt==='ML'){comPct=(parseFloat(document.getElementById('p_comissao_pct').value)||12)/100;com=base*comPct;frete=freteML(base);}
   else if(mkt==='Shopee'){com=comShopee(base);comPct=com/base;frete=freteShopee(base);}
@@ -595,7 +595,7 @@ function enviarParaLucratividade() {
   if(st.ultimoMkt==='ML'){selectMktLucr(document.getElementById('lmktML'),'ML');document.getElementById('l_anuncio_ml').value=st.ultimoAnuncio||'classico';document.getElementById('l_comissao_pct').value=(st.ultimoComPct*100).toFixed(1);}
   else if(st.ultimoMkt==='Shopee'){selectMktLucr(document.getElementById('lmktShopee'),'Shopee');}
   else{selectMktLucr(document.getElementById('lmktAmazon'),'Amazon');if(st.ultimoAnuncio)document.getElementById('l_modalidade_amazon').value=st.ultimoAnuncio;}
-  autoFrete(); calcLucr();
+  autoFrete();calcLucr();
 }
 
 /* ── CALC LUCRATIVIDADE ── */
@@ -608,7 +608,7 @@ function calcLucr() {
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
   if(!preco||!cmv)return;
   const cf=getCF()/100,imp=st.impostoPct/100;
-  const com=getLCom(preco), frete=getLFrete();
+  const com=getLCom(preco),frete=getLFrete();
   const fixo=preco*cf,imposto=preco*imp;
   const lucro=preco-com-frete-cmv-fixo-imposto,mPct=(lucro/preco)*100;
   document.getElementById('l_r_comissao').textContent=fmt(com);
@@ -648,7 +648,6 @@ function calcPrecoMin(cmv) {
   return p;
 }
 
-/* ── SIMULADOR — usa parâmetros editados ── */
 function calcPromo() {
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const pp=parseFloat(document.getElementById('l_promo_preco').value)||0;
@@ -668,8 +667,7 @@ function renderPromo(pp) {
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
   const cf=getCF()/100,imp=st.impostoPct/100,mkt=st.mktLucr;
   const modal=document.getElementById('l_modalidade_amazon').value||'DBA';
-  const c=getLCom(pp); // usa comissão editável
-  const f=getFrete(pp,mkt,modal); // frete auto pelo preço promocional
+  const c=getLCom(pp),f=getFrete(pp,mkt,modal);
   const fixo=pp*cf,imposto=pp*imp;
   const lucro=pp-c-f-cmv-fixo-imposto,margem=(lucro/pp)*100;
   document.getElementById('promo_preco_final').textContent=fmt(pp);
@@ -684,60 +682,45 @@ function renderPromo(pp) {
 function saveCF(filial,btn) {
   const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
   st.custofixo[filial]=parseFloat(document.getElementById(map[filial]).value)||5;
-  saveState(); updateDisplays(); flash(btn);
+  saveCfg();updateDisplays();flash(btn);
 }
 function saveImposto(btn) {
   st.impostoPct=parseFloat(document.getElementById('adm_imposto').value)||10;
-  saveState(); updateDisplays(); flash(btn);
+  saveCfg();updateDisplays();flash(btn);
 }
 function flash(btn){btn.textContent='Salvo!';setTimeout(()=>btn.textContent='Salvar',1500);}
 
-function openAddUser(){document.getElementById('newUserName').value='';document.getElementById('newUserSenha').value='gmc1234@';document.getElementById('modalAddUser').classList.add('open');}
-function saveNewUser(){
-  const nome=document.getElementById('newUserName').value.trim();
-  if(!nome)return;
-  st.users.push({nome,setor:document.getElementById('newUserSetor').value,senha:document.getElementById('newUserSenha').value||'gmc1234@'});
-  saveState(); renderUserTable();closeModal('modalAddUser');
-}
-function removeUser(i){st.users.splice(i,1);saveState();renderUserTable();}
-
+/* ── TABELA DE USUÁRIOS (só setor editável) ── */
 let editIdx = null;
-function openEditUser(i) {
+function openEditSetor(i) {
   editIdx = i;
-  const u = st.users[i];
-  document.getElementById('editUserName').value  = u.nome;
-  document.getElementById('editUserSetor').value = u.setor;
-  document.getElementById('editUserSenha').value = u.senha;
+  const users = getUsers();
+  document.getElementById('editUserNomeDisplay').textContent = users[i].nome;
+  document.getElementById('editUserSetor').value = users[i].setor;
   document.getElementById('modalEditUser').classList.add('open');
 }
 function saveEditUser() {
-  if (editIdx === null) return;
-  const nome = document.getElementById('editUserName').value.trim();
-  if (!nome) return;
-  st.users[editIdx] = {
-    nome,
-    setor: document.getElementById('editUserSetor').value,
-    senha: document.getElementById('editUserSenha').value || 'gmc1234@'
-  };
-  editIdx = null;
-  saveState(); renderUserTable();
+  if(editIdx===null)return;
+  const users=getUsers();
+  st.setores[FIXED_USERS[editIdx].usuario] = document.getElementById('editUserSetor').value;
+  editIdx=null;
+  saveCfg();renderUserTable();
   closeModal('modalEditUser');
 }
 
-function renderUserTable(){
+function renderUserTable() {
   const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full']};
-  document.getElementById('userTableBody').innerHTML=st.users.map((u,i)=>{
-    const[label,cls]=lb[u.setor]||[u.setor,'full'];
-    return`<tr>
+  document.getElementById('userTableBody').innerHTML = getUsers().map((u,i) => {
+    const [label,cls] = lb[u.setor]||[u.setor,'full'];
+    return `<tr>
       <td>${u.nome}</td>
+      <td><code style="font-size:12px;color:var(--text2);">${u.usuario}</code></td>
       <td><span class="badge badge-${cls}">${label}</span></td>
-      <td style="display:flex;gap:6px;">
-        <button class="btn-sm" onclick="openEditUser(${i})">Editar</button>
-        <button class="btn-sm btn-danger" onclick="removeUser(${i})">Remover</button>
-      </td>
+      <td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td>
     </tr>`;
   }).join('');
 }
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
 </body>
