@@ -423,17 +423,39 @@
 <script>
 const SENHA_ADM = 'adm2024#';
 
+const DEFAULT_USERS = [
+  { nome: 'Ana Catarina', setor: 'adm', senha: 'adm2024#' },
+  { nome: 'Colaborador Anuncios', setor: 'anuncios', senha: 'gmc1234@' },
+  { nome: 'Colaborador Prevenda', setor: 'prevenda', senha: 'gmc1234@' },
+];
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('aclon_hub_state');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return null;
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('aclon_hub_state', JSON.stringify({
+      custofixo: st.custofixo,
+      impostoPct: st.impostoPct,
+      users: st.users
+    }));
+  } catch(e) {}
+}
+
+const saved = loadState();
+
 let st = {
   isAdm: false, userName: '', userCnpj: 'GMC SP',
   mktPreco: 'ML', mktLucr: 'ML',
-  custofixo: { 'GMC SP': 5, 'GMC SC': 5, 'R4': 5 },
-  impostoPct: 10,
+  custofixo: saved ? saved.custofixo : { 'GMC SP': 5, 'GMC SC': 5, 'R4': 5 },
+  impostoPct: saved ? saved.impostoPct : 10,
   ultimoPreco: null, ultimoCmv: null, ultimoMkt: null, ultimoAnuncio: null, ultimoComPct: 0.12,
-  users: [
-    { nome: 'Ana Catarina', setor: 'adm', senha: 'adm2024#' },
-    { nome: 'Colaborador Anuncios', setor: 'anuncios', senha: 'gmc1234@' },
-    { nome: 'Colaborador Prevenda', setor: 'prevenda', senha: 'gmc1234@' },
-  ]
+  users: saved ? saved.users : DEFAULT_USERS
 };
 
 const fmt    = v => 'R$ ' + parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -456,7 +478,7 @@ function doLogin() {
   err.style.display = 'none';
   if (!user) { err.textContent='Informe seu nome.'; err.style.display='block'; return; }
   const masterAdm = pass === SENHA_ADM;
-  const found = st.users.find(u => u.nome.toLowerCase()===user.toLowerCase() && u.senha===pass);
+  const found = st.users.find(u => u.nome.trim().toLowerCase()===user.trim().toLowerCase() && u.senha===pass);
   if (!masterAdm && !found) { err.style.display='block'; return; }
   st.isAdm = masterAdm || (found && found.setor==='adm');
   st.userName = user; st.userCnpj = 'GMC SP';
@@ -662,11 +684,11 @@ function renderPromo(pp) {
 function saveCF(filial,btn) {
   const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
   st.custofixo[filial]=parseFloat(document.getElementById(map[filial]).value)||5;
-  updateDisplays(); flash(btn);
+  saveState(); updateDisplays(); flash(btn);
 }
 function saveImposto(btn) {
   st.impostoPct=parseFloat(document.getElementById('adm_imposto').value)||10;
-  updateDisplays(); flash(btn);
+  saveState(); updateDisplays(); flash(btn);
 }
 function flash(btn){btn.textContent='Salvo!';setTimeout(()=>btn.textContent='Salvar',1500);}
 
@@ -675,9 +697,9 @@ function saveNewUser(){
   const nome=document.getElementById('newUserName').value.trim();
   if(!nome)return;
   st.users.push({nome,setor:document.getElementById('newUserSetor').value,senha:document.getElementById('newUserSenha').value||'gmc1234@'});
-  renderUserTable();closeModal('modalAddUser');
+  saveState(); renderUserTable();closeModal('modalAddUser');
 }
-function removeUser(i){st.users.splice(i,1);renderUserTable();}
+function removeUser(i){st.users.splice(i,1);saveState();renderUserTable();}
 
 let editIdx = null;
 function openEditUser(i) {
@@ -698,7 +720,7 @@ function saveEditUser() {
     senha: document.getElementById('editUserSenha').value || 'gmc1234@'
   };
   editIdx = null;
-  renderUserTable();
+  saveState(); renderUserTable();
   closeModal('modalEditUser');
 }
 
