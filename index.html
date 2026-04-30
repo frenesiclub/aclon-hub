@@ -396,6 +396,28 @@
     </div>
   </div>
 
+  <!-- MODAL EDIT USER -->
+  <div class="modal-overlay" id="modalEditUser">
+    <div class="modal">
+      <h3>Editar colaborador</h3>
+      <label>Nome</label>
+      <input type="text" id="editUserName" placeholder="Nome completo" />
+      <label>Setor</label>
+      <select id="editUserSetor">
+        <option value="prevenda">Pré-venda</option>
+        <option value="anuncios">Anúncios</option>
+        <option value="mercado">Análise de Mercado</option>
+        <option value="full">Full</option>
+      </select>
+      <label>Senha</label>
+      <input type="text" id="editUserSenha" />
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('modalEditUser')">Cancelar</button>
+        <button class="btn-primary" onclick="saveEditUser()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -656,11 +678,42 @@ function saveNewUser(){
   renderUserTable();closeModal('modalAddUser');
 }
 function removeUser(i){st.users.splice(i,1);renderUserTable();}
+
+let editIdx = null;
+function openEditUser(i) {
+  editIdx = i;
+  const u = st.users[i];
+  document.getElementById('editUserName').value  = u.nome;
+  document.getElementById('editUserSetor').value = u.setor;
+  document.getElementById('editUserSenha').value = u.senha;
+  document.getElementById('modalEditUser').classList.add('open');
+}
+function saveEditUser() {
+  if (editIdx === null) return;
+  const nome = document.getElementById('editUserName').value.trim();
+  if (!nome) return;
+  st.users[editIdx] = {
+    nome,
+    setor: document.getElementById('editUserSetor').value,
+    senha: document.getElementById('editUserSenha').value || 'gmc1234@'
+  };
+  editIdx = null;
+  renderUserTable();
+  closeModal('modalEditUser');
+}
+
 function renderUserTable(){
   const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full']};
   document.getElementById('userTableBody').innerHTML=st.users.map((u,i)=>{
     const[label,cls]=lb[u.setor]||[u.setor,'full'];
-    return`<tr><td>${u.nome}</td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm btn-danger" onclick="removeUser(${i})">Remover</button></td></tr>`;
+    return`<tr>
+      <td>${u.nome}</td>
+      <td><span class="badge badge-${cls}">${label}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn-sm" onclick="openEditUser(${i})">Editar</button>
+        <button class="btn-sm btn-danger" onclick="removeUser(${i})">Remover</button>
+      </td>
+    </tr>`;
   }).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
