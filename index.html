@@ -13,9 +13,11 @@
       --radius-md: 8px; --radius-lg: 12px;
       --green: #3B6D11; --green-bg: #EAF3DE;
       --red: #A32D2D; --blue: #185FA5; --blue-bg: #E6F1FB; --blue-border: #B5D4F4;
+      --amber: #854F0B; --amber-bg: #FAEEDA; --amber-border: #FAC775;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
     .hub { background: var(--bg); border-radius: var(--radius-lg); border: 0.5px solid var(--border); width: 100%; max-width: 900px; min-height: 600px; position: relative; overflow: hidden; }
+    /* LOGIN */
     .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 580px; padding: 2rem; }
     .login-logo { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: var(--text2); margin-bottom: 1.5rem; text-transform: uppercase; }
     .login-title { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 0.35rem; }
@@ -24,13 +26,13 @@
     .login-card label { font-size: 11px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 0.07em; text-transform: uppercase; }
     .login-card input { width: 100%; margin-bottom: 1rem; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
     .login-error { font-size: 13px; color: var(--red); margin-top: 0.75rem; text-align: center; display: none; }
+    /* MAIN */
     .main-screen { display: none; }
     .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
     .topbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .topbar-logo { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: var(--text2); text-transform: uppercase; }
     .user-badge { font-size: 13px; color: var(--text2); }
-    .cnpj-select-topbar { font-size: 12px; padding: 4px 8px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); background: var(--bg2); color: var(--text); cursor: pointer; outline: none; }
-    .toast { font-size: 12px; color: var(--green); background: var(--green-bg); border: 0.5px solid #C0DD97; border-radius: var(--radius-md); padding: 3px 10px; display: none; }
+    /* BUTTONS */
     .btn-primary { width: 100%; padding: 10px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.25rem; }
     .btn-primary:hover { opacity: 0.85; }
     .btn-logout { font-size: 12px; color: var(--text2); background: none; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 5px 12px; cursor: pointer; }
@@ -42,20 +44,22 @@
     .btn-sm { font-size: 12px; padding: 4px 10px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: none; cursor: pointer; color: var(--text2); }
     .btn-sm:hover { background: var(--bg2); }
     .btn-danger { color: var(--red); border-color: #F0959590; }
-    .btn-add { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); background: none; cursor: pointer; color: var(--text); margin-top: 1rem; }
-    .btn-add:hover { background: var(--bg2); }
+    /* TABS */
     .nav-tabs { display: flex; border-bottom: 0.5px solid var(--border); padding: 0 1.5rem; overflow-x: auto; }
     .nav-tab { font-size: 13px; font-weight: 500; color: var(--text2); padding: 0.85rem 1.25rem; cursor: pointer; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; }
     .nav-tab.active { color: var(--text); border-bottom-color: var(--text); }
     .nav-tab:hover:not(.active) { color: var(--text); background: var(--bg2); }
+    /* CONTENT */
     .content { padding: 1.5rem; }
     .panel { display: none; }
     .panel.active { display: block; }
+    /* MKT */
     .mkt-selector { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .mkt-btn { flex: 1; min-width: 120px; padding: 10px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; text-align: center; }
     .mkt-btn.active { background: var(--bg2); border-color: var(--border2); color: var(--text); }
     .mkt-btn:hover:not(.active) { background: var(--bg2); }
     .mkt-tag { font-size: 10px; display: block; font-weight: 400; color: var(--text3); margin-top: 2px; }
+    /* FORM */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .form-group label { font-size: 11px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 0.07em; text-transform: uppercase; }
     .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
@@ -68,6 +72,7 @@
     .info-badge-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .info-badge { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 8px 14px; font-size: 13px; color: var(--text2); }
     .info-badge strong { color: var(--text); }
+    /* RESULTS */
     .result-section { margin-top: 1.5rem; }
     .result-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); margin-bottom: 1rem; }
     .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
@@ -75,16 +80,20 @@
     .result-card.highlight { background: var(--bg); border: 0.5px solid var(--border2); }
     .result-card.positive { border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
     .result-card.negative { border-left: 3px solid var(--red); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+    .result-card.accent { border-left: 3px solid var(--amber); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--amber-bg); border-top: 0.5px solid var(--amber-border); border-right: 0.5px solid var(--amber-border); border-bottom: 0.5px solid var(--amber-border); }
     .result-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
     .result-value { font-size: 18px; font-weight: 500; color: var(--text); }
     .result-value.green { color: var(--green); }
     .result-value.red { color: var(--red); }
     .result-value.blue { color: var(--blue); }
+    .result-value.amber { color: var(--amber); }
     .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
+    .section-sep { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin: 1.25rem 0 0.75rem; }
     .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
     .info-row:last-child { border-bottom: none; }
     .info-row span:first-child { color: var(--text2); }
     .info-row span:last-child { font-weight: 500; }
+    /* PROMO */
     .promo-box { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1.5rem; }
     .promo-box-title { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
     .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top:1rem; }
@@ -92,6 +101,7 @@
     .promo-result-item .label { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
     .promo-result-item .val { font-weight: 500; }
     .alert-info { font-size: 13px; padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 1rem; background: var(--blue-bg); color: var(--blue); border: 0.5px solid var(--blue-border); }
+    /* ADM */
     .adm-section { margin-bottom: 2rem; }
     .adm-section-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 0.5px solid var(--border); }
     .adm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; }
@@ -110,6 +120,7 @@
     .badge-prevenda { background: #FAEEDA; color: #633806; }
     .badge-mercado { background: #FBEAF0; color: #72243E; }
     .badge-full { background: #F1EFE8; color: #444441; }
+    /* MODAL */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 1.5rem; width: 340px; max-width: 95vw; }
@@ -119,19 +130,35 @@
     .modal-btns { display: flex; gap: 8px; margin-top: 0.5rem; }
     .modal-btns button { flex: 1; }
     .btn-cancel { background: none; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 9px; font-size: 14px; cursor: pointer; color: var(--text2); }
+    /* INSTRUCOES */
+    .instrucoes-section { margin-bottom: 2rem; }
+    .instrucoes-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
+    .instrucoes-section h3 .tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-md); background: var(--blue-bg); color: var(--blue); }
+    .instrucoes-section p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 0.5rem; }
+    .instrucoes-section ul { list-style: none; padding: 0; }
+    .instrucoes-section ul li { font-size: 13px; color: var(--text2); line-height: 1.6; padding: 6px 0; border-bottom: 0.5px solid var(--border); display: flex; gap: 10px; }
+    .instrucoes-section ul li:last-child { border-bottom: none; }
+    .instrucoes-section ul li .li-label { font-weight: 500; color: var(--text); min-width: 120px; }
+    .instrucoes-box { background: var(--bg2); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; border: 0.5px solid var(--border); }
+    .instrucoes-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 0.75rem; }
+    .instrucoes-step:last-child { margin-bottom: 0; }
+    .step-num { width: 22px; height: 22px; min-width: 22px; border-radius: 50%; background: var(--text); color: var(--bg); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+    .step-text { font-size: 13px; color: var(--text2); line-height: 1.55; }
+    .step-text strong { color: var(--text); }
     @media (max-width: 500px) { body { padding: 0; } .hub { border-radius: 0; border: none; min-height: 100vh; } .promo-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 <div class="hub">
 
+  <!-- LOGIN -->
   <div class="login-screen" id="loginScreen">
     <div class="login-logo">Hub Operacional</div>
     <div class="login-title">Aclon Hub</div>
     <div class="login-sub">Acesse com suas credenciais</div>
     <div class="login-card">
-      <label>Colaborador</label>
-      <input type="text" id="loginUser" placeholder="Seu nome" />
+      <label>Usuário</label>
+      <input type="text" id="loginUser" placeholder="Seu usuário" />
       <label>Senha</label>
       <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()" />
       <button class="btn-primary" onclick="doLogin()">Entrar</button>
@@ -139,18 +166,13 @@
     </div>
   </div>
 
+  <!-- MAIN -->
   <div class="main-screen" id="mainScreen">
     <div class="topbar">
       <div class="topbar-left">
         <span class="topbar-logo">Aclon Hub</span>
         <span style="color:var(--border2);">|</span>
         <span class="user-badge" id="topUser"></span>
-        <select class="cnpj-select-topbar" id="topCnpjSelect" onchange="changeCnpj(this.value)">
-          <option value="GMC SP">GMC SP</option>
-          <option value="GMC SC">GMC SC</option>
-          <option value="R4">R4</option>
-        </select>
-        <span class="toast" id="cnpjToast">Filial alterada</span>
       </div>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
@@ -158,12 +180,13 @@
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchTab('precificacao')">Calculadora de Preço de Venda</button>
       <button class="nav-tab" onclick="switchTab('lucratividade')">Lucratividade da Venda</button>
+      <button class="nav-tab" onclick="switchTab('instrucoes')">Como usar</button>
       <button class="nav-tab" id="tabAdm" style="display:none" onclick="switchTab('adm')">Painel ADM</button>
     </div>
 
     <div class="content">
 
-      <!-- PRECIFICAÇÃO -->
+      <!-- ── PRECIFICAÇÃO ── -->
       <div class="panel active" id="panel-precificacao">
         <div class="mkt-selector">
           <div class="mkt-btn active" onclick="selectMkt(this,'ML')">Mercado Livre<span class="mkt-tag">Clássico / Premium</span></div>
@@ -174,10 +197,6 @@
           <div class="form-group">
             <label>CMV (Custo de compra)</label>
             <input type="number" id="p_cmv" placeholder="0,00" step="0.01" oninput="calcPreco()" />
-          </div>
-          <div class="form-group">
-            <label>Markup</label>
-            <input type="text" value="35%" readonly class="input-locked" />
           </div>
           <div class="form-group" id="grp_anuncio_ml">
             <label>Tipo de Anúncio · % Comissão</label>
@@ -198,39 +217,54 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Custo Fixo (filial)</label>
-            <input type="text" id="p_custofixo_display" readonly class="input-locked" />
+            <label>Custo Fixo</label>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="text" id="p_custofixo_display" readonly class="input-locked" style="flex:1;" />
+              <button class="btn-sm" onclick="openCurvaA()">Editar</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Imposto</label>
-            <input type="text" id="p_imposto_display" readonly class="input-locked" />
+            <input type="text" value="9%" readonly class="input-locked" />
           </div>
         </div>
         <button class="calc-btn" onclick="calcPreco()">Calcular Preço Ideal</button>
+
         <div class="result-section" id="resultPreco" style="display:none">
           <hr class="divider">
-          <div class="result-title">Resultado · Meta lucro líquido 10%</div>
+          <div class="result-title">Resultado · Meta lucro líquido 20%</div>
+
+          <div class="section-sep">Estrutura de custos</div>
           <div class="result-grid">
             <div class="result-card"><div class="result-label">CMV</div><div class="result-value" id="r_cmv">—</div></div>
-            <div class="result-card"><div class="result-label">Markup aplicado</div><div class="result-value" id="r_markup_val">—</div></div>
-            <div class="result-card"><div class="result-label">Comissão</div><div class="result-value" id="r_comissao">—</div></div>
-            <div class="result-card"><div class="result-label">Frete estimado</div><div class="result-value" id="r_frete">—</div></div>
+            <div class="result-card"><div class="result-label">Comissão marketplace</div><div class="result-value" id="r_comissao">—</div></div>
+            <div class="result-card"><div class="result-label">Frete</div><div class="result-value" id="r_frete">—</div></div>
             <div class="result-card"><div class="result-label">Custo Fixo</div><div class="result-value" id="r_custofixo">—</div></div>
             <div class="result-card"><div class="result-label">Imposto</div><div class="result-value" id="r_imposto">—</div></div>
-            <div class="result-card highlight"><div class="result-label">Preço ideal de venda</div><div class="result-value blue" id="r_preco_venda">—</div></div>
-            <div class="result-card highlight positive"><div class="result-label">Lucro estimado</div><div class="result-value green" id="r_lucro">—</div></div>
           </div>
+
+          <div class="section-sep">Resultado</div>
+          <div class="result-grid">
+            <div class="result-card accent">
+              <div class="result-label">Lucro bruto plataforma</div>
+              <div class="result-value amber" id="r_lucro_bruto">—</div>
+              <div style="font-size:11px;color:var(--amber);margin-top:3px;" id="r_lucro_bruto_pct">—</div>
+            </div>
+            <div class="result-card highlight"><div class="result-label">Preço ideal de venda</div><div class="result-value blue" id="r_preco_venda">—</div></div>
+            <div class="result-card highlight positive"><div class="result-label">Lucro líquido</div><div class="result-value green" id="r_lucro">—</div></div>
+            <div class="result-card"><div class="result-label">Markup equivalente</div><div class="result-value" id="r_markup_equiv">—</div></div>
+          </div>
+
           <div style="margin-top:1rem;">
             <div class="info-row"><span>Comissão %</span><span id="r_info_comissao_pct">—</span></div>
-            <div class="info-row"><span>Lucro %</span><span id="r_info_lucro_pct" style="color:var(--green)">—</span></div>
+            <div class="info-row"><span>Lucro % sobre venda</span><span id="r_info_lucro_pct" style="color:var(--green)">20,00%</span></div>
             <div class="info-row"><span>Marketplace</span><span id="r_info_mkt">—</span></div>
-            <div class="info-row"><span>Filial</span><span id="r_info_cnpj">—</span></div>
           </div>
           <button class="calc-btn-secondary" onclick="enviarParaLucratividade()">Verificar lucratividade deste preço ↗</button>
         </div>
       </div>
 
-      <!-- LUCRATIVIDADE -->
+      <!-- ── LUCRATIVIDADE ── -->
       <div class="panel" id="panel-lucratividade">
         <div class="alert-info" id="alertLucr">Preencha os campos abaixo para análise de lucratividade.</div>
         <div class="mkt-selector">
@@ -272,24 +306,36 @@
         </div>
         <div class="info-badge-row">
           <div class="info-badge">Custo Fixo: <strong id="l_badge_cf">—</strong></div>
-          <div class="info-badge">Imposto: <strong id="l_badge_imp">—</strong></div>
+          <div class="info-badge">Imposto: <strong>9%</strong></div>
         </div>
         <button class="calc-btn" onclick="calcLucr()">Calcular Lucratividade</button>
+
         <div class="result-section" id="resultLucr" style="display:none">
           <hr class="divider">
-          <div class="result-title">Lucratividade real sobre o preço de venda</div>
+
+          <div class="section-sep">Receita da plataforma</div>
           <div class="result-grid">
-            <div class="result-card"><div class="result-label">Comissão</div><div class="result-value" id="l_r_comissao">—</div></div>
+            <div class="result-card"><div class="result-label">Comissão marketplace</div><div class="result-value" id="l_r_comissao">—</div></div>
             <div class="result-card"><div class="result-label">Frete</div><div class="result-value" id="l_r_frete">—</div></div>
+            <div class="result-card accent">
+              <div class="result-label">Lucro bruto plataforma</div>
+              <div class="result-value amber" id="l_r_lucro_bruto">—</div>
+              <div style="font-size:11px;color:var(--amber);margin-top:3px;" id="l_r_lucro_bruto_pct">—</div>
+            </div>
+          </div>
+
+          <div class="section-sep">Após CMV e encargos</div>
+          <div class="result-grid">
             <div class="result-card"><div class="result-label">CMV</div><div class="result-value" id="l_r_cmv">—</div></div>
             <div class="result-card"><div class="result-label">Custo Fixo</div><div class="result-value" id="l_r_fixo">—</div></div>
             <div class="result-card"><div class="result-label">Imposto</div><div class="result-value" id="l_r_imposto">—</div></div>
             <div class="result-card highlight" id="l_r_lucro_card"><div class="result-label">Lucro líquido</div><div class="result-value" id="l_r_lucro">—</div></div>
             <div class="result-card highlight" id="l_r_pct_card"><div class="result-label">Margem %</div><div class="result-value" id="l_r_pct">—</div></div>
           </div>
+
           <div class="promo-box">
             <div class="promo-box-title">Simulador de Promoção</div>
-            <div class="hint" style="margin-bottom:0;">Usa os mesmos parâmetros editados acima — comissão, frete e taxas.</div>
+            <div class="hint">Usa os mesmos parâmetros editados acima — comissão, frete e taxas.</div>
             <div class="promo-grid">
               <div class="form-group">
                 <label>Preço promocional (R$)</label>
@@ -314,7 +360,59 @@
         </div>
       </div>
 
-      <!-- ADM -->
+      <!-- ── COMO USAR ── -->
+      <div class="panel" id="panel-instrucoes">
+        <div class="instrucoes-box" style="background:var(--blue-bg);border-color:var(--blue-border);">
+          <div style="font-size:13px;color:var(--blue);font-weight:500;margin-bottom:4px;">Bem-vindo ao Aclon Hub</div>
+          <div style="font-size:13px;color:var(--blue);">Este hub tem duas calculadoras principais: <strong>Formação de Preço</strong> e <strong>Análise de Lucratividade</strong>. Use em sequência para garantir que o preço praticado é sustentável.</div>
+        </div>
+
+        <div class="instrucoes-section">
+          <h3>Calculadora de Preço de Venda <span class="tag">Tela 1</span></h3>
+          <p>Use esta tela para descobrir qual preço de venda garante <strong>20% de lucro líquido</strong> sobre o preço final, já considerando todos os encargos.</p>
+          <div class="instrucoes-box">
+            <div class="instrucoes-step"><div class="step-num">1</div><div class="step-text">Selecione o <strong>marketplace</strong> (Mercado Livre, Shopee ou Amazon).</div></div>
+            <div class="instrucoes-step"><div class="step-num">2</div><div class="step-text">Informe o <strong>CMV</strong> — o custo de compra do produto (valor pago ao fornecedor).</div></div>
+            <div class="instrucoes-step"><div class="step-num">3</div><div class="step-text">No Mercado Livre, selecione <strong>Clássico ou Premium</strong>. O percentual de comissão é preenchido automaticamente (12% ou 18%), mas pode ser editado se houver diferença.</div></div>
+            <div class="instrucoes-step"><div class="step-num">4</div><div class="step-text">Clique em <strong>Calcular Preço Ideal</strong>. O hub calcula o preço mínimo necessário para atingir 20% de lucro líquido.</div></div>
+            <div class="instrucoes-step"><div class="step-num">5</div><div class="step-text">O resultado mostra a estrutura completa: CMV, comissão, frete, custo fixo, imposto, <strong>lucro bruto da plataforma</strong> e lucro líquido final.</div></div>
+          </div>
+          <ul>
+            <li><span class="li-label">Lucro bruto plataforma</span><span>Preço de venda menos comissão e frete. É o que sobra antes de descontar CMV, custo fixo e imposto.</span></li>
+            <li><span class="li-label">Markup equivalente</span><span>Percentual de aumento sobre o CMV que o preço calculado representa. Informativo — não é o driver do cálculo.</span></li>
+            <li><span class="li-label">Custo Fixo</span><span>Percentual de despesas fixas da operação. Editável com senha. Padrão: 5%.</span></li>
+            <li><span class="li-label">Imposto</span><span>Fixo em 9% — não editável.</span></li>
+          </ul>
+        </div>
+
+        <div class="instrucoes-section">
+          <h3>Lucratividade da Venda <span class="tag">Tela 2</span></h3>
+          <p>Use esta tela para analisar a lucratividade real de um preço que já está sendo praticado ou que você quer testar.</p>
+          <div class="instrucoes-box">
+            <div class="instrucoes-step"><div class="step-num">1</div><div class="step-text">Selecione o <strong>marketplace</strong> e informe o <strong>preço de venda</strong> atual e o <strong>CMV</strong>.</div></div>
+            <div class="instrucoes-step"><div class="step-num">2</div><div class="step-text">O <strong>frete é calculado automaticamente</strong> pela tabela do marketplace. Você pode editar se necessário.</div></div>
+            <div class="instrucoes-step"><div class="step-num">3</div><div class="step-text">Clique em <strong>Calcular Lucratividade</strong>. O hub mostra o lucro bruto da plataforma e o lucro líquido real.</div></div>
+            <div class="instrucoes-step"><div class="step-num">4</div><div class="step-text">Use o <strong>Simulador de Promoção</strong> para testar descontos e ver a margem resultante. O campo <em>Preço mínimo com 3%</em> mostra o limite de desconto seguro.</div></div>
+          </div>
+          <ul>
+            <li><span class="li-label">Lucro bruto plataforma</span><span>Preço − comissão − frete. Mostra quanto sobra da venda antes dos custos internos.</span></li>
+            <li><span class="li-label">Margem %</span><span>Verde = acima de 3%. Vermelho = abaixo de 3% ou negativo.</span></li>
+            <li><span class="li-label">Preço mínimo 3%</span><span>O menor preço possível mantendo ao menos 3% de margem líquida. Use como referência para promoções.</span></li>
+          </ul>
+        </div>
+
+        <div class="instrucoes-section">
+          <h3>Dicas rápidas</h3>
+          <ul>
+            <li><span class="li-label">Fluxo recomendado</span><span>Calcule o preço ideal na Tela 1 → clique em "Verificar lucratividade" → confirme na Tela 2.</span></li>
+            <li><span class="li-label">Comissão editável</span><span>Se o ML praticar uma taxa diferente para o seu anúncio específico, edite o campo % diretamente.</span></li>
+            <li><span class="li-label">Frete editável</span><span>O frete é estimado pela faixa de preço. Se o frete real for diferente, edite antes de calcular.</span></li>
+            <li><span class="li-label">Custo Fixo</span><span>Representa as despesas fixas da operação rateadas por produto. Solicite a senha ao gestor para alterar.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ── ADM ── -->
       <div class="panel" id="panel-adm">
         <div class="adm-section">
           <div class="adm-section-title">Custo Fixo por Filial</div>
@@ -349,49 +447,29 @@
           </div>
         </div>
         <div class="adm-section">
-          <div class="adm-section-title">Imposto (global)</div>
-          <div style="max-width:220px;">
-            <div class="adm-card">
-              <div class="adm-card-label">Percentual</div>
-              <div class="adm-input-row" style="margin-top:8px;">
-                <input type="number" id="adm_imposto" step="0.1" />
-                <span style="font-size:14px;color:var(--text2);">%</span>
-                <button class="btn-sm" onclick="saveImposto(this)">Salvar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="adm-section">
           <div class="adm-section-title">Colaboradores</div>
           <table class="user-table">
             <thead><tr><th style="width:32%">Nome</th><th style="width:22%">Usuário</th><th style="width:28%">Setor</th><th style="width:18%"></th></tr></thead>
             <tbody id="userTableBody"></tbody>
           </table>
-          <button class="btn-add" onclick="openAddUser()">+ Adicionar colaborador</button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL ADD USER -->
-  <div class="modal-overlay" id="modalAddUser">
+  <!-- MODAL CURVA A -->
+  <div class="modal-overlay" id="modalCurvaA">
     <div class="modal">
-      <h3>Novo colaborador</h3>
-      <label>Nome</label>
-      <input type="text" id="newUserName" placeholder="Nome completo" />
-      <label>Setor</label>
-      <select id="newUserSetor">
-        <option value="prevenda">Pré-venda</option>
-        <option value="anuncios">Anúncios</option>
-        <option value="mercado">Análise de Mercado</option>
-        <option value="full">Full</option>
-      </select>
+      <h3>Editar Custo Fixo</h3>
       <label>Senha</label>
-      <input type="text" id="newUserSenha" value="gmc1234@" />
+      <input type="password" id="curvaASenha" placeholder="••••••••" />
+      <label>Novo valor (%)</label>
+      <input type="number" id="curvaAValor" step="0.1" />
+      <div style="font-size:12px;color:var(--red);display:none;margin-top:4px;" id="curvaAError">Senha incorreta.</div>
       <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modalAddUser')">Cancelar</button>
-        <button class="btn-primary" onclick="saveNewUser()">Adicionar</button>
+        <button class="btn-cancel" onclick="closeModal('modalCurvaA')">Cancelar</button>
+        <button class="btn-primary" onclick="confirmarCurvaA()">Confirmar</button>
       </div>
     </div>
   </div>
@@ -416,93 +494,69 @@
   </div>
 
 </div>
-
 <script>
-const SENHA_ADM = 'adm2024#';
+const SENHA_ADM     = 'adm2024#';
+const SENHA_CURVA_A = 'curvaAB';
+const IMPOSTO_PCT   = 9;
+const LUCRO_META    = 0.20;
 
-// Usuários fixos — senhas alteradas apenas via código
 const FIXED_USERS = [
-  { usuario: 'ecom19', nome: 'Giovanna',   setor: 'mercado',  senha: 'ecom19@gmc' },
-  { usuario: 'ecom10', nome: 'Thiago',     setor: 'anuncios', senha: 'ecom10@gmc' },
-  { usuario: 'ecom6',  nome: 'Vitória',    setor: 'prevenda', senha: 'ecom6@gmc'  },
-  { usuario: 'ecom16', nome: 'Miguel',     setor: 'prevenda', senha: 'ecom16@gmc' },
-  { usuario: 'ecom2',  nome: 'Leonardo',   setor: 'full',     senha: 'ecom2@gmc'  },
+  { usuario:'ecom19', nome:'Giovanna',  setor:'mercado',  senha:'ecom19@gmc' },
+  { usuario:'ecom10', nome:'Thiago',    setor:'anuncios', senha:'ecom10@gmc' },
+  { usuario:'ecom6',  nome:'Vitória',   setor:'prevenda', senha:'ecom6@gmc'  },
+  { usuario:'ecom16', nome:'Miguel',    setor:'prevenda', senha:'ecom16@gmc' },
+  { usuario:'ecom2',  nome:'Leonardo',  setor:'full',     senha:'ecom2@gmc'  },
+  { usuario:'ecom12', nome:'Alex',      setor:'anuncios', senha:'ecom12@gmc' },
+  { usuario:'ecom18', nome:'Laize',     setor:'mercado',  senha:'ecom18@gmc' },
 ];
 
-function loadCfg() {
-  try { const s=localStorage.getItem('aclon_cfg'); if(s) return JSON.parse(s); } catch(e){}
-  return null;
-}
-function saveCfg() {
-  try { localStorage.setItem('aclon_cfg', JSON.stringify({ custofixo: st.custofixo, impostoPct: st.impostoPct, setores: st.setores })); } catch(e){}
-}
+function loadCfg(){try{const s=localStorage.getItem('aclon_cfg3');if(s)return JSON.parse(s);}catch(e){}return null;}
+function saveCfg(){try{localStorage.setItem('aclon_cfg3',JSON.stringify({custofixo:st.custofixo,setores:st.setores}));}catch(e){}}
 
-const cfg = loadCfg();
-
-let st = {
-  isAdm: false, userName: '', userCnpj: 'GMC SP',
-  mktPreco: 'ML', mktLucr: 'ML',
-  custofixo: cfg ? cfg.custofixo : { 'GMC SP': 5, 'GMC SC': 5, 'R4': 5 },
-  impostoPct: cfg ? cfg.impostoPct : 10,
-  // setores editáveis pelo ADM: usuario -> setor
-  setores: cfg ? cfg.setores : {},
-  ultimoPreco: null, ultimoCmv: null, ultimoMkt: null, ultimoAnuncio: null, ultimoComPct: 0.12,
+const cfg=loadCfg();
+let st={
+  isAdm:false,userName:'',userCnpj:'GMC SP',
+  mktPreco:'ML',mktLucr:'ML',
+  custofixo:cfg?cfg.custofixo:{'GMC SP':5,'GMC SC':5,'R4':5},
+  setores:cfg?cfg.setores:{},
+  ultimoPreco:null,ultimoCmv:null,ultimoMkt:null,ultimoAnuncio:null,ultimoComPct:0.12,
 };
 
-// retorna lista de usuários com setores eventualmente editados pelo ADM
-function getUsers() {
-  return FIXED_USERS.map(u => ({ ...u, setor: st.setores[u.usuario] || u.setor }));
+function getUsers(){return FIXED_USERS.map(u=>({...u,setor:st.setores[u.usuario]||u.setor}));}
+const fmt=v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtPct=v=>parseFloat(v).toFixed(2)+'%';
+const getCF=()=>st.custofixo[st.userCnpj]||5;
+
+function updateDisplays(){
+  const cf=getCF();
+  document.getElementById('p_custofixo_display').value=cf+'%';
+  document.getElementById('l_badge_cf').textContent=cf+'%';
 }
 
-const fmt    = v => 'R$ ' + parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtPct = v => parseFloat(v).toFixed(2)+'%';
-const getCF  = () => st.custofixo[st.userCnpj]||5;
-
-function updateDisplays() {
-  const cf = getCF();
-  document.getElementById('p_custofixo_display').value = cf+'%';
-  document.getElementById('p_imposto_display').value   = st.impostoPct+'%';
-  document.getElementById('l_badge_cf').textContent    = cf+'%';
-  document.getElementById('l_badge_imp').textContent   = st.impostoPct+'%';
-}
-
-/* ── LOGIN ── */
-function doLogin() {
-  const user = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const err  = document.getElementById('loginError');
-  err.style.display = 'none';
-  if (!user) { err.textContent='Informe seu usuário.'; err.style.display='block'; return; }
-  const masterAdm = pass === SENHA_ADM && user.toLowerCase() === 'adm';
-  const found = getUsers().find(u =>
-    (u.usuario.toLowerCase()===user.toLowerCase() || u.nome.trim().toLowerCase()===user.trim().toLowerCase())
-    && u.senha===pass
-  );
-  if (!masterAdm && !found) { err.style.display='block'; err.textContent='Usuário ou senha incorretos.'; return; }
-  st.isAdm = masterAdm;
-  st.userName = masterAdm ? 'ADM' : found.nome;
-  st.userCnpj = 'GMC SP';
-  document.getElementById('topUser').textContent = st.userName;
-  document.getElementById('topCnpjSelect').value = 'GMC SP';
-  document.getElementById('tabAdm').style.display = st.isAdm ? '' : 'none';
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainScreen').style.display  = 'block';
+function doLogin(){
+  const user=document.getElementById('loginUser').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginError');
+  err.style.display='none';
+  if(!user){err.textContent='Informe seu usuário.';err.style.display='block';return;}
+  const masterAdm=pass===SENHA_ADM&&user.toLowerCase()==='adm';
+  const found=getUsers().find(u=>(u.usuario.toLowerCase()===user.toLowerCase()||u.nome.trim().toLowerCase()===user.trim().toLowerCase())&&u.senha===pass);
+  if(!masterAdm&&!found){err.style.display='block';err.textContent='Usuário ou senha incorretos.';return;}
+  st.isAdm=masterAdm;
+  st.userName=masterAdm?'ADM':found.nome;
+  st.userCnpj='GMC SP';
+  document.getElementById('topUser').textContent=st.userName;
+  document.getElementById('tabAdm').style.display=st.isAdm?'':'none';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainScreen').style.display='block';
   updateDisplays();
-  document.getElementById('adm_cf_gmcsp').value = st.custofixo['GMC SP'];
-  document.getElementById('adm_cf_gmcsc').value = st.custofixo['GMC SC'];
-  document.getElementById('adm_cf_r4').value    = st.custofixo['R4'];
-  document.getElementById('adm_imposto').value  = st.impostoPct;
+  document.getElementById('adm_cf_gmcsp').value=st.custofixo['GMC SP'];
+  document.getElementById('adm_cf_gmcsc').value=st.custofixo['GMC SC'];
+  document.getElementById('adm_cf_r4').value=st.custofixo['R4'];
   renderUserTable();
 }
 
-function changeCnpj(val) {
-  st.userCnpj = val;
-  updateDisplays();
-  const t = document.getElementById('cnpjToast');
-  t.style.display='inline-block'; setTimeout(()=>t.style.display='none',2000);
-}
-
-function doLogout() {
+function doLogout(){
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainScreen').style.display='none';
   document.getElementById('loginPass').value='';
@@ -511,44 +565,43 @@ function doLogout() {
   document.getElementById('resultLucr').style.display='none';
 }
 
-function switchTab(tab) {
-  const tabs=['precificacao','lucratividade','adm'];
+function switchTab(tab){
+  const tabs=['precificacao','lucratividade','instrucoes','adm'];
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const idx=tabs.indexOf(tab);
-  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(tab)].classList.add('active');
   document.getElementById('panel-'+tab).classList.add('active');
 }
 
-function selectMkt(el,mkt) {
+function selectMkt(el,mkt){
   document.querySelectorAll('#panel-precificacao .mkt-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active'); st.mktPreco=mkt;
-  document.getElementById('grp_anuncio_ml').style.display       = mkt==='ML'     ?'':'none';
-  document.getElementById('grp_modalidade_amazon').style.display = mkt==='Amazon' ?'':'none';
+  el.classList.add('active');st.mktPreco=mkt;
+  document.getElementById('grp_anuncio_ml').style.display=mkt==='ML'?'':'none';
+  document.getElementById('grp_modalidade_amazon').style.display=mkt==='Amazon'?'':'none';
   document.getElementById('resultPreco').style.display='none';
 }
-function selectMktLucr(el,mkt) {
+function selectMktLucr(el,mkt){
   document.querySelectorAll('#panel-lucratividade .mkt-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active'); st.mktLucr=mkt;
-  document.getElementById('lgrp_anuncio_ml').style.display       = mkt==='ML'     ?'':'none';
-  document.getElementById('lgrp_modalidade_amazon').style.display = mkt==='Amazon' ?'':'none';
+  el.classList.add('active');st.mktLucr=mkt;
+  document.getElementById('lgrp_anuncio_ml').style.display=mkt==='ML'?'':'none';
+  document.getElementById('lgrp_modalidade_amazon').style.display=mkt==='Amazon'?'':'none';
   document.getElementById('resultLucr').style.display='none';
   autoFrete();
 }
 
-/* ── TABELAS ── */
+/* FRETE / COMISSÃO */
 function freteML(p){if(p<=12.5)return p*.5;if(p<=29)return 6.25;if(p<=50)return 6.75;if(p<=78.99)return 7.75;if(p<=99.99)return 17;if(p<=119.99)return 18.85;if(p<=149.99)return 19.25;if(p<=199.99)return 21.65;return 23.65;}
 function freteShopee(p){if(p<=7.99)return p*.5;if(p<=79.99)return 4;if(p<=99.99)return 16;if(p<=199.99)return 20;return 26;}
 function freteAmazon(p,m){const t=m==='DBA'?[[30,4.5],[49.99,6.5],[78.99,6.75],[99.99,13.5],[119.99,16],[149.99,18],[199.99,20.5]]:[[30,5.65],[49.99,5.85],[78.99,6.05],[99.99,12],[119.99,15],[149.99,16],[199.99,18]];for(const[l,v]of t)if(p<=l)return v;return m==='DBA'?21.5:19;}
 function comShopee(p){if(p<=7.99)return p*.18;if(p<=79.99)return p*.20;return p*.14;}
 function getFrete(p,mkt,modal){if(mkt==='ML')return freteML(p);if(mkt==='Shopee')return freteShopee(p);return freteAmazon(p,modal||'DBA');}
 
-function onAnuncioMLChange(side) {
+function onAnuncioMLChange(side){
   const tipo=document.getElementById(side==='p'?'p_anuncio_ml':'l_anuncio_ml').value;
   document.getElementById(side==='p'?'p_comissao_pct':'l_comissao_pct').value=tipo==='premium'?18:12;
   side==='p'?calcPreco():calcLucr();
 }
-function autoFrete() {
+function autoFrete(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   if(!preco)return;
   document.getElementById('l_frete_edit').value=getFrete(preco,st.mktLucr,document.getElementById('l_modalidade_amazon').value||'DBA').toFixed(2);
@@ -556,34 +609,71 @@ function autoFrete() {
 function onLPrecoChange(){autoFrete();calcLucr();}
 function onLModalidadeChange(){autoFrete();calcLucr();}
 
-/* ── CALC PRECIFICAÇÃO ── */
-function calcPreco() {
-  const cmv=parseFloat(document.getElementById('p_cmv').value)||0; if(!cmv)return;
-  const base=cmv*1.35,cf=getCF()/100,imp=st.impostoPct/100,mkt=st.mktPreco;
-  let com=0,comPct=0,frete=0;
-  if(mkt==='ML'){comPct=(parseFloat(document.getElementById('p_comissao_pct').value)||12)/100;com=base*comPct;frete=freteML(base);}
-  else if(mkt==='Shopee'){com=comShopee(base);comPct=com/base;frete=freteShopee(base);}
-  else{const m=document.getElementById('p_modalidade_amazon').value;comPct=.15;com=base*.15;frete=freteAmazon(base,m);}
-  const fixo=(base+com+frete)*cf,imposto=(base+com+frete+fixo)*imp;
-  const ideal=base+com+frete+fixo+imposto,lucro=ideal*.10,final=ideal+lucro;
-  st.ultimoPreco=final;st.ultimoCmv=cmv;st.ultimoMkt=mkt;st.ultimoComPct=comPct;
-  st.ultimoAnuncio=mkt==='ML'?document.getElementById('p_anuncio_ml').value:mkt==='Amazon'?document.getElementById('p_modalidade_amazon').value:null;
+/* CALC PRECIFICAÇÃO — divisor direto 20% */
+function calcPrecoIdeal(cmv,mkt,comissaoPct,modal){
+  const cf=getCF()/100,imp=IMPOSTO_PCT/100,meta=LUCRO_META;
+  if(mkt==='ML'||mkt==='Amazon'){
+    let p=cmv*1.5;
+    for(let i=0;i<400;i++){
+      const frete=getFrete(p,mkt,modal);
+      const div=1-comissaoPct-cf-imp-meta;
+      if(div<=0)return cmv;
+      const pN=(cmv+frete)/div;
+      if(Math.abs(pN-p)<0.005){p=pN;break;}
+      p=pN;
+    }
+    return p;
+  }
+  let p=cmv*1.8;
+  for(let i=0;i<400;i++){
+    const frete=freteShopee(p),com=comShopee(p),comP=com/p;
+    const div=1-comP-cf-imp-meta;
+    if(div<=0)return cmv;
+    const pN=(cmv+frete)/div;
+    if(Math.abs(pN-p)<0.005){p=pN;break;}
+    p=pN;
+  }
+  return p;
+}
+
+function calcPreco(){
+  const cmv=parseFloat(document.getElementById('p_cmv').value)||0;
+  if(!cmv)return;
+  const mkt=st.mktPreco,modal=document.getElementById('p_modalidade_amazon').value||'DBA';
+  let comissaoPct=0;
+  if(mkt==='ML')comissaoPct=(parseFloat(document.getElementById('p_comissao_pct').value)||12)/100;
+  else if(mkt==='Amazon')comissaoPct=0.15;
+
+  const preco=calcPrecoIdeal(cmv,mkt,comissaoPct,modal);
+  const frete=getFrete(preco,mkt,modal);
+  const com=mkt==='ML'?preco*comissaoPct:mkt==='Amazon'?preco*0.15:comShopee(preco);
+  const cf=getCF()/100,imp=IMPOSTO_PCT/100;
+  const fixo=preco*cf,impVal=preco*imp;
+  const lucroBruto=preco-com-frete; // antes do CMV/CF/Imp
+  const lucro=preco-com-frete-cmv-fixo-impVal;
+  const markupEquiv=((preco/cmv)-1)*100;
+
+  st.ultimoPreco=preco;st.ultimoCmv=cmv;st.ultimoMkt=mkt;
+  st.ultimoComPct=mkt==='ML'?comissaoPct:mkt==='Amazon'?0.15:com/preco;
+  st.ultimoAnuncio=mkt==='ML'?document.getElementById('p_anuncio_ml').value:mkt==='Amazon'?modal:null;
+
   document.getElementById('r_cmv').textContent=fmt(cmv);
-  document.getElementById('r_markup_val').textContent=fmt(base);
   document.getElementById('r_comissao').textContent=fmt(com);
   document.getElementById('r_frete').textContent=fmt(frete);
   document.getElementById('r_custofixo').textContent=fmt(fixo);
-  document.getElementById('r_imposto').textContent=fmt(imposto);
-  document.getElementById('r_preco_venda').textContent=fmt(final);
+  document.getElementById('r_imposto').textContent=fmt(impVal);
+  document.getElementById('r_lucro_bruto').textContent=fmt(lucroBruto);
+  document.getElementById('r_lucro_bruto_pct').textContent=fmtPct((lucroBruto/preco)*100)+' sobre venda';
+  document.getElementById('r_preco_venda').textContent=fmt(preco);
   document.getElementById('r_lucro').textContent=fmt(lucro);
-  document.getElementById('r_info_comissao_pct').textContent=fmtPct(comPct*100);
-  document.getElementById('r_info_lucro_pct').textContent='10,00%';
+  document.getElementById('r_markup_equiv').textContent=fmtPct(markupEquiv);
+  document.getElementById('r_info_comissao_pct').textContent=fmtPct(st.ultimoComPct*100);
+  document.getElementById('r_info_lucro_pct').textContent='20,00%';
   document.getElementById('r_info_mkt').textContent=mkt+(st.ultimoAnuncio?' · '+st.ultimoAnuncio.toUpperCase():'');
-  document.getElementById('r_info_cnpj').textContent=st.userCnpj;
   document.getElementById('resultPreco').style.display='block';
 }
 
-function enviarParaLucratividade() {
+function enviarParaLucratividade(){
   if(!st.ultimoPreco)return;
   switchTab('lucratividade');
   document.getElementById('l_preco').value=st.ultimoPreco.toFixed(2);
@@ -594,24 +684,29 @@ function enviarParaLucratividade() {
   autoFrete();calcLucr();
 }
 
-/* ── CALC LUCRATIVIDADE ── */
+/* CALC LUCRATIVIDADE */
 function getLComPct(){return(parseFloat(document.getElementById('l_comissao_pct').value)||12)/100;}
 function getLFrete(){return parseFloat(document.getElementById('l_frete_edit').value)||0;}
 function getLCom(p){const mkt=st.mktLucr;if(mkt==='ML')return p*getLComPct();if(mkt==='Shopee')return comShopee(p);return p*.15;}
 
-function calcLucr() {
+function calcLucr(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
   if(!preco||!cmv)return;
-  const cf=getCF()/100,imp=st.impostoPct/100;
+  const cf=getCF()/100,imp=IMPOSTO_PCT/100;
   const com=getLCom(preco),frete=getLFrete();
-  const fixo=preco*cf,imposto=preco*imp;
-  const lucro=preco-com-frete-cmv-fixo-imposto,mPct=(lucro/preco)*100;
+  const fixo=preco*cf,impVal=preco*imp;
+  const lucroBruto=preco-com-frete;
+  const lucro=preco-com-frete-cmv-fixo-impVal;
+  const mPct=(lucro/preco)*100;
+
   document.getElementById('l_r_comissao').textContent=fmt(com);
   document.getElementById('l_r_frete').textContent=fmt(frete);
+  document.getElementById('l_r_lucro_bruto').textContent=fmt(lucroBruto);
+  document.getElementById('l_r_lucro_bruto_pct').textContent=fmtPct((lucroBruto/preco)*100)+' sobre venda';
   document.getElementById('l_r_cmv').textContent=fmt(cmv);
   document.getElementById('l_r_fixo').textContent=fmt(fixo);
-  document.getElementById('l_r_imposto').textContent=fmt(imposto);
+  document.getElementById('l_r_imposto').textContent=fmt(impVal);
   document.getElementById('l_r_lucro').textContent=fmt(lucro);
   document.getElementById('l_r_lucro').className='result-value '+(lucro>=0?'green':'red');
   document.getElementById('l_r_pct').textContent=fmtPct(mPct);
@@ -626,43 +721,24 @@ function calcLucr() {
   document.getElementById('l_promo_pct').value='';
 }
 
-function calcPrecoMin(cmv) {
-  // Usa comissão % e frete EXATAMENTE como estão nos campos editáveis.
-  // Frete fixo (não recalcula por faixa) — mesmo frete usado no cálculo principal.
-  const cf=getCF()/100, imp=st.impostoPct/100, mkt=st.mktLucr;
-  const comPct = mkt==='ML' ? getLComPct() : mkt==='Amazon' ? .15 : 0;
-  const freteFixo = getLFrete(); // frete do campo editável
-
-  // Margem alvo: 3%
-  // lucro = p - p*comPct - freteFixo - cmv - p*cf - p*imp = p*0.03
-  // p*(1 - comPct - cf - imp - 0.03) = cmv + freteFixo
-  // Para Shopee comissão varia com p, então usamos iteração só nesses casos.
-  if (mkt !== 'Shopee') {
-    const divisor = 1 - comPct - cf - imp - 0.03;
-    if (divisor <= 0) return cmv; // inviável
-    return (cmv + freteFixo) / divisor;
-  }
-  // Shopee: comissão depende do preço, iterar
-  let p = cmv * 1.5;
-  for(let i=0;i<400;i++){
-    const c = comShopee(p);
-    const lucro = p - c - freteFixo - cmv - p*cf - p*imp;
-    const m = lucro/p;
-    if(Math.abs(m-.03)<.0005) break;
-    p += m<.03 ? .25 : -.05;
-    if(p<cmv){p=cmv;break;}
-  }
+function calcPrecoMin(cmv){
+  const cf=getCF()/100,imp=IMPOSTO_PCT/100,mkt=st.mktLucr;
+  const comPct=mkt==='ML'?getLComPct():mkt==='Amazon'?.15:0;
+  const freteFixo=getLFrete();
+  if(mkt!=='Shopee'){const div=1-comPct-cf-imp-0.03;if(div<=0)return cmv;return(cmv+freteFixo)/div;}
+  let p=cmv*1.5;
+  for(let i=0;i<400;i++){const c=comShopee(p),lucro=p-c-freteFixo-cmv-p*cf-p*imp,m=lucro/p;if(Math.abs(m-.03)<.0005)break;p+=m<.03?.25:-.05;if(p<cmv){p=cmv;break;}}
   return p;
 }
 
-function calcPromo() {
+function calcPromo(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const pp=parseFloat(document.getElementById('l_promo_preco').value)||0;
   if(!pp||!preco)return;
   document.getElementById('l_promo_pct').value=(((preco-pp)/preco)*100).toFixed(1);
   renderPromo(pp);
 }
-function calcPromoFromPct() {
+function calcPromoFromPct(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const d=parseFloat(document.getElementById('l_promo_pct').value)||0;
   if(!d||!preco)return;
@@ -670,13 +746,13 @@ function calcPromoFromPct() {
   document.getElementById('l_promo_preco').value=pp.toFixed(2);
   renderPromo(pp);
 }
-function renderPromo(pp) {
+function renderPromo(pp){
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
-  const cf=getCF()/100,imp=st.impostoPct/100,mkt=st.mktLucr;
+  const cf=getCF()/100,imp=IMPOSTO_PCT/100,mkt=st.mktLucr;
   const modal=document.getElementById('l_modalidade_amazon').value||'DBA';
   const c=getLCom(pp),f=getFrete(pp,mkt,modal);
-  const fixo=pp*cf,imposto=pp*imp;
-  const lucro=pp-c-f-cmv-fixo-imposto,margem=(lucro/pp)*100;
+  const fixo=pp*cf,impVal=pp*imp;
+  const lucro=pp-c-f-cmv-fixo-impVal,margem=(lucro/pp)*100;
   document.getElementById('promo_preco_final').textContent=fmt(pp);
   document.getElementById('promo_margem').textContent=fmtPct(margem);
   document.getElementById('promo_margem').style.color=margem>=3?'var(--green)':'var(--red)';
@@ -685,49 +761,49 @@ function renderPromo(pp) {
   document.getElementById('promoResult').style.display='flex';
 }
 
-/* ── ADM ── */
-function saveCF(filial,btn) {
+function openCurvaA(){
+  document.getElementById('curvaASenha').value='';
+  document.getElementById('curvaAValor').value=getCF();
+  document.getElementById('curvaAError').style.display='none';
+  document.getElementById('modalCurvaA').classList.add('open');
+}
+function confirmarCurvaA(){
+  if(document.getElementById('curvaASenha').value!==SENHA_CURVA_A){document.getElementById('curvaAError').style.display='block';return;}
+  const val=parseFloat(document.getElementById('curvaAValor').value)||5;
+  st.custofixo[st.userCnpj]=val;
+  saveCfg();updateDisplays();
+  const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
+  document.getElementById(map[st.userCnpj]).value=val;
+  closeModal('modalCurvaA');
+}
+
+function saveCF(filial,btn){
   const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
   st.custofixo[filial]=parseFloat(document.getElementById(map[filial]).value)||5;
   saveCfg();updateDisplays();flash(btn);
 }
-function saveImposto(btn) {
-  st.impostoPct=parseFloat(document.getElementById('adm_imposto').value)||10;
-  saveCfg();updateDisplays();flash(btn);
-}
 function flash(btn){btn.textContent='Salvo!';setTimeout(()=>btn.textContent='Salvar',1500);}
 
-/* ── TABELA DE USUÁRIOS (só setor editável) ── */
-let editIdx = null;
-function openEditSetor(i) {
-  editIdx = i;
-  const users = getUsers();
-  document.getElementById('editUserNomeDisplay').textContent = users[i].nome;
-  document.getElementById('editUserSetor').value = users[i].setor;
+let editIdx=null;
+function openEditSetor(i){
+  editIdx=i;
+  const u=getUsers()[i];
+  document.getElementById('editUserNomeDisplay').textContent=u.nome;
+  document.getElementById('editUserSetor').value=u.setor;
   document.getElementById('modalEditUser').classList.add('open');
 }
-function saveEditUser() {
+function saveEditUser(){
   if(editIdx===null)return;
-  const users=getUsers();
-  st.setores[FIXED_USERS[editIdx].usuario] = document.getElementById('editUserSetor').value;
-  editIdx=null;
-  saveCfg();renderUserTable();
-  closeModal('modalEditUser');
+  st.setores[FIXED_USERS[editIdx].usuario]=document.getElementById('editUserSetor').value;
+  editIdx=null;saveCfg();renderUserTable();closeModal('modalEditUser');
 }
-
-function renderUserTable() {
+function renderUserTable(){
   const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full']};
-  document.getElementById('userTableBody').innerHTML = getUsers().map((u,i) => {
-    const [label,cls] = lb[u.setor]||[u.setor,'full'];
-    return `<tr>
-      <td>${u.nome}</td>
-      <td><code style="font-size:12px;color:var(--text2);">${u.usuario}</code></td>
-      <td><span class="badge badge-${cls}">${label}</span></td>
-      <td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td>
-    </tr>`;
+  document.getElementById('userTableBody').innerHTML=getUsers().map((u,i)=>{
+    const[label,cls]=lb[u.setor]||[u.setor,'full'];
+    return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text2);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;
   }).join('');
 }
-
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
 </body>
