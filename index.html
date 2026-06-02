@@ -1,151 +1,203 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Aclon Hub</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #ffffff; --bg2: #f5f5f3; --bg3: #efefec;
-      --text: #1a1a18; --text2: #6b6b67; --text3: #a0a09b;
-      --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.20);
-      --radius-md: 8px; --radius-lg: 12px;
-      --green: #3B6D11; --green-bg: #EAF3DE;
-      --red: #A32D2D; --blue: #185FA5; --blue-bg: #E6F1FB; --blue-border: #B5D4F4;
-      --amber: #854F0B; --amber-bg: #FAEEDA; --amber-border: #FAC775;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0f0ed;
+      --text:#111110;--text2:#6b6b67;--text3:#a8a8a3;
+      --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.16);
+      --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;
+      --green:#2d6a0a;--green-bg:#eaf3de;--green-light:#f0f8e8;
+      --red:#b02020;--red-bg:#fdf0f0;
+      --blue:#1a5fa8;--blue-bg:#e8f1fc;--blue-border:#b8d4f8;
+      --amber:#8a4e00;--amber-bg:#fdf3e3;--amber-border:#f5c87a;
+      --purple:#5b3fa8;--purple-bg:#f0ecfc;
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.08);
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
-    .hub { background: var(--bg); border-radius: var(--radius-lg); border: 0.5px solid var(--border); width: 100%; max-width: 900px; min-height: 600px; position: relative; overflow: hidden; }
-    /* LOGIN */
-    .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 580px; padding: 2rem; }
-    .login-logo { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: var(--text2); margin-bottom: 1.5rem; text-transform: uppercase; }
-    .login-title { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 0.35rem; }
-    .login-sub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
-    .login-card { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 340px; }
-    .login-card label { font-size: 11px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 0.07em; text-transform: uppercase; }
-    .login-card input { width: 100%; margin-bottom: 1rem; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
-    .login-error { font-size: 13px; color: var(--red); margin-top: 0.75rem; text-align: center; display: none; }
-    /* MAIN */
-    .main-screen { display: none; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
-    .topbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .topbar-logo { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: var(--text2); text-transform: uppercase; }
-    .user-badge { font-size: 13px; color: var(--text2); }
-    /* BUTTONS */
-    .btn-primary { width: 100%; padding: 10px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.25rem; }
-    .btn-primary:hover { opacity: 0.85; }
-    .btn-logout { font-size: 12px; color: var(--text2); background: none; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 5px 12px; cursor: pointer; }
-    .btn-logout:hover { background: var(--bg2); }
-    .calc-btn { width: 100%; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; }
-    .calc-btn:hover { opacity: 0.85; }
-    .calc-btn-secondary { width: 100%; padding: 10px; background: none; color: var(--text); border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 13px; cursor: pointer; margin-top: 0.5rem; }
-    .calc-btn-secondary:hover { background: var(--bg2); }
-    .btn-sm { font-size: 12px; padding: 4px 10px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: none; cursor: pointer; color: var(--text2); }
-    .btn-sm:hover { background: var(--bg2); }
-    .btn-danger { color: var(--red); border-color: #F0959590; }
-    /* TABS */
-    .nav-tabs { display: flex; border-bottom: 0.5px solid var(--border); padding: 0 1.5rem; overflow-x: auto; }
-    .nav-tab { font-size: 13px; font-weight: 500; color: var(--text2); padding: 0.85rem 1.25rem; cursor: pointer; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; }
-    .nav-tab.active { color: var(--text); border-bottom-color: var(--text); }
-    .nav-tab:hover:not(.active) { color: var(--text); background: var(--bg2); }
-    /* CONTENT */
-    .content { padding: 1.5rem; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    /* MKT */
-    .mkt-selector { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .mkt-btn { flex: 1; min-width: 120px; padding: 10px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; text-align: center; }
-    .mkt-btn.active { background: var(--bg2); border-color: var(--border2); color: var(--text); }
-    .mkt-btn:hover:not(.active) { background: var(--bg2); }
-    .mkt-tag { font-size: 10px; display: block; font-weight: 400; color: var(--text3); margin-top: 2px; }
-    /* FORM */
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .form-group label { font-size: 11px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 0.07em; text-transform: uppercase; }
-    .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
-    .form-group input:focus, .form-group select:focus { border-color: var(--text2); }
-    .input-locked { background: var(--bg2) !important; cursor: default; color: var(--text2) !important; }
-    .inline-pair { display: flex; gap: 6px; }
-    .inline-pair select { flex: 1.5; }
-    .inline-pair input { flex: 1; min-width: 58px; text-align: center; }
-    .hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
-    .info-badge-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .info-badge { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 8px 14px; font-size: 13px; color: var(--text2); }
-    .info-badge strong { color: var(--text); }
-    /* RESULTS */
-    .result-section { margin-top: 1.5rem; }
-    .result-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); margin-bottom: 1rem; }
-    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-    .result-card { background: var(--bg2); border-radius: var(--radius-md); padding: 0.85rem 1rem; }
-    .result-card.highlight { background: var(--bg); border: 0.5px solid var(--border2); }
-    .result-card.positive { border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
-    .result-card.negative { border-left: 3px solid var(--red); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
-    .result-card.accent { border-left: 3px solid var(--amber); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--amber-bg); border-top: 0.5px solid var(--amber-border); border-right: 0.5px solid var(--amber-border); border-bottom: 0.5px solid var(--amber-border); }
-    .result-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
-    .result-value { font-size: 18px; font-weight: 500; color: var(--text); }
-    .result-value.green { color: var(--green); }
-    .result-value.red { color: var(--red); }
-    .result-value.blue { color: var(--blue); }
-    .result-value.amber { color: var(--amber); }
-    .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
-    .section-sep { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin: 1.25rem 0 0.75rem; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
-    .info-row:last-child { border-bottom: none; }
-    .info-row span:first-child { color: var(--text2); }
-    .info-row span:last-child { font-weight: 500; }
-    /* PROMO */
-    .promo-box { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1.5rem; }
-    .promo-box-title { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-    .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top:1rem; }
-    .promo-result { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 10px 12px; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-md); font-size: 13px; margin-top: 1rem; }
-    .promo-result-item .label { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
-    .promo-result-item .val { font-weight: 500; }
-    .alert-info { font-size: 13px; padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 1rem; background: var(--blue-bg); color: var(--blue); border: 0.5px solid var(--blue-border); }
-    /* ADM */
-    .adm-section { margin-bottom: 2rem; }
-    .adm-section-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 0.5px solid var(--border); }
-    .adm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; }
-    .adm-card { background: var(--bg2); border-radius: var(--radius-md); padding: 1rem; }
-    .adm-card-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .adm-card-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 10px; }
-    .adm-input-row { display: flex; align-items: center; gap: 8px; }
-    .adm-input-row input { width: 75px; padding: 6px 8px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 15px; font-weight: 500; outline: none; }
-    .user-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .user-table th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; border-bottom: 0.5px solid var(--border); }
-    .user-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); }
-    .user-table tr:last-child td { border-bottom: none; }
-    .badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-md); }
-    .badge-adm { background: #E6F1FB; color: #0C447C; }
-    .badge-anuncios { background: #EAF3DE; color: #27500A; }
-    .badge-prevenda { background: #FAEEDA; color: #633806; }
-    .badge-mercado { background: #FBEAF0; color: #72243E; }
-    .badge-full { background: #F1EFE8; color: #444441; }
-    /* MODAL */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 1.5rem; width: 340px; max-width: 95vw; }
-    .modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 1.25rem; }
-    .modal label { font-size: 11px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .modal input, .modal select { width: 100%; margin-bottom: 1rem; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-md); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
-    .modal-btns { display: flex; gap: 8px; margin-top: 0.5rem; }
-    .modal-btns button { flex: 1; }
-    .btn-cancel { background: none; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 9px; font-size: 14px; cursor: pointer; color: var(--text2); }
-    /* INSTRUCOES */
-    .instrucoes-section { margin-bottom: 2rem; }
-    .instrucoes-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
-    .instrucoes-section h3 .tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-md); background: var(--blue-bg); color: var(--blue); }
-    .instrucoes-section p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 0.5rem; }
-    .instrucoes-section ul { list-style: none; padding: 0; }
-    .instrucoes-section ul li { font-size: 13px; color: var(--text2); line-height: 1.6; padding: 6px 0; border-bottom: 0.5px solid var(--border); display: flex; gap: 10px; }
-    .instrucoes-section ul li:last-child { border-bottom: none; }
-    .instrucoes-section ul li .li-label { font-weight: 500; color: var(--text); min-width: 120px; }
-    .instrucoes-box { background: var(--bg2); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; border: 0.5px solid var(--border); }
-    .instrucoes-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 0.75rem; }
-    .instrucoes-step:last-child { margin-bottom: 0; }
-    .step-num { width: 22px; height: 22px; min-width: 22px; border-radius: 50%; background: var(--text); color: var(--bg); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
-    .step-text { font-size: 13px; color: var(--text2); line-height: 1.55; }
-    .step-text strong { color: var(--text); }
-    @media (max-width: 500px) { body { padding: 0; } .hub { border-radius: 0; border: none; min-height: 100vh; } .promo-grid { grid-template-columns: 1fr; } }
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#eeeeed;color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;}
+    .hub{background:var(--bg);border-radius:var(--radius-xl);border:0.5px solid var(--border);width:100%;max-width:920px;min-height:640px;box-shadow:var(--shadow-md);overflow:hidden;}
+
+    /* ── LOGIN ── */
+    .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:580px;padding:2rem;background:var(--bg);}
+    .login-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:1.25rem;}
+    .login-title{font-size:26px;font-weight:600;color:var(--text);margin-bottom:0.3rem;letter-spacing:-0.3px;}
+    .login-sub{font-size:14px;color:var(--text2);margin-bottom:2.5rem;}
+    .login-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:340px;box-shadow:var(--shadow-sm);}
+    .login-card label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;letter-spacing:0.07em;text-transform:uppercase;}
+    .login-card input{width:100%;margin-bottom:1rem;padding:10px 13px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+    .login-card input:focus{border-color:var(--text);}
+    .login-error{font-size:13px;color:var(--red);margin-top:.75rem;text-align:center;display:none;}
+
+    /* ── TOPBAR ── */
+    .main-screen{display:none;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;border-bottom:0.5px solid var(--border);background:var(--bg);}
+    .topbar-left{display:flex;align-items:center;gap:10px;}
+    .topbar-logo{font-size:11px;font-weight:700;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;}
+    .topbar-sep{color:var(--border2);}
+    .user-chip{font-size:12px;font-weight:500;color:var(--text2);background:var(--bg2);border:0.5px solid var(--border);border-radius:20px;padding:3px 12px;}
+
+    /* ── BUTTONS ── */
+    .btn-primary{width:100%;padding:11px;background:var(--text);color:#fff;border:none;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.01em;transition:opacity .15s;}
+    .btn-primary:hover{opacity:.85;}
+    .btn-logout{font-size:12px;color:var(--text2);background:none;border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:5px 13px;cursor:pointer;}
+    .btn-logout:hover{background:var(--bg2);}
+    .calc-btn{width:100%;padding:13px;background:var(--text);color:#fff;border:none;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;margin-top:.5rem;letter-spacing:0.01em;transition:opacity .15s;}
+    .calc-btn:hover{opacity:.85;}
+    .calc-btn-sec{width:100%;padding:10px;background:none;color:var(--text);border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:13px;cursor:pointer;margin-top:.5rem;font-weight:500;}
+    .calc-btn-sec:hover{background:var(--bg2);}
+    .btn-sm{font-size:12px;padding:4px 11px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:none;cursor:pointer;color:var(--text2);}
+    .btn-sm:hover{background:var(--bg2);}
+
+    /* ── TABS ── */
+    .nav-tabs{display:flex;border-bottom:0.5px solid var(--border);padding:0 1.5rem;overflow-x:auto;background:var(--bg);}
+    .nav-tab{font-size:13px;font-weight:500;color:var(--text2);padding:.85rem 1.1rem;cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;transition:color .15s;}
+    .nav-tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:600;}
+    .nav-tab:hover:not(.active){color:var(--text);background:var(--bg2);}
+
+    /* ── CONTENT ── */
+    .content{padding:1.75rem 1.5rem;}
+    .panel{display:none;}
+    .panel.active{display:block;}
+
+    /* ── MKT SELECTOR ── */
+    .mkt-selector{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .mkt-btn{flex:1;min-width:110px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius-md);background:var(--bg);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;}
+    .mkt-btn.active{background:var(--text);color:#fff;border-color:var(--text);}
+    .mkt-btn:hover:not(.active){background:var(--bg2);}
+    .mkt-tag{font-size:10px;display:block;font-weight:400;opacity:.65;margin-top:2px;}
+
+    /* ── FORM ── */
+    .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.25rem;}
+    .fg label{font-size:10px;font-weight:600;color:var(--text3);display:block;margin-bottom:5px;letter-spacing:0.08em;text-transform:uppercase;}
+    .fg input,.fg select{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+    .fg input:focus,.fg select:focus{border-color:var(--text);}
+    .fg .locked{background:var(--bg2)!important;color:var(--text2)!important;cursor:default;}
+    .inline-pair{display:flex;gap:6px;}
+    .inline-pair select{flex:1.6;}
+    .inline-pair input{flex:1;min-width:55px;text-align:center;}
+    .hint{font-size:11px;color:var(--text3);margin-top:3px;}
+
+    /* ── FILIAL SELECTOR ── */
+    .filial-row{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
+    .filial-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px;}
+    .filial-chip{font-size:12px;font-weight:500;padding:5px 14px;border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg);transition:all .15s;}
+    .filial-chip.active{background:var(--text);color:#fff;border-color:var(--text);}
+    .filial-chip:hover:not(.active){background:var(--bg2);}
+    .cf-edit-row{display:flex;align-items:center;gap:6px;margin-left:auto;}
+    .cf-val-input{width:58px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:500;text-align:center;outline:none;}
+    .cf-pct{font-size:13px;color:var(--text2);}
+
+    /* ── HERO RESULT (preço + margem) ── */
+    .result-hero{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+    .hero-card{border-radius:var(--radius-lg);padding:1.25rem 1.5rem;position:relative;overflow:hidden;}
+    .hero-card.price{background:var(--text);color:#fff;}
+    .hero-card.margin-pos{background:var(--green-bg);border:1px solid #c8e6a8;}
+    .hero-card.margin-neg{background:var(--red-bg);border:1px solid #f0b8b8;}
+    .hero-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;opacity:.6;margin-bottom:.5rem;}
+    .hero-card.price .hero-eyebrow{color:#fff;}
+    .hero-card.margin-pos .hero-eyebrow{color:var(--green);}
+    .hero-card.margin-neg .hero-eyebrow{color:var(--red);}
+    .hero-value{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1;}
+    .hero-card.price .hero-value{color:#fff;}
+    .hero-card.margin-pos .hero-value{color:var(--green);}
+    .hero-card.margin-neg .hero-value{color:var(--red);}
+    .hero-sub{font-size:12px;margin-top:.4rem;opacity:.65;}
+    .hero-card.price .hero-sub{color:#fff;}
+    .hero-card.margin-pos .hero-sub{color:var(--green);}
+    .hero-card.margin-neg .hero-sub{color:var(--red);}
+
+    /* ── BREAKDOWN ── */
+    .breakdown-title{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;}
+    .breakdown-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem;}
+    .bk-card{background:var(--bg2);border-radius:var(--radius-md);padding:.75rem 1rem;}
+    .bk-card.bruto{background:var(--amber-bg);border:0.5px solid var(--amber-border);}
+    .bk-card.meta{background:var(--green-light);border:0.5px solid #c8e6a8;}
+    .bk-label{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;}
+    .bk-val{font-size:15px;font-weight:600;color:var(--text);}
+    .bk-card.bruto .bk-label{color:var(--amber);}
+    .bk-card.bruto .bk-val{color:var(--amber);}
+    .bk-card.meta .bk-label{color:var(--green);}
+    .bk-card.meta .bk-val{color:var(--green);}
+    .bk-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+    .bk-card.bruto .bk-sub{color:var(--amber);opacity:.7;}
+
+    /* ── INFO ROWS ── */
+    .info-block{background:var(--bg2);border-radius:var(--radius-md);padding:.75rem 1rem;margin-bottom:1rem;}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
+    .info-row:last-child{border-bottom:none;}
+    .info-row span:first-child{color:var(--text2);}
+    .info-row span:last-child{font-weight:600;color:var(--text);}
+    .divider{border:none;border-top:0.5px solid var(--border);margin:1.25rem 0;}
+
+    /* ── BADGE FILIAL (topbar) ── */
+    .filial-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;background:var(--bg2);border:0.5px solid var(--border);color:var(--text2);}
+
+    /* ── PROMO ── */
+    .promo-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1.25rem;}
+    .promo-title{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;}
+    .promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+    .promo-result{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-md);font-size:13px;}
+    .pr-item .pr-label{font-size:10px;color:var(--text3);margin-bottom:2px;}
+    .pr-item .pr-val{font-size:14px;font-weight:600;}
+    .promo-min-row{margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border);display:flex;align-items:baseline;gap:10px;}
+    .promo-min-label{font-size:12px;color:var(--text2);}
+    .promo-min-val{font-size:20px;font-weight:700;color:var(--blue);}
+    .promo-warn{font-size:11px;color:var(--red);font-weight:500;display:none;margin-top:4px;}
+
+    /* ── ADM ── */
+    .adm-section{margin-bottom:1.75rem;}
+    .adm-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:0.5px solid var(--border);}
+    .user-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .user-table th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:7px 12px;border-bottom:0.5px solid var(--border);}
+    .user-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);}
+    .user-table tr:last-child td{border-bottom:none;}
+    .badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;}
+    .badge-adm{background:#e8f1fc;color:#1a5fa8;}
+    .badge-anuncios{background:#eaf3de;color:#2d6a0a;}
+    .badge-prevenda{background:#fdf3e3;color:#8a4e00;}
+    .badge-mercado{background:#f8eafa;color:#6b2fa0;}
+    .badge-full{background:#f0f0ed;color:#444;}
+    .badge-operacional{background:#f0ecfc;color:#5b3fa8;}
+
+    /* ── MODAL ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:200;align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:320px;max-width:95vw;box-shadow:var(--shadow-md);}
+    .modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem;}
+    .modal label{font-size:10px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+    .modal input,.modal select{width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;}
+    .modal-btns{display:flex;gap:8px;margin-top:.5rem;}
+    .modal-btns button{flex:1;}
+    .btn-cancel{background:none;border:0.5px solid var(--border);border-radius:var(--radius-md);padding:9px;font-size:14px;cursor:pointer;color:var(--text2);}
+    .modal-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+
+    /* ── INSTRUCOES ── */
+    .instr-hero{background:var(--text);color:#fff;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;}
+    .instr-hero h2{font-size:18px;font-weight:700;margin-bottom:.4rem;letter-spacing:-0.2px;}
+    .instr-hero p{font-size:13px;opacity:.7;line-height:1.55;}
+    .instr-section{margin-bottom:1.75rem;}
+    .instr-section-head{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+    .instr-num{width:28px;height:28px;border-radius:50%;background:var(--text);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .instr-section-head h3{font-size:15px;font-weight:600;color:var(--text);}
+    .instr-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue);margin-left:4px;}
+    .instr-box{background:var(--bg2);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:1rem;}
+    .instr-step{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:0.5px solid var(--border);}
+    .instr-step:last-child{border-bottom:none;}
+    .step-dot{width:18px;height:18px;border-radius:50%;background:var(--border2);color:var(--text2);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .step-txt{font-size:13px;color:var(--text2);line-height:1.5;}
+    .step-txt strong{color:var(--text);}
+    .filial-ref{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+    .filial-ref-card{background:var(--bg2);border-radius:var(--radius-md);padding:.75rem 1rem;text-align:center;}
+    .filial-ref-card .name{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px;}
+    .filial-ref-card .pct{font-size:20px;font-weight:700;color:var(--text);}
+    .instr-tip{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);padding:.75rem 1rem;font-size:13px;color:var(--amber);line-height:1.5;margin-bottom:1rem;}
+
+    @media(max-width:500px){body{padding:0;}.hub{border-radius:0;border:none;min-height:100vh;}.result-hero,.promo-grid{grid-template-columns:1fr;}.hero-value{font-size:26px;}}
   </style>
 </head>
 <body>
@@ -153,14 +205,14 @@
 
   <!-- LOGIN -->
   <div class="login-screen" id="loginScreen">
-    <div class="login-logo">Hub Operacional</div>
+    <div class="login-eyebrow">Hub Operacional</div>
     <div class="login-title">Aclon Hub</div>
     <div class="login-sub">Acesse com suas credenciais</div>
     <div class="login-card">
       <label>Usuário</label>
-      <input type="text" id="loginUser" placeholder="Seu usuário" />
+      <input type="text" id="loginUser" placeholder="Seu usuário"/>
       <label>Senha</label>
-      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()" />
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
       <button class="btn-primary" onclick="doLogin()">Entrar</button>
       <div class="login-error" id="loginError">Usuário ou senha incorretos.</div>
     </div>
@@ -171,391 +223,393 @@
     <div class="topbar">
       <div class="topbar-left">
         <span class="topbar-logo">Aclon Hub</span>
-        <span style="color:var(--border2);">|</span>
-        <span class="user-badge" id="topUser"></span>
+        <span class="topbar-sep">·</span>
+        <span class="user-chip" id="topUser"></span>
+        <span class="filial-badge" id="topFilialBadge">GMC SP</span>
       </div>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
 
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('precificacao')">Calculadora de Preço de Venda</button>
-      <button class="nav-tab" onclick="switchTab('lucratividade')">Lucratividade da Venda</button>
-      <button class="nav-tab" onclick="switchTab('instrucoes')">Como usar</button>
-      <button class="nav-tab" id="tabAdm" style="display:none" onclick="switchTab('adm')">Painel ADM</button>
+      <button class="nav-tab active" onclick="switchTab('preco')">Preço de Venda</button>
+      <button class="nav-tab" onclick="switchTab('lucr')">Lucratividade</button>
+      <button class="nav-tab" onclick="switchTab('como')">Como usar</button>
+      <button class="nav-tab" id="tabAdm" style="display:none" onclick="switchTab('adm')">ADM</button>
     </div>
 
     <div class="content">
 
-      <!-- ── PRECIFICAÇÃO ── -->
-      <div class="panel active" id="panel-precificacao">
+      <!-- ══ TELA 1 — PREÇO DE VENDA ══ -->
+      <div class="panel active" id="panel-preco">
+
+        <!-- MKT -->
         <div class="mkt-selector">
           <div class="mkt-btn active" onclick="selectMkt(this,'ML')">Mercado Livre<span class="mkt-tag">Clássico / Premium</span></div>
           <div class="mkt-btn" onclick="selectMkt(this,'Shopee')">Shopee<span class="mkt-tag">Comissão variável</span></div>
           <div class="mkt-btn" onclick="selectMkt(this,'Amazon')">Amazon<span class="mkt-tag">DBA / FBA</span></div>
         </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>CMV (Custo de compra)</label>
-            <input type="number" id="p_cmv" placeholder="0,00" step="0.01" oninput="calcPreco()" />
+
+        <!-- FILIAL -->
+        <div class="filial-row">
+          <span class="filial-label">Filial / Custo Fixo</span>
+          <div class="filial-chip active" onclick="selectFilial(this,'GMC SP',5)" data-cf="5">GMC SP · 5%</div>
+          <div class="filial-chip" onclick="selectFilial(this,'GMC SC',3)" data-cf="3">GMC SC · 3%</div>
+          <div class="filial-chip" onclick="selectFilial(this,'R4',5)" data-cf="5">R4 · 5%</div>
+          <div class="cf-edit-row">
+            <input type="number" class="cf-val-input" id="p_cf_val" value="5" step="0.1" oninput="onCFEdit('p')" title="Custo fixo %"/>
+            <span class="cf-pct">%</span>
           </div>
-          <div class="form-group" id="grp_anuncio_ml">
-            <label>Tipo de Anúncio · % Comissão</label>
+        </div>
+
+        <!-- FORM -->
+        <div class="form-row">
+          <div class="fg">
+            <label>CMV (Custo de compra)</label>
+            <input type="number" id="p_cmv" placeholder="0,00" step="0.01" oninput="calcPreco()"/>
+          </div>
+          <div class="fg" id="grp_ml">
+            <label>Tipo · % Comissão</label>
             <div class="inline-pair">
-              <select id="p_anuncio_ml" onchange="onAnuncioMLChange('p')">
+              <select id="p_anuncio" onchange="onAnuncioChange('p')">
                 <option value="classico">Clássico</option>
                 <option value="premium">Premium</option>
               </select>
-              <input type="number" id="p_comissao_pct" value="12" step="0.1" min="0" max="100" oninput="calcPreco()" title="% editável" />
+              <input type="number" id="p_com_pct" value="12" step="0.1" min="0" max="100" oninput="calcPreco()" title="% comissão editável"/>
             </div>
-            <div class="hint">% comissão — editável se necessário</div>
+            <div class="hint">Editável se necessário</div>
           </div>
-          <div class="form-group" id="grp_modalidade_amazon" style="display:none">
-            <label>Modalidade de Envio</label>
-            <select id="p_modalidade_amazon" onchange="calcPreco()">
+          <div class="fg" id="grp_amazon" style="display:none">
+            <label>Modalidade</label>
+            <select id="p_modal" onchange="calcPreco()">
               <option value="DBA">DBA</option>
               <option value="FBA">FBA</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Custo Fixo</label>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <input type="text" id="p_custofixo_display" readonly class="input-locked" style="flex:1;" />
-              <button class="btn-sm" onclick="openCurvaA()">Editar</button>
-            </div>
-          </div>
-          <div class="form-group">
+          <div class="fg">
             <label>Imposto</label>
-            <input type="text" value="9%" readonly class="input-locked" />
+            <input type="text" value="9%" readonly class="locked"/>
           </div>
         </div>
+
         <button class="calc-btn" onclick="calcPreco()">Calcular Preço Ideal</button>
 
-        <div class="result-section" id="resultPreco" style="display:none">
-          <hr class="divider">
-          <div class="result-title">Resultado · Meta lucro líquido 20%</div>
+        <!-- RESULTADO -->
+        <div id="resultPreco" style="display:none">
+          <div class="divider"></div>
 
-          <div class="section-sep">Estrutura de custos</div>
-          <div class="result-grid">
-            <div class="result-card"><div class="result-label">CMV</div><div class="result-value" id="r_cmv">—</div></div>
-            <div class="result-card"><div class="result-label">Comissão marketplace</div><div class="result-value" id="r_comissao">—</div></div>
-            <div class="result-card"><div class="result-label">Frete</div><div class="result-value" id="r_frete">—</div></div>
-            <div class="result-card"><div class="result-label">Custo Fixo</div><div class="result-value" id="r_custofixo">—</div></div>
-            <div class="result-card"><div class="result-label">Imposto</div><div class="result-value" id="r_imposto">—</div></div>
-          </div>
-
-          <div class="section-sep">Resultado</div>
-          <div class="result-grid">
-            <div class="result-card accent">
-              <div class="result-label">Lucro bruto plataforma</div>
-              <div class="result-value amber" id="r_lucro_bruto">—</div>
-              <div style="font-size:11px;color:var(--amber);margin-top:3px;" id="r_lucro_bruto_pct">—</div>
+          <!-- HERO: preço + margem -->
+          <div class="result-hero">
+            <div class="hero-card price">
+              <div class="hero-eyebrow">Preço ideal de venda</div>
+              <div class="hero-value" id="r_preco">—</div>
+              <div class="hero-sub" id="r_mkt_label">—</div>
             </div>
-            <div class="result-card highlight"><div class="result-label">Preço ideal de venda</div><div class="result-value blue" id="r_preco_venda">—</div></div>
-            <div class="result-card highlight positive"><div class="result-label">Lucro líquido</div><div class="result-value green" id="r_lucro">—</div></div>
-            <div class="result-card"><div class="result-label">Markup equivalente</div><div class="result-value" id="r_markup_equiv">—</div></div>
+            <div class="hero-card margin-pos" id="r_margem_card">
+              <div class="hero-eyebrow">Lucro líquido</div>
+              <div class="hero-value" id="r_lucro_pct">—</div>
+              <div class="hero-sub" id="r_lucro_val">—</div>
+            </div>
           </div>
 
-          <div style="margin-top:1rem;">
-            <div class="info-row"><span>Comissão %</span><span id="r_info_comissao_pct">—</span></div>
-            <div class="info-row"><span>Lucro % sobre venda</span><span id="r_info_lucro_pct" style="color:var(--green)">20,00%</span></div>
-            <div class="info-row"><span>Marketplace</span><span id="r_info_mkt">—</span></div>
+          <!-- BREAKDOWN -->
+          <div class="breakdown-title">Estrutura de custos</div>
+          <div class="breakdown-grid">
+            <div class="bk-card"><div class="bk-label">CMV</div><div class="bk-val" id="r_cmv">—</div></div>
+            <div class="bk-card"><div class="bk-label">Comissão</div><div class="bk-val" id="r_comissao">—</div></div>
+            <div class="bk-card"><div class="bk-label">Frete</div><div class="bk-val" id="r_frete">—</div></div>
+            <div class="bk-card"><div class="bk-label">Custo Fixo</div><div class="bk-val" id="r_cf">—</div></div>
+            <div class="bk-card"><div class="bk-label">Imposto</div><div class="bk-val" id="r_imp">—</div></div>
+            <div class="bk-card bruto">
+              <div class="bk-label">Lucro bruto plataforma</div>
+              <div class="bk-val" id="r_lbruto">—</div>
+              <div class="bk-sub" id="r_lbruto_pct">—</div>
+            </div>
           </div>
-          <button class="calc-btn-secondary" onclick="enviarParaLucratividade()">Verificar lucratividade deste preço ↗</button>
+
+          <div class="info-block">
+            <div class="info-row"><span>Markup equivalente sobre CMV</span><span id="r_markup">—</span></div>
+            <div class="info-row"><span>Comissão %</span><span id="r_com_info">—</span></div>
+            <div class="info-row"><span>Filial</span><span id="r_filial_info">—</span></div>
+          </div>
+
+          <button class="calc-btn-sec" onclick="enviarLucr()">Verificar lucratividade deste preço ↗</button>
         </div>
       </div>
 
-      <!-- ── LUCRATIVIDADE ── -->
-      <div class="panel" id="panel-lucratividade">
-        <div class="alert-info" id="alertLucr">Preencha os campos abaixo para análise de lucratividade.</div>
+      <!-- ══ TELA 2 — LUCRATIVIDADE ══ -->
+      <div class="panel" id="panel-lucr">
+
         <div class="mkt-selector">
-          <div class="mkt-btn active" onclick="selectMktLucr(this,'ML')" id="lmktML">Mercado Livre</div>
-          <div class="mkt-btn" onclick="selectMktLucr(this,'Shopee')" id="lmktShopee">Shopee</div>
-          <div class="mkt-btn" onclick="selectMktLucr(this,'Amazon')" id="lmktAmazon">Amazon</div>
+          <div class="mkt-btn active" onclick="selectMktL(this,'ML')" id="lmML">Mercado Livre</div>
+          <div class="mkt-btn" onclick="selectMktL(this,'Shopee')" id="lmShopee">Shopee</div>
+          <div class="mkt-btn" onclick="selectMktL(this,'Amazon')" id="lmAmazon">Amazon</div>
         </div>
-        <div class="form-grid">
-          <div class="form-group">
+
+        <!-- FILIAL -->
+        <div class="filial-row">
+          <span class="filial-label">Filial / Custo Fixo</span>
+          <div class="filial-chip active" onclick="selectFilialL(this,'GMC SP',5)" data-cf="5">GMC SP · 5%</div>
+          <div class="filial-chip" onclick="selectFilialL(this,'GMC SC',3)" data-cf="3">GMC SC · 3%</div>
+          <div class="filial-chip" onclick="selectFilialL(this,'R4',5)" data-cf="5">R4 · 5%</div>
+          <div class="cf-edit-row">
+            <input type="number" class="cf-val-input" id="l_cf_val" value="5" step="0.1" oninput="onCFEdit('l')" title="Custo fixo %"/>
+            <span class="cf-pct">%</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="fg">
             <label>Preço de Venda</label>
-            <input type="number" id="l_preco" placeholder="0,00" step="0.01" oninput="onLPrecoChange()" />
+            <input type="number" id="l_preco" placeholder="0,00" step="0.01" oninput="onLPrecoChange()"/>
           </div>
-          <div class="form-group">
+          <div class="fg">
             <label>CMV</label>
-            <input type="number" id="l_cmv" placeholder="0,00" step="0.01" oninput="calcLucr()" />
+            <input type="number" id="l_cmv" placeholder="0,00" step="0.01" oninput="calcLucr()"/>
           </div>
-          <div class="form-group" id="lgrp_anuncio_ml">
-            <label>Tipo de Anúncio · % Comissão</label>
+          <div class="fg" id="lgrp_ml">
+            <label>Tipo · % Comissão</label>
             <div class="inline-pair">
-              <select id="l_anuncio_ml" onchange="onAnuncioMLChange('l')">
+              <select id="l_anuncio" onchange="onAnuncioChange('l')">
                 <option value="classico">Clássico</option>
                 <option value="premium">Premium</option>
               </select>
-              <input type="number" id="l_comissao_pct" value="12" step="0.1" min="0" max="100" oninput="calcLucr()" title="% editável" />
+              <input type="number" id="l_com_pct" value="12" step="0.1" min="0" max="100" oninput="calcLucr()" title="% editável"/>
             </div>
-            <div class="hint">% comissão — editável se necessário</div>
+            <div class="hint">Editável se necessário</div>
           </div>
-          <div class="form-group" id="lgrp_modalidade_amazon" style="display:none">
-            <label>Modalidade de Envio</label>
-            <select id="l_modalidade_amazon" onchange="onLModalidadeChange()">
+          <div class="fg" id="lgrp_amazon" style="display:none">
+            <label>Modalidade</label>
+            <select id="l_modal" onchange="onLModalChange()">
               <option value="DBA">DBA</option>
               <option value="FBA">FBA</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Frete <span style="font-weight:400;color:var(--text3)">(auto · editável)</span></label>
-            <input type="number" id="l_frete_edit" placeholder="0,00" step="0.01" oninput="calcLucr()" />
+          <div class="fg">
+            <label>Frete <span style="font-weight:400;opacity:.6">(auto · editável)</span></label>
+            <input type="number" id="l_frete" placeholder="0,00" step="0.01" oninput="calcLucr()"/>
           </div>
         </div>
-        <div class="info-badge-row">
-          <div class="info-badge">Custo Fixo: <strong id="l_badge_cf">—</strong></div>
-          <div class="info-badge">Imposto: <strong>9%</strong></div>
-        </div>
+
         <button class="calc-btn" onclick="calcLucr()">Calcular Lucratividade</button>
 
-        <div class="result-section" id="resultLucr" style="display:none">
-          <hr class="divider">
+        <div id="resultLucr" style="display:none">
+          <div class="divider"></div>
 
-          <div class="section-sep">Receita da plataforma</div>
-          <div class="result-grid">
-            <div class="result-card"><div class="result-label">Comissão marketplace</div><div class="result-value" id="l_r_comissao">—</div></div>
-            <div class="result-card"><div class="result-label">Frete</div><div class="result-value" id="l_r_frete">—</div></div>
-            <div class="result-card accent">
-              <div class="result-label">Lucro bruto plataforma</div>
-              <div class="result-value amber" id="l_r_lucro_bruto">—</div>
-              <div style="font-size:11px;color:var(--amber);margin-top:3px;" id="l_r_lucro_bruto_pct">—</div>
+          <!-- HERO: preço + margem -->
+          <div class="result-hero">
+            <div class="hero-card price">
+              <div class="hero-eyebrow">Preço analisado</div>
+              <div class="hero-value" id="l_hero_preco">—</div>
+              <div class="hero-sub" id="l_hero_mkt">—</div>
+            </div>
+            <div class="hero-card margin-pos" id="l_margem_card">
+              <div class="hero-eyebrow">Margem líquida</div>
+              <div class="hero-value" id="l_margem_pct">—</div>
+              <div class="hero-sub" id="l_lucro_val">—</div>
             </div>
           </div>
 
-          <div class="section-sep">Após CMV e encargos</div>
-          <div class="result-grid">
-            <div class="result-card"><div class="result-label">CMV</div><div class="result-value" id="l_r_cmv">—</div></div>
-            <div class="result-card"><div class="result-label">Custo Fixo</div><div class="result-value" id="l_r_fixo">—</div></div>
-            <div class="result-card"><div class="result-label">Imposto</div><div class="result-value" id="l_r_imposto">—</div></div>
-            <div class="result-card highlight" id="l_r_lucro_card"><div class="result-label">Lucro líquido</div><div class="result-value" id="l_r_lucro">—</div></div>
-            <div class="result-card highlight" id="l_r_pct_card"><div class="result-label">Margem %</div><div class="result-value" id="l_r_pct">—</div></div>
+          <!-- PLATAFORMA -->
+          <div class="breakdown-title">Receita da plataforma</div>
+          <div class="breakdown-grid">
+            <div class="bk-card"><div class="bk-label">Comissão</div><div class="bk-val" id="l_r_com">—</div></div>
+            <div class="bk-card"><div class="bk-label">Frete</div><div class="bk-val" id="l_r_frete">—</div></div>
+            <div class="bk-card bruto">
+              <div class="bk-label">Lucro bruto plataforma</div>
+              <div class="bk-val" id="l_r_lbruto">—</div>
+              <div class="bk-sub" id="l_r_lbruto_pct">—</div>
+            </div>
           </div>
 
+          <!-- CMV + ENCARGOS -->
+          <div class="breakdown-title">Após CMV e encargos</div>
+          <div class="breakdown-grid">
+            <div class="bk-card"><div class="bk-label">CMV</div><div class="bk-val" id="l_r_cmv">—</div></div>
+            <div class="bk-card"><div class="bk-label">Custo Fixo</div><div class="bk-val" id="l_r_cf">—</div></div>
+            <div class="bk-card"><div class="bk-label">Imposto (9%)</div><div class="bk-val" id="l_r_imp">—</div></div>
+          </div>
+
+          <div class="info-block">
+            <div class="info-row"><span>Filial utilizada</span><span id="l_filial_info">—</span></div>
+          </div>
+
+          <!-- SIMULADOR -->
           <div class="promo-box">
-            <div class="promo-box-title">Simulador de Promoção</div>
-            <div class="hint">Usa os mesmos parâmetros editados acima — comissão, frete e taxas.</div>
+            <div class="promo-title">Simulador de Promoção</div>
+            <div class="hint" style="margin-bottom:.75rem;">Usa comissão e taxas configuradas acima.</div>
             <div class="promo-grid">
-              <div class="form-group">
+              <div class="fg">
                 <label>Preço promocional (R$)</label>
-                <input type="number" id="l_promo_preco" placeholder="0,00" step="0.01" oninput="calcPromo()" />
+                <input type="number" id="l_promo_preco" placeholder="0,00" step="0.01" oninput="calcPromo()"/>
               </div>
-              <div class="form-group">
+              <div class="fg">
                 <label>Desconto (%)</label>
-                <input type="number" id="l_promo_pct" placeholder="ex: 10" step="0.1" oninput="calcPromoFromPct()" />
+                <input type="number" id="l_promo_pct" placeholder="ex: 10" step="0.1" oninput="calcPromoFromPct()"/>
               </div>
             </div>
             <div class="promo-result" id="promoResult" style="display:none">
-              <div class="promo-result-item"><div class="label">Preço com desconto</div><div class="val" id="promo_preco_final">—</div></div>
-              <div class="promo-result-item"><div class="label">Margem na promo</div><div class="val" id="promo_margem">—</div></div>
-              <div class="promo-result-item"><div class="label">Lucro na promo</div><div class="val" id="promo_lucro">—</div></div>
+              <div class="pr-item"><div class="pr-label">Preço com desconto</div><div class="pr-val" id="pr_preco">—</div></div>
+              <div class="pr-item"><div class="pr-label">Margem na promo</div><div class="pr-val" id="pr_margem">—</div></div>
+              <div class="pr-item"><div class="pr-label">Lucro na promo</div><div class="pr-val" id="pr_lucro">—</div></div>
             </div>
-            <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border);">
-              <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Preço mínimo com margem de 3%</div>
-              <div style="font-size:18px;font-weight:500;color:var(--blue);" id="l_preco_minimo">—</div>
-              <div class="hint" style="margin-top:4px;">Calculado com comissão e frete configurados acima</div>
+            <div class="promo-warn" id="promoWarn">⚠ Abaixo do preço mínimo com 3% de margem</div>
+            <div class="promo-min-row">
+              <span class="promo-min-label">Preço mínimo com 3% de margem</span>
+              <span class="promo-min-val" id="l_preco_min">—</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── COMO USAR ── -->
-      <div class="panel" id="panel-instrucoes">
-        <div class="instrucoes-box" style="background:var(--blue-bg);border-color:var(--blue-border);">
-          <div style="font-size:13px;color:var(--blue);font-weight:500;margin-bottom:4px;">Bem-vindo ao Aclon Hub</div>
-          <div style="font-size:13px;color:var(--blue);">Este hub tem duas calculadoras principais: <strong>Formação de Preço</strong> e <strong>Análise de Lucratividade</strong>. Use em sequência para garantir que o preço praticado é sustentável.</div>
+      <!-- ══ COMO USAR ══ -->
+      <div class="panel" id="panel-como">
+        <div class="instr-hero">
+          <h2>Como usar o Aclon Hub</h2>
+          <p>Duas calculadoras integradas: formação de preço e análise de lucratividade. Use sempre em sequência para garantir preços sustentáveis.</p>
         </div>
 
-        <div class="instrucoes-section">
-          <h3>Calculadora de Preço de Venda <span class="tag">Tela 1</span></h3>
-          <p>Use esta tela para descobrir qual preço de venda garante <strong>20% de lucro líquido</strong> sobre o preço final, já considerando todos os encargos.</p>
-          <div class="instrucoes-box">
-            <div class="instrucoes-step"><div class="step-num">1</div><div class="step-text">Selecione o <strong>marketplace</strong> (Mercado Livre, Shopee ou Amazon).</div></div>
-            <div class="instrucoes-step"><div class="step-num">2</div><div class="step-text">Informe o <strong>CMV</strong> — o custo de compra do produto (valor pago ao fornecedor).</div></div>
-            <div class="instrucoes-step"><div class="step-num">3</div><div class="step-text">No Mercado Livre, selecione <strong>Clássico ou Premium</strong>. O percentual de comissão é preenchido automaticamente (12% ou 18%), mas pode ser editado se houver diferença.</div></div>
-            <div class="instrucoes-step"><div class="step-num">4</div><div class="step-text">Clique em <strong>Calcular Preço Ideal</strong>. O hub calcula o preço mínimo necessário para atingir 20% de lucro líquido.</div></div>
-            <div class="instrucoes-step"><div class="step-num">5</div><div class="step-text">O resultado mostra a estrutura completa: CMV, comissão, frete, custo fixo, imposto, <strong>lucro bruto da plataforma</strong> e lucro líquido final.</div></div>
+        <div class="instr-section">
+          <div class="instr-section-head">
+            <div class="instr-num">1</div>
+            <h3>Selecione a Filial e o Custo Fixo <span class="instr-tag">Passo obrigatório</span></h3>
           </div>
-          <ul>
-            <li><span class="li-label">Lucro bruto plataforma</span><span>Preço de venda menos comissão e frete. É o que sobra antes de descontar CMV, custo fixo e imposto.</span></li>
-            <li><span class="li-label">Markup equivalente</span><span>Percentual de aumento sobre o CMV que o preço calculado representa. Informativo — não é o driver do cálculo.</span></li>
-            <li><span class="li-label">Custo Fixo</span><span>Percentual de despesas fixas da operação. Editável com senha. Padrão: 5%.</span></li>
-            <li><span class="li-label">Imposto</span><span>Fixo em 9% — não editável.</span></li>
-          </ul>
-        </div>
-
-        <div class="instrucoes-section">
-          <h3>Lucratividade da Venda <span class="tag">Tela 2</span></h3>
-          <p>Use esta tela para analisar a lucratividade real de um preço que já está sendo praticado ou que você quer testar.</p>
-          <div class="instrucoes-box">
-            <div class="instrucoes-step"><div class="step-num">1</div><div class="step-text">Selecione o <strong>marketplace</strong> e informe o <strong>preço de venda</strong> atual e o <strong>CMV</strong>.</div></div>
-            <div class="instrucoes-step"><div class="step-num">2</div><div class="step-text">O <strong>frete é calculado automaticamente</strong> pela tabela do marketplace. Você pode editar se necessário.</div></div>
-            <div class="instrucoes-step"><div class="step-num">3</div><div class="step-text">Clique em <strong>Calcular Lucratividade</strong>. O hub mostra o lucro bruto da plataforma e o lucro líquido real.</div></div>
-            <div class="instrucoes-step"><div class="step-num">4</div><div class="step-text">Use o <strong>Simulador de Promoção</strong> para testar descontos e ver a margem resultante. O campo <em>Preço mínimo com 3%</em> mostra o limite de desconto seguro.</div></div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:.75rem;">Antes de calcular, sempre selecione a filial correta. Cada filial tem um custo fixo padrão diferente:</p>
+          <div class="filial-ref">
+            <div class="filial-ref-card"><div class="name">GMC SP</div><div class="pct">5%</div></div>
+            <div class="filial-ref-card"><div class="name">GMC SC</div><div class="pct">3%</div></div>
+            <div class="filial-ref-card"><div class="name">R4</div><div class="pct">5%</div></div>
           </div>
-          <ul>
-            <li><span class="li-label">Lucro bruto plataforma</span><span>Preço − comissão − frete. Mostra quanto sobra da venda antes dos custos internos.</span></li>
-            <li><span class="li-label">Margem %</span><span>Verde = acima de 3%. Vermelho = abaixo de 3% ou negativo.</span></li>
-            <li><span class="li-label">Preço mínimo 3%</span><span>O menor preço possível mantendo ao menos 3% de margem líquida. Use como referência para promoções.</span></li>
-          </ul>
+          <div class="instr-tip">💡 O campo de % ao lado dos chips é editável. Se o produto tiver um custo fixo diferente, ajuste diretamente antes de calcular.</div>
         </div>
 
-        <div class="instrucoes-section">
-          <h3>Dicas rápidas</h3>
-          <ul>
-            <li><span class="li-label">Fluxo recomendado</span><span>Calcule o preço ideal na Tela 1 → clique em "Verificar lucratividade" → confirme na Tela 2.</span></li>
-            <li><span class="li-label">Comissão editável</span><span>Se o ML praticar uma taxa diferente para o seu anúncio específico, edite o campo % diretamente.</span></li>
-            <li><span class="li-label">Frete editável</span><span>O frete é estimado pela faixa de preço. Se o frete real for diferente, edite antes de calcular.</span></li>
-            <li><span class="li-label">Custo Fixo</span><span>Representa as despesas fixas da operação rateadas por produto. Solicite a senha ao gestor para alterar.</span></li>
-          </ul>
+        <div class="instr-section">
+          <div class="instr-section-head">
+            <div class="instr-num">2</div>
+            <h3>Calculadora de Preço de Venda <span class="instr-tag">Tela 1</span></h3>
+          </div>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">1</div><div class="step-txt">Selecione o <strong>marketplace</strong> e a <strong>filial</strong>.</div></div>
+            <div class="instr-step"><div class="step-dot">2</div><div class="step-txt">Informe o <strong>CMV</strong> — custo de compra do produto.</div></div>
+            <div class="instr-step"><div class="step-dot">3</div><div class="step-txt">No ML, selecione <strong>Clássico (12%)</strong> ou <strong>Premium (18%)</strong>. Edite o % se necessário.</div></div>
+            <div class="instr-step"><div class="step-dot">4</div><div class="step-txt">Clique em <strong>Calcular Preço Ideal</strong>. O hub garante <strong>15% de lucro líquido</strong> sobre o preço de venda.</div></div>
+            <div class="instr-step"><div class="step-dot">5</div><div class="step-txt">O <strong>Preço ideal</strong> e a <strong>margem</strong> aparecem em destaque. Abaixo, a estrutura completa de custos.</div></div>
+          </div>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">·</div><div class="step-txt"><strong>Lucro bruto plataforma</strong> = Preço − Comissão − Frete. O que sobra antes dos custos internos.</div></div>
+            <div class="instr-step"><div class="step-dot">·</div><div class="step-txt"><strong>Markup equivalente</strong> = percentual de aumento sobre o CMV. Informativo.</div></div>
+          </div>
+        </div>
+
+        <div class="instr-section">
+          <div class="instr-section-head">
+            <div class="instr-num">3</div>
+            <h3>Lucratividade da Venda <span class="instr-tag">Tela 2</span></h3>
+          </div>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">1</div><div class="step-txt">Informe o <strong>preço de venda praticado</strong> e o <strong>CMV</strong>. Selecione a filial.</div></div>
+            <div class="instr-step"><div class="step-dot">2</div><div class="step-txt">O <strong>frete é automático</strong> pela tabela do marketplace — edite se o real for diferente.</div></div>
+            <div class="instr-step"><div class="step-dot">3</div><div class="step-txt">A <strong>margem %</strong> aparece em destaque. Verde = saudável (≥3%). Vermelho = atenção.</div></div>
+            <div class="instr-step"><div class="step-dot">4</div><div class="step-txt">Use o <strong>Simulador de Promoção</strong> para testar descontos. O hub alerta quando o preço fica abaixo do mínimo seguro (3%).</div></div>
+          </div>
+        </div>
+
+        <div class="instr-section">
+          <div class="instr-section-head">
+            <div class="instr-num">4</div>
+            <h3>Fluxo recomendado</h3>
+          </div>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">→</div><div class="step-txt">Tela 1: calcule o preço ideal → clique em <strong>"Verificar lucratividade"</strong> → confirme na Tela 2.</div></div>
+            <div class="instr-step"><div class="step-dot">→</div><div class="step-txt">Tela 2 standalone: use para analisar preços já praticados ou testar promoções antes de ativar.</div></div>
+          </div>
         </div>
       </div>
 
-      <!-- ── ADM ── -->
+      <!-- ══ ADM ══ -->
       <div class="panel" id="panel-adm">
         <div class="adm-section">
-          <div class="adm-section-title">Custo Fixo por Filial</div>
-          <div class="adm-grid">
-            <div class="adm-card">
-              <div class="adm-card-label">Filial</div>
-              <div class="adm-card-title">GMC SP</div>
-              <div class="adm-input-row">
-                <input type="number" id="adm_cf_gmcsp" step="0.1" />
-                <span style="font-size:14px;color:var(--text2);">%</span>
-                <button class="btn-sm" onclick="saveCF('GMC SP',this)">Salvar</button>
-              </div>
-            </div>
-            <div class="adm-card">
-              <div class="adm-card-label">Filial</div>
-              <div class="adm-card-title">GMC SC</div>
-              <div class="adm-input-row">
-                <input type="number" id="adm_cf_gmcsc" step="0.1" />
-                <span style="font-size:14px;color:var(--text2);">%</span>
-                <button class="btn-sm" onclick="saveCF('GMC SC',this)">Salvar</button>
-              </div>
-            </div>
-            <div class="adm-card">
-              <div class="adm-card-label">Filial</div>
-              <div class="adm-card-title">R4</div>
-              <div class="adm-input-row">
-                <input type="number" id="adm_cf_r4" step="0.1" />
-                <span style="font-size:14px;color:var(--text2);">%</span>
-                <button class="btn-sm" onclick="saveCF('R4',this)">Salvar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="adm-section">
-          <div class="adm-section-title">Colaboradores</div>
+          <div class="adm-title">Colaboradores</div>
           <table class="user-table">
-            <thead><tr><th style="width:32%">Nome</th><th style="width:22%">Usuário</th><th style="width:28%">Setor</th><th style="width:18%"></th></tr></thead>
+            <thead><tr><th style="width:30%">Nome</th><th style="width:20%">Usuário</th><th style="width:30%">Setor</th><th style="width:20%"></th></tr></thead>
             <tbody id="userTableBody"></tbody>
           </table>
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- MODAL CURVA A -->
-  <div class="modal-overlay" id="modalCurvaA">
-    <div class="modal">
-      <h3>Editar Custo Fixo</h3>
-      <label>Senha</label>
-      <input type="password" id="curvaASenha" placeholder="••••••••" />
-      <label>Novo valor (%)</label>
-      <input type="number" id="curvaAValor" step="0.1" />
-      <div style="font-size:12px;color:var(--red);display:none;margin-top:4px;" id="curvaAError">Senha incorreta.</div>
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modalCurvaA')">Cancelar</button>
-        <button class="btn-primary" onclick="confirmarCurvaA()">Confirmar</button>
-      </div>
-    </div>
-  </div>
+    </div><!-- /content -->
+  </div><!-- /main -->
 
   <!-- MODAL EDIT SETOR -->
-  <div class="modal-overlay" id="modalEditUser">
+  <div class="modal-overlay" id="modalEditSetor">
     <div class="modal">
       <h3>Alterar setor</h3>
-      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:1rem;" id="editUserNomeDisplay"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:1rem;" id="editNomeDisplay"></div>
       <label>Setor</label>
-      <select id="editUserSetor">
+      <select id="editSetor">
         <option value="prevenda">Pré-venda</option>
         <option value="anuncios">Anúncios</option>
         <option value="mercado">Análise de Mercado</option>
+        <option value="operacional">Operacional</option>
         <option value="full">Full</option>
       </select>
       <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modalEditUser')">Cancelar</button>
-        <button class="btn-primary" onclick="saveEditUser()">Salvar</button>
+        <button class="btn-cancel" onclick="closeModal('modalEditSetor')">Cancelar</button>
+        <button class="btn-primary" onclick="saveEditSetor()">Salvar</button>
       </div>
     </div>
   </div>
 
-</div>
-<script>
-const SENHA_ADM     = 'adm2024#';
-const SENHA_CURVA_A = 'curvaAB';
-const IMPOSTO_PCT   = 9;
-const LUCRO_META    = 0.20;
+</div><!-- /hub -->
 
-const FIXED_USERS = [
-  { usuario:'ecom19', nome:'Giovanna',  setor:'mercado',  senha:'ecom19@gmc' },
-  { usuario:'ecom10', nome:'Thiago',    setor:'anuncios', senha:'ecom10@gmc' },
-  { usuario:'ecom6',  nome:'Vitória',   setor:'prevenda', senha:'ecom6@gmc'  },
-  { usuario:'ecom16', nome:'Miguel',    setor:'prevenda', senha:'ecom16@gmc' },
-  { usuario:'ecom2',  nome:'Leonardo',  setor:'full',     senha:'ecom2@gmc'  },
-  { usuario:'ecom12', nome:'Alex',      setor:'anuncios', senha:'ecom12@gmc' },
-  { usuario:'ecom18', nome:'Laize',     setor:'mercado',  senha:'ecom18@gmc' },
+<script>
+const SENHA_ADM='adm@2026';
+const IMP=9, META=0.15;
+
+const FIXED_USERS=[
+  {usuario:'ecom19',nome:'Miguel 2',  setor:'mercado',     senha:'ecom19@gmc'},
+  {usuario:'ecom10',nome:'Thiago',    setor:'mercado',     senha:'ecom10@gmc'},
+  {usuario:'ecom6', nome:'Vitória',   setor:'operacional', senha:'ecom6@gmc' },
+  {usuario:'ecom16',nome:'Miguel',    setor:'anuncios',    senha:'ecom16@gmc'},
+  {usuario:'ecom2', nome:'Leonardo',  setor:'mercado',     senha:'ecom2@gmc' },
+  {usuario:'ecom12',nome:'Alex',      setor:'anuncios',    senha:'ecom12@gmc'},
+  {usuario:'ecom18',nome:'Laize',     setor:'prevenda',    senha:'ecom18@gmc'},
+  {usuario:'ecom14',nome:'Felipe',    setor:'mercado',     senha:'ecom14@gmc'},
 ];
 
-function loadCfg(){try{const s=localStorage.getItem('aclon_cfg3');if(s)return JSON.parse(s);}catch(e){}return null;}
-function saveCfg(){try{localStorage.setItem('aclon_cfg3',JSON.stringify({custofixo:st.custofixo,setores:st.setores}));}catch(e){}}
+function loadCfg(){try{const s=localStorage.getItem('aclon4');if(s)return JSON.parse(s);}catch(e){}return null;}
+function saveCfg(){try{localStorage.setItem('aclon4',JSON.stringify({setores:st.setores}));}catch(e){}}
 
 const cfg=loadCfg();
 let st={
-  isAdm:false,userName:'',userCnpj:'GMC SP',
-  mktPreco:'ML',mktLucr:'ML',
-  custofixo:cfg?cfg.custofixo:{'GMC SP':5,'GMC SC':5,'R4':5},
-  setores:cfg?cfg.setores:{},
+  isAdm:false,userName:'',
+  mktP:'ML',mktL:'ML',
+  filialP:'GMC SP',cfP:5,
+  filialL:'GMC SP',cfL:5,
   ultimoPreco:null,ultimoCmv:null,ultimoMkt:null,ultimoAnuncio:null,ultimoComPct:0.12,
+  setores:cfg?cfg.setores:{},
 };
 
 function getUsers(){return FIXED_USERS.map(u=>({...u,setor:st.setores[u.usuario]||u.setor}));}
 const fmt=v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtPct=v=>parseFloat(v).toFixed(2)+'%';
-const getCF=()=>st.custofixo[st.userCnpj]||5;
+const fmtP=v=>parseFloat(v).toFixed(2)+'%';
 
-function updateDisplays(){
-  const cf=getCF();
-  document.getElementById('p_custofixo_display').value=cf+'%';
-  document.getElementById('l_badge_cf').textContent=cf+'%';
-}
-
+/* LOGIN */
 function doLogin(){
   const user=document.getElementById('loginUser').value.trim();
   const pass=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
   err.style.display='none';
   if(!user){err.textContent='Informe seu usuário.';err.style.display='block';return;}
-  const masterAdm=pass===SENHA_ADM&&user.toLowerCase()==='adm';
+  const isAdm=pass===SENHA_ADM&&user.toLowerCase()==='adm';
   const found=getUsers().find(u=>(u.usuario.toLowerCase()===user.toLowerCase()||u.nome.trim().toLowerCase()===user.trim().toLowerCase())&&u.senha===pass);
-  if(!masterAdm&&!found){err.style.display='block';err.textContent='Usuário ou senha incorretos.';return;}
-  st.isAdm=masterAdm;
-  st.userName=masterAdm?'ADM':found.nome;
-  st.userCnpj='GMC SP';
+  if(!isAdm&&!found){err.style.display='block';return;}
+  st.isAdm=isAdm;st.userName=isAdm?'ADM':found.nome;
   document.getElementById('topUser').textContent=st.userName;
-  document.getElementById('tabAdm').style.display=st.isAdm?'':'none';
+  document.getElementById('tabAdm').style.display=isAdm?'':'none';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainScreen').style.display='block';
-  updateDisplays();
-  document.getElementById('adm_cf_gmcsp').value=st.custofixo['GMC SP'];
-  document.getElementById('adm_cf_gmcsc').value=st.custofixo['GMC SC'];
-  document.getElementById('adm_cf_r4').value=st.custofixo['R4'];
   renderUserTable();
 }
-
 function doLogout(){
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainScreen').style.display='none';
@@ -565,71 +619,97 @@ function doLogout(){
   document.getElementById('resultLucr').style.display='none';
 }
 
-function switchTab(tab){
-  const tabs=['precificacao','lucratividade','instrucoes','adm'];
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab')[tabs.indexOf(tab)].classList.add('active');
-  document.getElementById('panel-'+tab).classList.add('active');
+function switchTab(t){
+  const tabs=['preco','lucr','como','adm'];
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(t)].classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
 }
 
+/* FILIAL */
+function selectFilial(el,filial,cf){
+  document.querySelectorAll('#panel-preco .filial-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  st.filialP=filial;st.cfP=cf;
+  document.getElementById('p_cf_val').value=cf;
+  updateTopFilial(filial);
+  calcPreco();
+}
+function selectFilialL(el,filial,cf){
+  document.querySelectorAll('#panel-lucr .filial-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  st.filialL=filial;st.cfL=cf;
+  document.getElementById('l_cf_val').value=cf;
+  updateTopFilial(filial);
+  calcLucr();
+}
+function onCFEdit(side){
+  if(side==='p'){st.cfP=parseFloat(document.getElementById('p_cf_val').value)||5;calcPreco();}
+  else{st.cfL=parseFloat(document.getElementById('l_cf_val').value)||5;calcLucr();}
+}
+function updateTopFilial(f){
+  document.getElementById('topFilialBadge').textContent=f;
+}
+
+/* MKT */
 function selectMkt(el,mkt){
-  document.querySelectorAll('#panel-precificacao .mkt-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');st.mktPreco=mkt;
-  document.getElementById('grp_anuncio_ml').style.display=mkt==='ML'?'':'none';
-  document.getElementById('grp_modalidade_amazon').style.display=mkt==='Amazon'?'':'none';
+  document.querySelectorAll('#panel-preco .mkt-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');st.mktP=mkt;
+  document.getElementById('grp_ml').style.display=mkt==='ML'?'':'none';
+  document.getElementById('grp_amazon').style.display=mkt==='Amazon'?'':'none';
   document.getElementById('resultPreco').style.display='none';
 }
-function selectMktLucr(el,mkt){
-  document.querySelectorAll('#panel-lucratividade .mkt-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');st.mktLucr=mkt;
-  document.getElementById('lgrp_anuncio_ml').style.display=mkt==='ML'?'':'none';
-  document.getElementById('lgrp_modalidade_amazon').style.display=mkt==='Amazon'?'':'none';
+function selectMktL(el,mkt){
+  document.querySelectorAll('#panel-lucr .mkt-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');st.mktL=mkt;
+  document.getElementById('lgrp_ml').style.display=mkt==='ML'?'':'none';
+  document.getElementById('lgrp_amazon').style.display=mkt==='Amazon'?'':'none';
   document.getElementById('resultLucr').style.display='none';
   autoFrete();
 }
 
 /* FRETE / COMISSÃO */
-function freteML(p){if(p<=12.5)return p*.5;if(p<=29)return 6.25;if(p<=50)return 6.75;if(p<=78.99)return 7.75;if(p<=99.99)return 17;if(p<=119.99)return 18.85;if(p<=149.99)return 19.25;if(p<=199.99)return 21.65;return 23.65;}
-function freteShopee(p){if(p<=7.99)return p*.5;if(p<=79.99)return 4;if(p<=99.99)return 16;if(p<=199.99)return 20;return 26;}
-function freteAmazon(p,m){const t=m==='DBA'?[[30,4.5],[49.99,6.5],[78.99,6.75],[99.99,13.5],[119.99,16],[149.99,18],[199.99,20.5]]:[[30,5.65],[49.99,5.85],[78.99,6.05],[99.99,12],[119.99,15],[149.99,16],[199.99,18]];for(const[l,v]of t)if(p<=l)return v;return m==='DBA'?21.5:19;}
-function comShopee(p){if(p<=7.99)return p*.18;if(p<=79.99)return p*.20;return p*.14;}
-function getFrete(p,mkt,modal){if(mkt==='ML')return freteML(p);if(mkt==='Shopee')return freteShopee(p);return freteAmazon(p,modal||'DBA');}
+function frML(p){if(p<=12.5)return p*.5;if(p<=29)return 6.25;if(p<=50)return 6.75;if(p<=78.99)return 7.75;if(p<=99.99)return 17;if(p<=119.99)return 18.85;if(p<=149.99)return 19.25;if(p<=199.99)return 21.65;return 23.65;}
+function frSh(p){if(p<=7.99)return p*.5;if(p<=79.99)return 4;if(p<=99.99)return 16;if(p<=199.99)return 20;return 26;}
+function frAm(p,m){const t=m==='DBA'?[[30,4.5],[49.99,6.5],[78.99,6.75],[99.99,13.5],[119.99,16],[149.99,18],[199.99,20.5]]:[[30,5.65],[49.99,5.85],[78.99,6.05],[99.99,12],[119.99,15],[149.99,16],[199.99,18]];for(const[l,v]of t)if(p<=l)return v;return m==='DBA'?21.5:19;}
+function comSh(p){if(p<=7.99)return p*.18;if(p<=79.99)return p*.20;return p*.14;}
+function getFr(p,mkt,modal){if(mkt==='ML')return frML(p);if(mkt==='Shopee')return frSh(p);return frAm(p,modal||'DBA');}
 
-function onAnuncioMLChange(side){
-  const tipo=document.getElementById(side==='p'?'p_anuncio_ml':'l_anuncio_ml').value;
-  document.getElementById(side==='p'?'p_comissao_pct':'l_comissao_pct').value=tipo==='premium'?18:12;
+function onAnuncioChange(side){
+  const tipo=document.getElementById(side==='p'?'p_anuncio':'l_anuncio').value;
+  document.getElementById(side==='p'?'p_com_pct':'l_com_pct').value=tipo==='premium'?18:12;
   side==='p'?calcPreco():calcLucr();
 }
 function autoFrete(){
-  const preco=parseFloat(document.getElementById('l_preco').value)||0;
-  if(!preco)return;
-  document.getElementById('l_frete_edit').value=getFrete(preco,st.mktLucr,document.getElementById('l_modalidade_amazon').value||'DBA').toFixed(2);
+  const p=parseFloat(document.getElementById('l_preco').value)||0;
+  if(!p)return;
+  document.getElementById('l_frete').value=getFr(p,st.mktL,document.getElementById('l_modal').value||'DBA').toFixed(2);
 }
 function onLPrecoChange(){autoFrete();calcLucr();}
-function onLModalidadeChange(){autoFrete();calcLucr();}
+function onLModalChange(){autoFrete();calcLucr();}
 
-/* CALC PRECIFICAÇÃO — divisor direto 20% */
-function calcPrecoIdeal(cmv,mkt,comissaoPct,modal){
-  const cf=getCF()/100,imp=IMPOSTO_PCT/100,meta=LUCRO_META;
+/* CALC PREÇO — divisor iterativo com 15% meta */
+function calcPrecoIdeal(cmv,mkt,comPct,modal,cfPct){
+  const cf=cfPct/100,imp=IMP/100,meta=META;
   if(mkt==='ML'||mkt==='Amazon'){
     let p=cmv*1.5;
     for(let i=0;i<400;i++){
-      const frete=getFrete(p,mkt,modal);
-      const div=1-comissaoPct-cf-imp-meta;
+      const fr=getFr(p,mkt,modal);
+      const div=1-comPct-cf-imp-meta;
       if(div<=0)return cmv;
-      const pN=(cmv+frete)/div;
+      const pN=(cmv+fr)/div;
       if(Math.abs(pN-p)<0.005){p=pN;break;}
       p=pN;
     }
     return p;
   }
-  let p=cmv*1.8;
+  let p=cmv*1.7;
   for(let i=0;i<400;i++){
-    const frete=freteShopee(p),com=comShopee(p),comP=com/p;
+    const fr=frSh(p),com=comSh(p),comP=com/p;
     const div=1-comP-cf-imp-meta;
     if(div<=0)return cmv;
-    const pN=(cmv+frete)/div;
+    const pN=(cmv+fr)/div;
     if(Math.abs(pN-p)<0.005){p=pN;break;}
     p=pN;
   }
@@ -639,98 +719,131 @@ function calcPrecoIdeal(cmv,mkt,comissaoPct,modal){
 function calcPreco(){
   const cmv=parseFloat(document.getElementById('p_cmv').value)||0;
   if(!cmv)return;
-  const mkt=st.mktPreco,modal=document.getElementById('p_modalidade_amazon').value||'DBA';
-  let comissaoPct=0;
-  if(mkt==='ML')comissaoPct=(parseFloat(document.getElementById('p_comissao_pct').value)||12)/100;
-  else if(mkt==='Amazon')comissaoPct=0.15;
+  const mkt=st.mktP,modal=document.getElementById('p_modal').value||'DBA';
+  const cfPct=st.cfP;
+  let comPct=0;
+  if(mkt==='ML')comPct=(parseFloat(document.getElementById('p_com_pct').value)||12)/100;
+  else if(mkt==='Amazon')comPct=0.15;
 
-  const preco=calcPrecoIdeal(cmv,mkt,comissaoPct,modal);
-  const frete=getFrete(preco,mkt,modal);
-  const com=mkt==='ML'?preco*comissaoPct:mkt==='Amazon'?preco*0.15:comShopee(preco);
-  const cf=getCF()/100,imp=IMPOSTO_PCT/100;
-  const fixo=preco*cf,impVal=preco*imp;
-  const lucroBruto=preco-com-frete; // antes do CMV/CF/Imp
-  const lucro=preco-com-frete-cmv-fixo-impVal;
-  const markupEquiv=((preco/cmv)-1)*100;
+  const preco=calcPrecoIdeal(cmv,mkt,comPct,modal,cfPct);
+  const fr=getFr(preco,mkt,modal);
+  const com=mkt==='ML'?preco*comPct:mkt==='Amazon'?preco*0.15:comSh(preco);
+  const cf=cfPct/100,imp=IMP/100;
+  const fixo=preco*cf,impV=preco*imp;
+  const lBruto=preco-com-fr;
+  const lucro=preco-com-fr-cmv-fixo-impV;
+  const lucroPct=(lucro/preco)*100;
+  const markup=((preco/cmv)-1)*100;
 
   st.ultimoPreco=preco;st.ultimoCmv=cmv;st.ultimoMkt=mkt;
-  st.ultimoComPct=mkt==='ML'?comissaoPct:mkt==='Amazon'?0.15:com/preco;
-  st.ultimoAnuncio=mkt==='ML'?document.getElementById('p_anuncio_ml').value:mkt==='Amazon'?modal:null;
+  st.ultimoComPct=mkt==='ML'?comPct:mkt==='Amazon'?0.15:com/preco;
+  st.ultimoAnuncio=mkt==='ML'?document.getElementById('p_anuncio').value:mkt==='Amazon'?modal:null;
+  st.ultimoCfP=cfPct;st.ultimoFilialP=st.filialP;
 
+  /* Hero */
+  document.getElementById('r_preco').textContent=fmt(preco);
+  document.getElementById('r_mkt_label').textContent=mkt+(st.ultimoAnuncio?' · '+st.ultimoAnuncio.toUpperCase():'');
+  document.getElementById('r_lucro_pct').textContent=fmtP(lucroPct);
+  document.getElementById('r_lucro_val').textContent=fmt(lucro)+' de lucro líquido';
+  const mc=document.getElementById('r_margem_card');
+  mc.className='hero-card '+(lucro>=0?'margin-pos':'margin-neg');
+
+  /* Breakdown */
   document.getElementById('r_cmv').textContent=fmt(cmv);
   document.getElementById('r_comissao').textContent=fmt(com);
-  document.getElementById('r_frete').textContent=fmt(frete);
-  document.getElementById('r_custofixo').textContent=fmt(fixo);
-  document.getElementById('r_imposto').textContent=fmt(impVal);
-  document.getElementById('r_lucro_bruto').textContent=fmt(lucroBruto);
-  document.getElementById('r_lucro_bruto_pct').textContent=fmtPct((lucroBruto/preco)*100)+' sobre venda';
-  document.getElementById('r_preco_venda').textContent=fmt(preco);
-  document.getElementById('r_lucro').textContent=fmt(lucro);
-  document.getElementById('r_markup_equiv').textContent=fmtPct(markupEquiv);
-  document.getElementById('r_info_comissao_pct').textContent=fmtPct(st.ultimoComPct*100);
-  document.getElementById('r_info_lucro_pct').textContent='20,00%';
-  document.getElementById('r_info_mkt').textContent=mkt+(st.ultimoAnuncio?' · '+st.ultimoAnuncio.toUpperCase():'');
+  document.getElementById('r_frete').textContent=fmt(fr);
+  document.getElementById('r_cf').textContent=fmt(fixo);
+  document.getElementById('r_imp').textContent=fmt(impV);
+  document.getElementById('r_lbruto').textContent=fmt(lBruto);
+  document.getElementById('r_lbruto_pct').textContent=fmtP((lBruto/preco)*100)+' sobre venda';
+  document.getElementById('r_markup').textContent=fmtP(markup);
+  document.getElementById('r_com_info').textContent=fmtP(st.ultimoComPct*100);
+  document.getElementById('r_filial_info').textContent=st.filialP+' · CF '+cfPct+'%';
+
   document.getElementById('resultPreco').style.display='block';
 }
 
-function enviarParaLucratividade(){
+function enviarLucr(){
   if(!st.ultimoPreco)return;
-  switchTab('lucratividade');
+  switchTab('lucr');
   document.getElementById('l_preco').value=st.ultimoPreco.toFixed(2);
   document.getElementById('l_cmv').value=st.ultimoCmv.toFixed(2);
-  if(st.ultimoMkt==='ML'){selectMktLucr(document.getElementById('lmktML'),'ML');document.getElementById('l_anuncio_ml').value=st.ultimoAnuncio||'classico';document.getElementById('l_comissao_pct').value=(st.ultimoComPct*100).toFixed(1);}
-  else if(st.ultimoMkt==='Shopee'){selectMktLucr(document.getElementById('lmktShopee'),'Shopee');}
-  else{selectMktLucr(document.getElementById('lmktAmazon'),'Amazon');if(st.ultimoAnuncio)document.getElementById('l_modalidade_amazon').value=st.ultimoAnuncio;}
+  // sincronizar filial
+  const filial=st.ultimoFilialP||'GMC SP';
+  const cf=st.ultimoCfP||5;
+  document.getElementById('l_cf_val').value=cf;
+  document.querySelectorAll('#panel-lucr .filial-chip').forEach(c=>{
+    if(c.textContent.startsWith(filial)){c.classList.add('active');}
+    else c.classList.remove('active');
+  });
+  st.filialL=filial;st.cfL=cf;
+  if(st.ultimoMkt==='ML'){
+    selectMktL(document.getElementById('lmML'),'ML');
+    document.getElementById('l_anuncio').value=st.ultimoAnuncio||'classico';
+    document.getElementById('l_com_pct').value=(st.ultimoComPct*100).toFixed(1);
+  }else if(st.ultimoMkt==='Shopee'){selectMktL(document.getElementById('lmShopee'),'Shopee');}
+  else{selectMktL(document.getElementById('lmAmazon'),'Amazon');if(st.ultimoAnuncio)document.getElementById('l_modal').value=st.ultimoAnuncio;}
   autoFrete();calcLucr();
 }
 
 /* CALC LUCRATIVIDADE */
-function getLComPct(){return(parseFloat(document.getElementById('l_comissao_pct').value)||12)/100;}
-function getLFrete(){return parseFloat(document.getElementById('l_frete_edit').value)||0;}
-function getLCom(p){const mkt=st.mktLucr;if(mkt==='ML')return p*getLComPct();if(mkt==='Shopee')return comShopee(p);return p*.15;}
+function getLCom(p){const mkt=st.mktL;if(mkt==='ML')return p*((parseFloat(document.getElementById('l_com_pct').value)||12)/100);if(mkt==='Shopee')return comSh(p);return p*.15;}
+function getLFr(){return parseFloat(document.getElementById('l_frete').value)||0;}
+function getLComPct(){return(parseFloat(document.getElementById('l_com_pct').value)||12)/100;}
 
 function calcLucr(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
   if(!preco||!cmv)return;
-  const cf=getCF()/100,imp=IMPOSTO_PCT/100;
-  const com=getLCom(preco),frete=getLFrete();
-  const fixo=preco*cf,impVal=preco*imp;
-  const lucroBruto=preco-com-frete;
-  const lucro=preco-com-frete-cmv-fixo-impVal;
+  const cfPct=st.cfL,cf=cfPct/100,imp=IMP/100;
+  const com=getLCom(preco),fr=getLFr();
+  const fixo=preco*cf,impV=preco*imp;
+  const lBruto=preco-com-fr;
+  const lucro=preco-com-fr-cmv-fixo-impV;
   const mPct=(lucro/preco)*100;
 
-  document.getElementById('l_r_comissao').textContent=fmt(com);
-  document.getElementById('l_r_frete').textContent=fmt(frete);
-  document.getElementById('l_r_lucro_bruto').textContent=fmt(lucroBruto);
-  document.getElementById('l_r_lucro_bruto_pct').textContent=fmtPct((lucroBruto/preco)*100)+' sobre venda';
+  /* Hero */
+  document.getElementById('l_hero_preco').textContent=fmt(preco);
+  document.getElementById('l_hero_mkt').textContent=st.mktL+(document.getElementById('l_anuncio')?.value?' · '+document.getElementById('l_anuncio').value.toUpperCase():'');
+  document.getElementById('l_margem_pct').textContent=fmtP(mPct);
+  document.getElementById('l_lucro_val').textContent=fmt(lucro)+' de lucro líquido';
+  const mc=document.getElementById('l_margem_card');
+  mc.className='hero-card '+(mPct>=3?'margin-pos':'margin-neg');
+
+  /* Breakdown plataforma */
+  document.getElementById('l_r_com').textContent=fmt(com);
+  document.getElementById('l_r_frete').textContent=fmt(fr);
+  document.getElementById('l_r_lbruto').textContent=fmt(lBruto);
+  document.getElementById('l_r_lbruto_pct').textContent=fmtP((lBruto/preco)*100)+' sobre venda';
+
+  /* Breakdown encargos */
   document.getElementById('l_r_cmv').textContent=fmt(cmv);
-  document.getElementById('l_r_fixo').textContent=fmt(fixo);
-  document.getElementById('l_r_imposto').textContent=fmt(impVal);
-  document.getElementById('l_r_lucro').textContent=fmt(lucro);
-  document.getElementById('l_r_lucro').className='result-value '+(lucro>=0?'green':'red');
-  document.getElementById('l_r_pct').textContent=fmtPct(mPct);
-  document.getElementById('l_r_pct').className='result-value '+(mPct>=3?'green':'red');
-  document.getElementById('l_r_lucro_card').className='result-card highlight '+(lucro>=0?'positive':'negative');
-  document.getElementById('l_r_pct_card').className='result-card highlight '+(mPct>=3?'positive':'negative');
-  document.getElementById('l_preco_minimo').textContent=fmt(calcPrecoMin(cmv));
+  document.getElementById('l_r_cf').textContent=fmt(fixo);
+  document.getElementById('l_r_imp').textContent=fmt(impV);
+
+  document.getElementById('l_filial_info').textContent=st.filialL+' · CF '+cfPct+'%';
+
+  /* Preço mínimo */
+  document.getElementById('l_preco_min').textContent=fmt(calcPrecoMin(cmv));
+
   document.getElementById('resultLucr').style.display='block';
-  document.getElementById('alertLucr').style.display='none';
   document.getElementById('promoResult').style.display='none';
+  document.getElementById('promoWarn').style.display='none';
   document.getElementById('l_promo_preco').value='';
   document.getElementById('l_promo_pct').value='';
 }
 
 function calcPrecoMin(cmv){
-  const cf=getCF()/100,imp=IMPOSTO_PCT/100,mkt=st.mktLucr;
+  const cfPct=st.cfL,cf=cfPct/100,imp=IMP/100,mkt=st.mktL;
   const comPct=mkt==='ML'?getLComPct():mkt==='Amazon'?.15:0;
-  const freteFixo=getLFrete();
-  if(mkt!=='Shopee'){const div=1-comPct-cf-imp-0.03;if(div<=0)return cmv;return(cmv+freteFixo)/div;}
+  const frFixo=getLFr();
+  if(mkt!=='Shopee'){const div=1-comPct-cf-imp-0.03;if(div<=0)return cmv;return(cmv+frFixo)/div;}
   let p=cmv*1.5;
-  for(let i=0;i<400;i++){const c=comShopee(p),lucro=p-c-freteFixo-cmv-p*cf-p*imp,m=lucro/p;if(Math.abs(m-.03)<.0005)break;p+=m<.03?.25:-.05;if(p<cmv){p=cmv;break;}}
+  for(let i=0;i<400;i++){const c=comSh(p),l=p-c-frFixo-cmv-p*cf-p*imp,m=l/p;if(Math.abs(m-.03)<.0005)break;p+=m<.03?.25:-.05;if(p<cmv){p=cmv;break;}}
   return p;
 }
 
+/* SIMULADOR */
 function calcPromo(){
   const preco=parseFloat(document.getElementById('l_preco').value)||0;
   const pp=parseFloat(document.getElementById('l_promo_preco').value)||0;
@@ -748,60 +861,40 @@ function calcPromoFromPct(){
 }
 function renderPromo(pp){
   const cmv=parseFloat(document.getElementById('l_cmv').value)||0;
-  const cf=getCF()/100,imp=IMPOSTO_PCT/100,mkt=st.mktLucr;
-  const modal=document.getElementById('l_modalidade_amazon').value||'DBA';
-  const c=getLCom(pp),f=getFrete(pp,mkt,modal);
-  const fixo=pp*cf,impVal=pp*imp;
-  const lucro=pp-c-f-cmv-fixo-impVal,margem=(lucro/pp)*100;
-  document.getElementById('promo_preco_final').textContent=fmt(pp);
-  document.getElementById('promo_margem').textContent=fmtPct(margem);
-  document.getElementById('promo_margem').style.color=margem>=3?'var(--green)':'var(--red)';
-  document.getElementById('promo_lucro').textContent=fmt(lucro);
-  document.getElementById('promo_lucro').style.color=lucro>=0?'var(--green)':'var(--red)';
+  const cf=st.cfL/100,imp=IMP/100,mkt=st.mktL;
+  const modal=document.getElementById('l_modal').value||'DBA';
+  const c=getLCom(pp),f=getFr(pp,mkt,modal);
+  const fixo=pp*cf,impV=pp*imp;
+  const lucro=pp-c-f-cmv-fixo-impV,margem=(lucro/pp)*100;
+  const min=parseFloat(document.getElementById('l_preco_min').textContent.replace(/[^0-9,]/g,'').replace(',','.'));
+  document.getElementById('pr_preco').textContent=fmt(pp);
+  document.getElementById('pr_margem').textContent=fmtP(margem);
+  document.getElementById('pr_margem').style.color=margem>=3?'var(--green)':'var(--red)';
+  document.getElementById('pr_lucro').textContent=fmt(lucro);
+  document.getElementById('pr_lucro').style.color=lucro>=0?'var(--green)':'var(--red)';
   document.getElementById('promoResult').style.display='flex';
+  document.getElementById('promoWarn').style.display=pp<min?'block':'none';
 }
 
-function openCurvaA(){
-  document.getElementById('curvaASenha').value='';
-  document.getElementById('curvaAValor').value=getCF();
-  document.getElementById('curvaAError').style.display='none';
-  document.getElementById('modalCurvaA').classList.add('open');
-}
-function confirmarCurvaA(){
-  if(document.getElementById('curvaASenha').value!==SENHA_CURVA_A){document.getElementById('curvaAError').style.display='block';return;}
-  const val=parseFloat(document.getElementById('curvaAValor').value)||5;
-  st.custofixo[st.userCnpj]=val;
-  saveCfg();updateDisplays();
-  const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
-  document.getElementById(map[st.userCnpj]).value=val;
-  closeModal('modalCurvaA');
-}
-
-function saveCF(filial,btn){
-  const map={'GMC SP':'adm_cf_gmcsp','GMC SC':'adm_cf_gmcsc','R4':'adm_cf_r4'};
-  st.custofixo[filial]=parseFloat(document.getElementById(map[filial]).value)||5;
-  saveCfg();updateDisplays();flash(btn);
-}
-function flash(btn){btn.textContent='Salvo!';setTimeout(()=>btn.textContent='Salvar',1500);}
-
+/* ADM */
 let editIdx=null;
 function openEditSetor(i){
   editIdx=i;
   const u=getUsers()[i];
-  document.getElementById('editUserNomeDisplay').textContent=u.nome;
-  document.getElementById('editUserSetor').value=u.setor;
-  document.getElementById('modalEditUser').classList.add('open');
+  document.getElementById('editNomeDisplay').textContent=u.nome;
+  document.getElementById('editSetor').value=u.setor;
+  document.getElementById('modalEditSetor').classList.add('open');
 }
-function saveEditUser(){
+function saveEditSetor(){
   if(editIdx===null)return;
-  st.setores[FIXED_USERS[editIdx].usuario]=document.getElementById('editUserSetor').value;
-  editIdx=null;saveCfg();renderUserTable();closeModal('modalEditUser');
+  st.setores[FIXED_USERS[editIdx].usuario]=document.getElementById('editSetor').value;
+  editIdx=null;saveCfg();renderUserTable();closeModal('modalEditSetor');
 }
 function renderUserTable(){
-  const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full']};
+  const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
   document.getElementById('userTableBody').innerHTML=getUsers().map((u,i)=>{
     const[label,cls]=lb[u.setor]||[u.setor,'full'];
-    return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text2);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;
+    return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;
   }).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
