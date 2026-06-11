@@ -197,6 +197,73 @@
     .filial-ref-card .pct{font-size:20px;font-weight:700;color:var(--text);}
     .instr-tip{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);padding:.75rem 1rem;font-size:13px;color:var(--amber);line-height:1.5;margin-bottom:1rem;}
 
+
+    /* ── PxQ ── */
+    .pxq-header{background:var(--text);color:#fff;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .pxq-header-left h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}
+    .pxq-header-left p{font-size:12px;opacity:.65;}
+    .pxq-header-badge{font-size:11px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;color:#fff;}
+    .pxq-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.25rem;}
+    .pxq-mode-alert{border-radius:var(--radius-md);padding:10px 14px;margin-bottom:1.25rem;font-size:13px;font-weight:500;display:none;}
+    .pxq-mode-normal{background:var(--green-bg);color:var(--green);border:0.5px solid #b8dda0;}
+    .pxq-mode-smart{background:var(--amber-bg);color:var(--amber);border:0.5px solid var(--amber-border);}
+    .pxq-fator-row{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;background:var(--bg2);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;flex-wrap:wrap;}
+    .pxq-fator-label{color:var(--text2);flex:1;}
+    .pxq-fator-input{width:65px;padding:6px 10px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;text-align:center;outline:none;}
+    .pxq-fator-hint{font-size:11px;color:var(--text3);font-style:italic;}
+    .pxq-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+    /* FAIXA — layout ML-inspired */
+    .pxq-faixa{border-radius:var(--radius-lg);border:0.5px solid var(--border2);overflow:hidden;transition:box-shadow .15s;}
+    .pxq-faixa:hover{box-shadow:var(--shadow-sm);}
+    /* linha principal clicável */
+    .pxq-main{display:flex;align-items:center;padding:14px 18px;gap:16px;cursor:pointer;user-select:none;}
+    .pxq-qtd-col{min-width:90px;}
+    .pxq-qtd-num{font-size:15px;font-weight:700;color:var(--text);}
+    .pxq-qtd-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+    .pxq-preco-col{flex:1;}
+    .pxq-preco-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1;}
+    .pxq-preco-desc{font-size:11px;margin-top:3px;font-weight:500;}
+    .pxq-right-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+    .pxq-margem-badge{font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;}
+    .pxq-lucro-txt{font-size:11px;color:var(--text3);}
+    .pxq-chevron{font-size:11px;color:var(--text3);margin-left:4px;transition:transform .2s;}
+    .pxq-faixa.open .pxq-chevron{transform:rotate(180deg);}
+    /* detalhe expansível */
+    .pxq-detail{display:none;border-top:0.5px solid var(--border);padding:12px 18px;background:var(--bg2);grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;}
+    .pxq-faixa.open .pxq-detail{display:grid;}
+    .pxq-di{font-size:12px;}
+    .pxq-di-label{color:var(--text3);font-size:10px;margin-bottom:2px;}
+    .pxq-di-val{font-weight:600;color:var(--text);}
+    /* aviso linha */
+    .pxq-aviso{font-size:12px;padding:7px 18px;border-top:0.5px solid var(--border);display:none;}
+    /* cores por status */
+    .pxq-faixa.verde .pxq-main{background:var(--green-bg);}
+    .pxq-faixa.verde .pxq-preco-val{color:var(--green);}
+    .pxq-faixa.verde .pxq-margem-badge{background:#c5efcf;color:var(--green);}
+    .pxq-faixa.verde .pxq-preco-desc{color:var(--green);}
+    .pxq-faixa.amber .pxq-main{background:var(--amber-bg);}
+    .pxq-faixa.amber .pxq-preco-val{color:var(--amber);}
+    .pxq-faixa.amber .pxq-margem-badge{background:#fde8bb;color:var(--amber);}
+    .pxq-faixa.amber .pxq-preco-desc{color:var(--amber);}
+    .pxq-faixa.red .pxq-main{background:var(--red-bg);}
+    .pxq-faixa.red .pxq-preco-val{color:var(--red);}
+    .pxq-faixa.red .pxq-margem-badge{background:#fdd;color:var(--red);}
+    .pxq-faixa.red .pxq-preco-desc{color:var(--red);}
+    .pxq-faixa.blocked .pxq-main{background:var(--bg2);}
+    .pxq-faixa.blocked .pxq-preco-val{color:var(--text3);}
+    .pxq-faixa.blocked .pxq-margem-badge{background:var(--bg3);color:var(--text3);}
+    .pxq-faixa5-qtd{width:65px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-weight:700;text-align:center;outline:none;background:transparent;}
+    .pxq-faixa5-qtd{width:70px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:600;text-align:center;outline:none;background:var(--bg);}
+    .pxq-copy-btn{font-size:12px;padding:6px 14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--text2);margin-top:.5rem;}
+    .pxq-copy-btn:hover{background:var(--bg2);}
+    .pxq-copy-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem;}
+    .pxq-copy-chip{font-size:12px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:5px 12px;color:var(--text2);}
+    .pxq-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:14px;}
+    .btn-pxq{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--text2);margin-top:.75rem;font-weight:500;}
+    .btn-pxq:hover{background:var(--bg2);}
+    .btn-pxq.highlight{background:var(--text);color:#fff;border-color:var(--text);}
+    .btn-pxq.highlight:hover{opacity:.85;}
+
     @media(max-width:500px){body{padding:0;}.hub{border-radius:0;border:none;min-height:100vh;}.result-hero,.promo-grid{grid-template-columns:1fr;}.hero-value{font-size:26px;}}
   </style>
 </head>
@@ -233,6 +300,7 @@
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchTab('preco')">Preço de Venda</button>
       <button class="nav-tab" onclick="switchTab('lucr')">Lucratividade</button>
+      <button class="nav-tab" onclick="switchTab('pxq')">Preços de Atacado</button>
       <button class="nav-tab" onclick="switchTab('como')">Como usar</button>
       <button class="nav-tab" id="tabAdm" style="display:none" onclick="switchTab('adm')">ADM</button>
     </div>
@@ -333,6 +401,7 @@
           </div>
 
           <button class="calc-btn-sec" onclick="enviarLucr()">Verificar lucratividade deste preço ↗</button>
+          <button class="btn-pxq highlight" onclick="enviarPxQ('preco')" style="width:100%;justify-content:center;margin-top:.5rem;">📦 Simular Preços de Atacado PxQ ↗</button>
         </div>
       </div>
 
@@ -459,6 +528,101 @@
             </div>
           </div>
         </div>
+        <button class="btn-pxq highlight" onclick="enviarPxQ('lucr')" style="width:100%;justify-content:center;margin-top:.75rem;">📦 Simular Preços de Atacado PxQ ↗</button>
+      </div>
+
+
+      <!-- ══ PREÇOS DE ATACADO PxQ ══ -->
+      <div class="panel" id="panel-pxq">
+
+        <div class="pxq-header">
+          <div class="pxq-header-left">
+            <h3>Preços de Atacado · PxQ</h3>
+            <p>Mercado Livre · Exclusivo B2B · Preço por quantidade</p>
+          </div>
+          <span class="pxq-header-badge">Somente ML</span>
+        </div>
+
+        <!-- Filial -->
+        <div class="filial-row">
+          <span class="filial-label">Filial / Custo Fixo</span>
+          <div class="filial-chip active" onclick="selectFilialPxQ(this,'GMC SP',5)">GMC SP · 5%</div>
+          <div class="filial-chip" onclick="selectFilialPxQ(this,'GMC SC',3)">GMC SC · 3%</div>
+          <div class="filial-chip" onclick="selectFilialPxQ(this,'R4',5)">R4 · 5%</div>
+          <div class="cf-edit-row">
+            <input type="number" class="cf-val-input" id="pxq_cf" value="5" step="0.1" oninput="calcPxQ()" title="Custo fixo %"/>
+            <span class="cf-pct">%</span>
+          </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="pxq-inputs">
+          <div class="fg">
+            <label>Preço unitário de venda (R$)</label>
+            <input type="number" id="pxq_preco" placeholder="0,00" step="0.01" oninput="calcPxQ()" />
+          </div>
+          <div class="fg">
+            <label>CMV (R$)</label>
+            <input type="number" id="pxq_cmv" placeholder="0,00" step="0.01" oninput="calcPxQ()" />
+          </div>
+          <div class="fg">
+            <label>Tipo · % Comissão</label>
+            <div class="inline-pair">
+              <select id="pxq_anuncio" onchange="onPxqAnuncioChange()">
+                <option value="classico">Clássico</option>
+                <option value="premium">Premium</option>
+              </select>
+              <input type="number" id="pxq_com_pct" value="12" step="0.1" min="0" max="100" oninput="calcPxQ()" title="% editável" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Fator frete PxQ: campo oculto, valor fixo internamente -->
+        <input type="hidden" id="pxq_fator" value="40" />
+
+        <!-- Card contexto unitário -->
+        <div id="pxq_ctx_card" style="display:none;margin-bottom:1rem;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:12px 16px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Referência · Venda unitária</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Preço unitário</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);" id="pxq_ctx_preco">—</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Margem unitária</div>
+              <div style="font-size:16px;font-weight:700;" id="pxq_ctx_margem">—</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Lucro unitário</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);" id="pxq_ctx_lucro">—</div>
+            </div>
+            <div style="margin-left:auto;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Frete unitário (cheio)</div>
+              <div style="font-size:13px;font-weight:500;color:var(--text2);" id="pxq_ctx_frete">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerta modo -->
+        <div class="pxq-mode-alert pxq-mode-normal" id="pxq_mode_normal">
+          ✅ Margem unitária saudável — faixas calculadas com escalonamento padrão (6% → 5% → 4% → 3%)
+        </div>
+        <div class="pxq-mode-alert pxq-mode-smart" id="pxq_mode_smart">
+          ⚡ Modo inteligente ativado — margem unitária &lt; 8%. O ganho vem principalmente da economia no frete PxQ. Preços ajustados para maximizar viabilidade.
+        </div>
+
+        <!-- Faixas -->
+        <div class="pxq-grid" id="pxqGrid">
+          <div class="pxq-empty">Preencha o Preço de Venda e o CMV para ver as faixas PxQ</div>
+        </div>
+
+        <!-- Copiar preços -->
+        <div id="pxqCopySection" style="display:none">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;">Preços para cadastrar no ML</div>
+          <div class="pxq-copy-row" id="pxqCopyRow"></div>
+          <button class="pxq-copy-btn" onclick="copiarPrecosPxQ()">📋 Copiar todos os preços</button>
+        </div>
+
       </div>
 
       <!-- ══ COMO USAR ══ -->
@@ -513,9 +677,31 @@
           </div>
         </div>
 
+
         <div class="instr-section">
           <div class="instr-section-head">
-            <div class="instr-num">4</div>
+            <div class="instr-num">5</div>
+            <h3>Preços de Atacado · PxQ <span class="instr-tag">Mercado Livre · B2B</span></h3>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:.75rem;">Simule faixas de preço para vendas B2B no ML, onde CNPJ compra em quantidade com desconto progressivo no frete.</p>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">1</div><div class="step-txt">Use o botão <strong>"Simular PxQ"</strong> na Tela 1 ou Tela 2 — os dados são enviados automaticamente.</div></div>
+            <div class="instr-step"><div class="step-dot">2</div><div class="step-txt">O hub detecta a <strong>margem unitária</strong> e escolhe o modo de cálculo: padrão (≥8%) ou inteligente (&lt;8%).</div></div>
+            <div class="instr-step"><div class="step-dot">3</div><div class="step-txt"><strong>Modo padrão:</strong> metas de lucro 6% / 5% / 4% / 3% por faixa. O desconto no frete permite preços competitivos.</div></div>
+            <div class="instr-step"><div class="step-dot">4</div><div class="step-txt"><strong>Modo inteligente:</strong> margem apertada. O ganho vem da economia no frete PxQ — preço reduzido minimamente.</div></div>
+            <div class="instr-step"><div class="step-dot">5</div><div class="step-txt">A <strong>Faixa 5</strong> tem quantidade livre — você define. Use para volumes maiores ou ofertas especiais.</div></div>
+            <div class="instr-step"><div class="step-dot">6</div><div class="step-txt">Use <strong>"Copiar preços"</strong> para colar direto no painel de Preços de Atacado do ML.</div></div>
+          </div>
+          <div class="instr-box">
+            <div class="instr-step"><div class="step-dot">·</div><div class="step-txt"><strong>Frete PxQ estimado</strong> = Frete unitário × Qtd × 40%. Fator conservador baseado em dados reais ML (trava de segurança).</div></div>
+            <div class="instr-step"><div class="step-dot">·</div><div class="step-txt"><strong>Semáforo:</strong> 🟢 ≥6% · 🟡 3–6% · 🔴 &lt;3% com aviso · ⛔ negativo bloqueado.</div></div>
+
+          </div>
+        </div>
+
+        <div class="instr-section">
+          <div class="instr-section-head">
+            <div class="instr-num">6</div>
             <h3>Fluxo recomendado</h3>
           </div>
           <div class="instr-box">
@@ -620,7 +806,7 @@ function doLogout(){
 }
 
 function switchTab(t){
-  const tabs=['preco','lucr','como','adm'];
+  const tabs=['preco','lucr','pxq','como','adm'];
   document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-tab')[tabs.indexOf(t)].classList.add('active');
@@ -875,6 +1061,334 @@ function renderPromo(pp){
   document.getElementById('promoResult').style.display='flex';
   document.getElementById('promoWarn').style.display=pp<min?'block':'none';
 }
+
+
+/* ══ PxQ ══════════════════════════════════════════════════════════════════ */
+function selectFilialPxQ(el,filial,cf){
+  document.querySelectorAll('#panel-pxq .filial-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pxq_cf').value=cf;
+  updateTopFilial(filial);
+  calcPxQ();
+}
+
+function onPxqAnuncioChange(){
+  const tipo=document.getElementById('pxq_anuncio').value;
+  document.getElementById('pxq_com_pct').value=tipo==='premium'?18:12;
+  calcPxQ();
+}
+
+function enviarPxQ(origem){
+  switchTab('pxq');
+  let filial='GMC SP', cf=5;
+  if(origem==='preco'&&st.ultimoPreco){
+    document.getElementById('pxq_preco').value=st.ultimoPreco.toFixed(2);
+    document.getElementById('pxq_cmv').value=st.ultimoCmv.toFixed(2);
+    document.getElementById('pxq_com_pct').value=(st.ultimoComPct*100).toFixed(1);
+    document.getElementById('pxq_anuncio').value=st.ultimoAnuncio||'classico';
+    cf=st.ultimoCfP||5; filial=st.ultimoFilialP||'GMC SP';
+  } else if(origem==='lucr'){
+    const lp=parseFloat(document.getElementById('l_preco').value)||0;
+    const lc=parseFloat(document.getElementById('l_cmv').value)||0;
+    if(lp) document.getElementById('pxq_preco').value=lp.toFixed(2);
+    if(lc) document.getElementById('pxq_cmv').value=lc.toFixed(2);
+    const lcom=parseFloat(document.getElementById('l_com_pct').value)||12;
+    document.getElementById('pxq_com_pct').value=lcom;
+    cf=st.cfL||5; filial=st.filialL||'GMC SP';
+  }
+  // Sincronizar chip de filial
+  document.getElementById('pxq_cf').value=cf;
+  document.querySelectorAll('#panel-pxq .filial-chip').forEach(c=>{
+    c.classList.toggle('active', c.textContent.startsWith(filial));
+  });
+  updateTopFilial(filial);
+  calcPxQ();
+}
+
+// Fator progressivo de desconto no frete PxQ por quantidade
+// Baseado em dados reais ML — quanto mais peças, menor o frete/un
+function fatorPxQ(qtd){
+  if(qtd<=2)  return 0.40;
+  if(qtd<=3)  return 0.38;
+  if(qtd<=5)  return 0.35;
+  if(qtd<=10) return 0.30;
+  return 0.25; // 15+ unidades
+}
+
+function calcPxQFrete(frUnit, qtd){
+  // Frete por unidade com desconto progressivo
+  return frUnit * fatorPxQ(qtd);
+}
+
+function calcPxQPrecoIdeal(cmv, comPct, frUnit, qtd, cfPct, meta){
+  // Preço = (CMV + FreteUnit_PxQ) / (1 - Com% - CF% - Imp% - meta%)
+  const cf=cfPct/100, imp=IMP/100;
+  const fretePorUnit = frUnit * fatorPxQ(qtd);
+  const div = 1 - comPct - cf - imp - meta;
+  if(div<=0) return null;
+  return (cmv + fretePorUnit) / div;
+}
+
+function calcPxQLucro(preco, cmv, comPct, frUnit, qtd, cfPct){
+  const cf=cfPct/100, imp=IMP/100;
+  const fretePxQUnit = frUnit * fatorPxQ(qtd); // fator progressivo por qtd
+  const com = preco*comPct;
+  const fixo = preco*cf;
+  const impV = preco*imp;
+  return preco - com - fretePxQUnit - cmv - fixo - impV;
+}
+
+function getSemaforoClass(pct){
+  if(pct>=6) return 'verde';
+  if(pct>=3) return 'amber';
+  if(pct>0)  return 'red';
+  return 'blocked';
+}
+
+function getSemaforoDot(pct){
+  if(pct>=6) return 'pxq-dot-green';
+  if(pct>=3) return 'pxq-dot-amber';
+  if(pct>0)  return 'pxq-dot-red';
+  return 'pxq-dot-gray';
+}
+
+function getSemaforoTxt(pct){
+  if(pct>=6) return '🟢 Saudável';
+  if(pct>=3) return '🟡 Limite mínimo';
+  if(pct>0)  return '🔴 Abaixo de 3% — atenção';
+  return '⛔ Inviável';
+}
+
+function calcPxQ(){
+  const preco  = parseFloat(document.getElementById('pxq_preco').value)||0;
+  const cmv    = parseFloat(document.getElementById('pxq_cmv').value)||0;
+  const comPct = (parseFloat(document.getElementById('pxq_com_pct').value)||12)/100;
+  const cfPct  = parseFloat(document.getElementById('pxq_cf').value)||5;
+  const fator  = parseFloat(document.getElementById('pxq_fator').value)||40;
+  const grid   = document.getElementById('pxqGrid');
+  const copySection = document.getElementById('pxqCopySection');
+
+  if(!preco||!cmv){
+    grid.innerHTML='<div class="pxq-empty">Preencha o Preço de Venda e o CMV para ver as faixas PxQ</div>';
+    copySection.style.display='none';
+    document.getElementById('pxq_mode_normal').style.display='none';
+    document.getElementById('pxq_mode_smart').style.display='none';
+    document.getElementById('pxq_ctx_card').style.display='none';
+    return;
+  }
+
+  // Card de contexto — margem unitária com frete cheio
+  const frUnitCheio = frML(preco);
+  const lucroUnit   = preco - preco*comPct - frUnitCheio - cmv - preco*(cfPct/100) - preco*(IMP/100);
+  const margemUnit  = (lucroUnit/preco)*100;
+  const ctxCard     = document.getElementById('pxq_ctx_card');
+  ctxCard.style.display='block';
+  document.getElementById('pxq_ctx_preco').textContent  = fmt(preco);
+  document.getElementById('pxq_ctx_frete').textContent  = fmt(frUnitCheio);
+  document.getElementById('pxq_ctx_lucro').textContent  = fmt(lucroUnit);
+  const mEl = document.getElementById('pxq_ctx_margem');
+  mEl.textContent  = fmtP(margemUnit);
+  mEl.style.color  = margemUnit>=10?'var(--green)':margemUnit>=3?'var(--amber)':'var(--red)';
+
+  // Frete unitário normal pela tabela ML
+  const frUnit = frML(preco);
+
+  // Margem unitária no contexto PxQ (frete cheio)
+  const lucroUnitRef = preco - preco*comPct - frUnit - cmv - preco*(cfPct/100) - preco*(IMP/100);
+  const margemUnitRef = (lucroUnitRef/preco)*100;
+
+  // Modo de cálculo
+  // Margem no contexto PxQ (usando frete com desconto, não frete cheio)
+  // Margem base: usa fatorPxQ(2) = 0.40 como referência de entrada
+  const frPxQUnitBase = frUnit * fatorPxQ(2);
+  const lucroComFretePxQ = preco - preco*comPct - frPxQUnitBase - cmv - preco*(cfPct/100) - preco*(IMP/100);
+  const margemPxQBase = (lucroComFretePxQ/preco)*100;
+
+  // 3 modos:
+  // PADRAO: margem PxQ >= 8% → metas 6/5/4/3%
+  // INTELIGENTE: margem PxQ 0–8% → redução mínima, aproveita economia de frete
+  // CRITICO: margem PxQ < 0% → frete inviabiliza PxQ
+  const modoPadrao     = margemPxQBase >= 8;
+  const modoInteligente= margemPxQBase >= 0 && margemPxQBase < 8;
+  const modoCritico    = margemPxQBase < 0;
+
+  document.getElementById('pxq_mode_normal').style.display = modoPadrao ? 'block' : 'none';
+  document.getElementById('pxq_mode_smart').style.display  = modoInteligente ? 'block' : 'none';
+
+  // Modo crítico — sobrescreve texto do alerta
+  const alertSmart = document.getElementById('pxq_mode_smart');
+  if(modoCritico){
+    alertSmart.style.display='block';
+    alertSmart.style.background='var(--red-bg)';
+    alertSmart.style.color='var(--red)';
+    alertSmart.style.borderColor='#f0b8b8';
+    alertSmart.textContent='⛔ Atenção: o frete deste item consome toda a margem no contexto PxQ. As faixas mostram o melhor cenário possível — verifique se o produto é viável para precificação de atacado.';
+  } else {
+    alertSmart.style.background=''; alertSmart.style.color=''; alertSmart.style.borderColor='';
+    alertSmart.textContent='⚡ Modo inteligente ativado — margem PxQ < 8%. O ganho vem da economia no frete. Preços ajustados para maximizar viabilidade.';
+  }
+
+  // Metas por faixa
+  const FAIXAS = [
+    {label:'F1', qtd:2,  meta:modoPadrao?0.06:null, editable:false},
+    {label:'F2', qtd:3,  meta:modoPadrao?0.05:null, editable:false},
+    {label:'F3', qtd:5,  meta:modoPadrao?0.04:null, editable:false},
+    {label:'F4', qtd:10, meta:modoPadrao?0.03:null, editable:false},
+    {label:'F5', qtd:null, meta:null, editable:true},
+  ];
+
+  // Reduções escalonadas para modo inteligente/crítico
+  // Faixas com preço igual ou ligeiramente abaixo do unitário
+  const reducoesInteligentes = [0.003, 0.008, 0.013, 0.018, 0.025];
+
+  let html = '';
+  const precosPxQ = [];
+
+  FAIXAS.forEach((f, idx) => {
+    let precoFaixa, margemFaixa, lucroFaixa, fretePxQUnit;
+
+    if(f.editable){
+      // F5 — usa qtd editável do input se existir
+      const qtdInput = document.getElementById('pxq_f5_qtd');
+      const qtdF5 = qtdInput ? (parseInt(qtdInput.value)||15) : 15;
+      f.qtd = qtdF5;
+    }
+
+    if(f.meta !== null && modoPadrao){
+      // Modo padrão: calcula preço para atingir meta
+      const p = calcPxQPrecoIdeal(cmv, comPct, frUnit, f.qtd, cfPct, f.meta);
+      if(p===null||p<0||p>preco){
+        // Preço acima do unitário → usa redução mínima preservando hierarquia
+        const reducao = reducoesInteligentes[idx]||0.003;
+        precoFaixa = preco*(1-reducao);
+        lucroFaixa = calcPxQLucro(precoFaixa,cmv,comPct,frUnit,f.qtd,cfPct);
+        margemFaixa = (lucroFaixa/precoFaixa)*100;
+      } else {
+        precoFaixa=p;
+        lucroFaixa=calcPxQLucro(precoFaixa,cmv,comPct,frUnit,f.qtd,cfPct);
+        margemFaixa=(lucroFaixa/precoFaixa)*100;
+      }
+    } else {
+      if(f.editable){
+        // F5: calcula preço ideal para meta 3% usando fator 0.25 (volume alto)
+        // Fator 0.25 garante frete/un menor que F4 (fator 0.30) → preço sempre menor
+        const p5 = calcPxQPrecoIdeal(cmv, comPct, frUnit, f.qtd, cfPct, 0.03);
+        if(p5===null||p5<=0){
+          precoFaixa=0; lucroFaixa=-999; margemFaixa=-999;
+        } else {
+          // Garante que F5 é sempre menor que F4
+          const f4preco = calcPxQPrecoIdeal(cmv, comPct, frUnit, 10, cfPct, 0.03);
+          precoFaixa = (f4preco && p5 >= f4preco) ? f4preco*0.995 : p5;
+          lucroFaixa = calcPxQLucro(precoFaixa,cmv,comPct,frUnit,f.qtd,cfPct);
+          margemFaixa = (lucroFaixa/precoFaixa)*100;
+        }
+      } else {
+        // Modo inteligente / crítico para F1-F4
+        const reducao = reducoesInteligentes[idx];
+        precoFaixa = preco*(1-reducao);
+        if(precoFaixa > preco) precoFaixa = preco;
+        lucroFaixa = calcPxQLucro(precoFaixa,cmv,comPct,frUnit,f.qtd,cfPct);
+        margemFaixa = (lucroFaixa/precoFaixa)*100;
+      }
+    }
+
+    const cls = precoFaixa<=0 ? 'blocked' : getSemaforoClass(margemFaixa);
+    const dotCls = getSemaforoDot(margemFaixa);
+    const semaforoTxt = getSemaforoTxt(margemFaixa);
+    const precoDisplay = precoFaixa>0 ? fmt(precoFaixa) : '—';
+    const margemDisplay = precoFaixa>0 ? fmtP(margemFaixa) : '—';
+    const lucroDisplay = precoFaixa>0 ? fmt(lucroFaixa) : '—';
+    const desconto = preco>0&&precoFaixa>0 ? fmtP(((preco-precoFaixa)/preco)*100) : '—';
+    const fretePxQUnit_faixa = frUnit * fatorPxQ(f.qtd);
+    const fretePxQDisplay = fmt(fretePxQUnit_faixa);
+    const econFrete = fmt(frUnit - fretePxQUnit_faixa);
+
+    if(precoFaixa>0) precosPxQ.push({qtd:f.qtd, preco:precoFaixa, margem:margemFaixa});
+
+    // Quantidade label
+    const qtdLabel = f.editable
+      ? `<input type="number" class="pxq-faixa5-qtd" id="pxq_f5_qtd" value="${f.qtd}" min="11" oninput="calcPxQ()" onclick="event.stopPropagation()" />`
+      : `${f.qtd}`;
+
+    // Desconto em R$ vs unitário
+    const descontoRS = precoFaixa>0&&preco>0 ? fmt(preco-precoFaixa) : '—';
+    const descontoMostra = precoFaixa>0&&preco>0&&preco>precoFaixa
+      ? `↓ ${descontoRS}/un vs unitário`
+      : precoFaixa===preco ? 'mesmo preço unitário' : '';
+
+    // Aviso inline
+    let avisoTxt='', avisoStyle='';
+    if(precoFaixa<=0){
+      avisoTxt='⛔ Inviável — margem negativa em qualquer preço';
+      avisoStyle='color:var(--text3);';
+    } else if(f.editable&&margemFaixa<3){
+      avisoTxt='⚠️ Margem abaixo de 3% — aumente a quantidade mínima ou use com critério';
+      avisoStyle='color:var(--red);background:#fff5f5;';
+    } else if(margemFaixa<0){
+      avisoTxt='⚠️ Prejuízo nesta faixa';
+      avisoStyle='color:var(--red);background:#fff5f5;';
+    }
+
+    html += `
+    <div class="pxq-faixa ${cls}" onclick="togglePxQ(this)">
+      <div class="pxq-main">
+        <div class="pxq-qtd-col">
+          <div class="pxq-qtd-num">${qtdLabel}${f.editable?' <small style=\"font-size:11px;font-weight:400;color:var(--text3)\">ou mais</small>':' ou mais'}</div>
+          ${f.editable?'<div class="pxq-qtd-sub">quantidade livre</div>':''}
+        </div>
+        <div class="pxq-preco-col">
+          <div class="pxq-preco-val">${precoDisplay}</div>
+          <div class="pxq-preco-desc">${descontoMostra}</div>
+        </div>
+        <div class="pxq-right-col">
+          <span class="pxq-margem-badge">${margemDisplay}</span>
+          <span class="pxq-lucro-txt">${lucroDisplay} lucro</span>
+        </div>
+        <span class="pxq-chevron">▾</span>
+      </div>
+      <div class="pxq-detail">
+        <div class="pxq-di"><div class="pxq-di-label">Desconto s/ unitário</div><div class="pxq-di-val">${desconto}</div></div>
+        <div class="pxq-di"><div class="pxq-di-label">Frete unit. PxQ</div><div class="pxq-di-val">${fretePxQDisplay}</div></div>
+        <div class="pxq-di"><div class="pxq-di-label">Economia frete/un</div><div class="pxq-di-val" style="color:var(--green)">${econFrete}</div></div>
+        <div class="pxq-di"><div class="pxq-di-label">Comissão ML</div><div class="pxq-di-val">${fmtP(comPct*100)}</div></div>
+        <div class="pxq-di"><div class="pxq-di-label">Custo Fixo</div><div class="pxq-di-val">${fmtP(cfPct)}</div></div>
+        <div class="pxq-di"><div class="pxq-di-label">Imposto</div><div class="pxq-di-val">${fmtP(IMP)}</div></div>
+      </div>
+      ${avisoTxt?`<div class="pxq-aviso" style="${avisoStyle}display:block;">${avisoTxt}</div>`:''}
+    </div>`;
+  });
+
+  grid.innerHTML = html;
+  copySection.style.display = precosPxQ.length>0 ? 'block' : 'none';
+
+  // Chips para copiar
+  const copyRow = document.getElementById('pxqCopyRow');
+  copyRow.innerHTML = precosPxQ.map(p=>
+    `<span class="pxq-copy-chip">${p.qtd}+ un → ${fmt(p.preco)}</span>`
+  ).join('');
+
+  // Salva para copiar
+  window._pxqPrecos = precosPxQ;
+}
+
+function togglePxQ(el){
+  // Não abre se clicou no input da F5
+  if(event.target.tagName==='INPUT')return;
+  el.classList.toggle('open');
+}
+
+function copiarPrecosPxQ(){
+  if(!window._pxqPrecos||!window._pxqPrecos.length)return;
+  const txt = window._pxqPrecos.map(p=>`${p.qtd}+ un: R$ ${p.preco.toFixed(2).replace('.',',')}`).join('\n');
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector('.pxq-copy-btn');
+    btn.textContent='✅ Copiado!';
+    setTimeout(()=>btn.textContent='📋 Copiar todos os preços',2000);
+  }).catch(()=>{
+    alert(txt);
+  });
+}
+/* ══ fim PxQ ══ */
 
 /* ADM */
 let editIdx=null;
