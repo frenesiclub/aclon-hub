@@ -15,6 +15,7 @@
   --red:#b02020;--red-bg:#fdf0f0;
   --blue:#1a5fa8;--blue-bg:#e8f1fc;--blue-border:#b8d4f8;
   --amber:#8a4e00;--amber-bg:#fdf3e3;--amber-border:#f5c87a;
+  --orange:#c2540c;--orange-bg:#fef0e3;
   --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
   --shadow-md:0 4px 20px rgba(0,0,0,0.10);
   /* ML amarelo */
@@ -308,9 +309,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .kcard-prazo{font-size:11px;color:var(--text3);margin-top:2px;}
 .kcard-prazo.late{color:var(--red);font-weight:600;}
 .prio{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;}
-.prio-alta{background:var(--red-bg);color:var(--red);}
+.prio-urgente{background:var(--red);color:#fff;}
+.prio-alta{background:var(--orange-bg);color:var(--orange);}
 .prio-media{background:var(--amber-bg);color:var(--amber);}
 .prio-baixa{background:var(--blue-bg);color:var(--blue);}
+.kcard-tipo{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.kcard-links{font-size:11px;margin-bottom:6px;}
+.kcard-links a{color:var(--blue);text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kcard-links a:hover{text-decoration:underline;}
+.kcard-obs{font-size:11px;color:var(--text2);background:var(--bg2);border-radius:6px;padding:5px 8px;margin-top:6px;}
+.kcard-obs-btn{font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;margin-top:6px;text-decoration:underline;}
 .prod-empty{color:var(--text3);font-size:12px;padding:1.5rem 0;text-align:center;}
 .prod-placeholder{padding:3rem 1rem;text-align:center;color:var(--text2);font-size:13px;}
 .mini-rank{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
@@ -989,7 +997,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 <!-- MODAL EDIT SETOR -->
 <div class="modal-overlay" id="modalEditSetor">
   <div class="modal">
-    <h3>Alterar setor</h3>
+    <h3>Editar colaborador</h3>
     <div style="font-size:14px;font-weight:600;margin-bottom:1rem;" id="editNomeDisplay"></div>
     <label>Setor</label>
     <select id="editSetor">
@@ -999,7 +1007,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
       <option value="operacional">Operacional</option>
       <option value="full">Full</option>
     </select>
-    <div class="modal-btns">
+    <label style="display:flex;align-items:center;gap:7px;margin-top:.25rem;">
+      <input type="checkbox" id="editLider" style="width:auto;margin:0;"/>
+      <span style="text-transform:none;font-weight:500;color:var(--text2);letter-spacing:0;">Líder (vê e cria demandas para toda a equipe)</span>
+    </label>
+    <div class="modal-btns" style="margin-top:1rem;">
       <button class="btn-cancel" onclick="closeModal('modalEditSetor')">Cancelar</button>
       <button class="btn-confirm" onclick="saveEditSetor()">Salvar</button>
     </div>
@@ -1011,7 +1023,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 const META=0.15;
 
 let st={
-  isAdm:false,userName:'',usuario:'',setor:'',senha:null,
+  isAdm:false,isLider:false,userName:'',usuario:'',setor:'',senha:null,
   mkt:'ml', // aba mkt ativa
   cf:{ml:{p:5,l:5},sh:{p:5,l:5},az:{p:5,l:5}},
   filial:{ml:{p:'GMC SP',l:'GMC SP'},sh:{p:'GMC SP',l:'GMC SP'},az:{p:'GMC SP',l:'GMC SP'}},
@@ -1055,7 +1067,7 @@ async function doLogin(){
   }
   btn.disabled=false;btn.style.opacity=1;
   if(!d.ok){err.style.display='block';err.textContent=d.erro||'Usuário ou senha incorretos.';return;}
-  st.isAdm=d.user.isAdm; st.userName=d.user.nome; st.usuario=d.user.usuario; st.setor=d.user.setor; st.senha=pass;
+  st.isAdm=d.user.isAdm; st.isLider=!!d.user.isLider; st.userName=d.user.nome; st.usuario=d.user.usuario; st.setor=d.user.setor; st.senha=pass;
   document.getElementById('topUser').textContent=st.userName;
   document.getElementById('mtab-adm').style.display=st.isAdm?'':'none';
   document.getElementById('loginScreen').style.display='none';
@@ -1081,6 +1093,7 @@ function switchMkt(mod){
     if(p) p.classList.toggle('active',m===mod);
   });
   st.mod=mod;
+  document.getElementById('topFilialBadge').style.display=mod==='calc'?'':'none';
   if(mod==='prod') renderProd();
 }
 
@@ -1529,19 +1542,20 @@ function copiarPrecosPxQ(){
 /* ── ADM ── */
 const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
 let editIdx=null;
-function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNomeDisplay').textContent=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('modalEditSetor').classList.add('open');}
+function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNomeDisplay').textContent=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
 async function saveEditSetor(){
   if(editIdx===null)return;
   const u=usersCache[editIdx];
   const novoSetor=document.getElementById('editSetor').value;
-  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,setor:novoSetor})});
+  const novoLider=document.getElementById('editLider').checked;
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,setor:novoSetor,lider:novoLider})});
   editIdx=null;
   await fetchUsers();
   renderUserTable();
   closeModal('modalEditSetor');
 }
 function renderUserTable(){
-  document.getElementById('userTableBody').innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;}).join('');
+  document.getElementById('userTableBody').innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${u.nome}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;}).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
@@ -1565,7 +1579,7 @@ async function renderProd(){
   const el=document.getElementById('prodContent');
   el.innerHTML='<div class="prod-empty">Carregando...</div>';
   await Promise.all([fetchUsers(),fetchCards()]);
-  if(st.isAdm) renderProdAdmin(el);
+  if(st.isAdm||st.isLider) renderProdAdmin(el);
   else renderProdColaborador(el);
 }
 
@@ -1607,13 +1621,27 @@ function renderProdAdmin(el){
         <input id="ndTitulo" type="text"/>
         <label>Descrição (opcional)</label>
         <input id="ndDescricao" type="text"/>
+        <label>Links externos (opcional, um por linha)</label>
+        <textarea id="ndLinks" rows="2" style="width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;resize:vertical;"></textarea>
         <label>Tipo</label>
-        <select id="ndTipo"><option value="semanal">Semanal</option><option value="esporadica">Esporádica</option></select>
+        <select id="ndTipo">
+          <option value="diario">Diário</option>
+          <option value="semanal" selected>Semanal</option>
+          <option value="quinzenal">Quinzenal</option>
+          <option value="esporadica">Esporádica</option>
+        </select>
         <label>Prioridade</label>
-        <select id="ndPrioridade"><option value="alta">Alta</option><option value="media" selected>Média</option><option value="baixa">Baixa</option></select>
+        <select id="ndPrioridade">
+          <option value="urgente">Urgente</option>
+          <option value="alta">Alta</option>
+          <option value="media" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
         <label>Responsável</label>
         <select id="ndResponsavel">${usersCache.filter(u=>u.setor===prodSetorAtivo).map(u=>`<option value="${u.usuario}">${u.nome}</option>`).join('')}</select>
-        <label>Prazo</label>
+        <label>Prazo de início (opcional)</label>
+        <input id="ndPrazoInicio" type="date"/>
+        <label>Prazo de término</label>
         <input id="ndPrazo" type="date" value="${hojeISO()}"/>
         <div class="modal-btns">
           <button class="btn-cancel" onclick="closeModal('modalNovaDemanda')">Cancelar</button>
@@ -1687,7 +1715,7 @@ function renderKanbanAdmin(setorInfo){
     <div class="prod-toolbar">
       <div style="font-size:12px;color:var(--text2);">${cards.length} demanda${cards.length===1?'':'s'} no quadro</div>
       <div style="display:flex;gap:8px;">
-        <button class="btn-sm" onclick="abrirNovoColaborador()">+ Colaborador</button>
+        ${st.isAdm?'<button class="btn-sm" onclick="abrirNovoColaborador()">+ Colaborador</button>':''}
         <button class="btn-primary" onclick="abrirNovaDemanda()">+ Nova demanda</button>
       </div>
     </div>
@@ -1700,15 +1728,32 @@ function renderKcard(c){
   const atrasado=c.prazo&&c.prazo<hojeISO()&&c.status!=='concluido';
   const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
   const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
-  const prioLabel={alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
+  const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
+  const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
+  const linksHtml=c.links?`<div class="kcard-links">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${l}" target="_blank" rel="noopener">${l}</a>`).join('')}</div>`:'';
+  const prazoHtml=(c.prazoInicio||c.prazo)?`<div class="kcard-prazo${atrasado?' late':''}">${c.prazoInicio?fmtDataCard(c.prazoInicio)+' → ':''}${c.prazo?fmtDataCard(c.prazo):''}</div>`:'';
+  const obsHtml=c.observacao?`<div class="kcard-obs">${c.observacao}</div>`:'';
   return `<div class="kcard${atrasado?' overdue':''}">
+    <div class="kcard-tipo">${tipoLabel}${c.criadoPor?' · Delegado por '+c.criadoPor:''}</div>
     <div class="kcard-top"><span class="kcard-title">${c.titulo}</span><span class="prio prio-${c.prioridade}">${prioLabel}</span></div>
     ${c.descricao?`<div class="kcard-desc">${c.descricao}</div>`:''}
+    ${linksHtml}
     <div class="kcard-foot">
-      <div><div class="kcard-resp">${resp?resp.nome:'—'}</div>${c.prazo?`<div class="kcard-prazo${atrasado?' late':''}">${fmtDataCard(c.prazo)}</div>`:''}</div>
+      <div><div class="kcard-resp">${resp?resp.nome:'—'}</div>${prazoHtml}</div>
       ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}')">${nextLabel}</button>`:''}
     </div>
+    ${obsHtml}
+    <button class="kcard-obs-btn" onclick="editarObservacao('${c.id}')">${c.observacao?'Editar observação':'+ Observação'}</button>
   </div>`;
+}
+
+async function editarObservacao(id){
+  const card=cardsCache.find(c=>c.id===id);
+  const nova=window.prompt('Observação (ex: motivo do atraso):',(card&&card.observacao)||'');
+  if(nova===null)return;
+  await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,observacao:nova})});
+  await fetchCards();
+  renderProd();
 }
 
 function switchProdSetor(id){prodSetorAtivo=id;renderProd();}
@@ -1721,13 +1766,16 @@ async function criarDemanda(){
   const novo={
     titulo,
     descricao:document.getElementById('ndDescricao').value.trim(),
+    links:document.getElementById('ndLinks').value.trim(),
     setor:prodSetorAtivo,
     tipo:document.getElementById('ndTipo').value,
     responsavel,
     prioridade:document.getElementById('ndPrioridade').value,
+    prazoInicio:document.getElementById('ndPrazoInicio').value||null,
     prazo:document.getElementById('ndPrazo').value,
   };
-  await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
   closeModal('modalNovaDemanda');
   await fetchCards();
   renderProd();
