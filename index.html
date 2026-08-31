@@ -270,7 +270,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .modal{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:320px;max-width:95vw;box-shadow:var(--shadow-md);}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:1.25rem;}
 .modal label{font-size:10px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
-.modal input,.modal select{width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;}
+.modal input,.modal select,.modal textarea{width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;font-family:inherit;resize:vertical;}
 .modal-btns{display:flex;gap:8px;margin-top:.5rem;}
 .modal-btns button{flex:1;}
 .btn-cancel{background:none;border:0.5px solid var(--border);border-radius:var(--radius-md);padding:9px;font-size:14px;cursor:pointer;color:var(--text2);}
@@ -1018,6 +1018,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
   </div>
 </div>
 
+<div id="modalDetalheContainer"></div>
+
 </div><!-- /hub -->
 <script>
 const META=0.15;
@@ -1622,7 +1624,7 @@ function renderProdAdmin(el){
         <label>Descrição (opcional)</label>
         <input id="ndDescricao" type="text"/>
         <label>Links externos (opcional, um por linha)</label>
-        <textarea id="ndLinks" rows="2" style="width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;resize:vertical;"></textarea>
+        <textarea id="ndLinks" rows="2"></textarea>
         <label>Tipo</label>
         <select id="ndTipo">
           <option value="diario">Diário</option>
@@ -1723,35 +1725,121 @@ function renderKanbanAdmin(setorInfo){
   `;
 }
 
+function escHtml(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 function renderKcard(c){
   const resp=usersCache.find(u=>u.usuario===c.responsavel);
   const atrasado=c.prazo&&c.prazo<hojeISO()&&c.status!=='concluido';
-  const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
-  const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
   const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
   const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
-  const linksHtml=c.links?`<div class="kcard-links">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${l}" target="_blank" rel="noopener">${l}</a>`).join('')}</div>`:'';
+  const linksHtml=c.links?`<div class="kcard-links">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${escHtml(l)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(l)}</a>`).join('')}</div>`:'';
   const prazoHtml=(c.prazoInicio||c.prazo)?`<div class="kcard-prazo${atrasado?' late':''}">${c.prazoInicio?fmtDataCard(c.prazoInicio)+' → ':''}${c.prazo?fmtDataCard(c.prazo):''}</div>`:'';
-  const obsHtml=c.observacao?`<div class="kcard-obs">${c.observacao}</div>`:'';
-  return `<div class="kcard${atrasado?' overdue':''}">
-    <div class="kcard-tipo">${tipoLabel}${c.criadoPor?' · Delegado por '+c.criadoPor:''}</div>
-    <div class="kcard-top"><span class="kcard-title">${c.titulo}</span><span class="prio prio-${c.prioridade}">${prioLabel}</span></div>
-    ${c.descricao?`<div class="kcard-desc">${c.descricao}</div>`:''}
+  const obsHtml=c.observacao?`<div class="kcard-obs">${escHtml(c.observacao)}</div>`:'';
+  return `<div class="kcard${atrasado?' overdue':''}" onclick="abrirDetalheCard('${c.id}')" style="cursor:pointer;">
+    <div class="kcard-tipo">${tipoLabel}${c.criadoPor?' · Delegado por '+escHtml(c.criadoPor):''}</div>
+    <div class="kcard-top"><span class="kcard-title">${escHtml(c.titulo)}</span><span class="prio prio-${c.prioridade}">${prioLabel}</span></div>
+    ${c.descricao?`<div class="kcard-desc">${escHtml(c.descricao)}</div>`:''}
     ${linksHtml}
     <div class="kcard-foot">
       <div><div class="kcard-resp">${resp?resp.nome:'—'}</div>${prazoHtml}</div>
-      ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}')">${nextLabel}</button>`:''}
     </div>
     ${obsHtml}
-    <button class="kcard-obs-btn" onclick="editarObservacao('${c.id}')">${c.observacao?'Editar observação':'+ Observação'}</button>
   </div>`;
 }
 
-async function editarObservacao(id){
-  const card=cardsCache.find(c=>c.id===id);
-  const nova=window.prompt('Observação (ex: motivo do atraso):',(card&&card.observacao)||'');
-  if(nova===null)return;
-  await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,observacao:nova})});
+/* ── DETALHE / EDIÇÃO / EXCLUSÃO DE DEMANDA ── */
+const TIPO_OPTS=[['diario','Diário'],['semanal','Semanal'],['quinzenal','Quinzenal'],['esporadica','Esporádica']];
+const PRIO_OPTS=[['urgente','Urgente'],['alta','Alta'],['media','Média'],['baixa','Baixa']];
+
+function abrirDetalheCard(id){
+  const c=cardsCache.find(x=>x.id===id);
+  if(!c)return;
+  const podeGerir=st.isAdm||st.isLider;
+  const resp=usersCache.find(u=>u.usuario===c.responsavel);
+  const equipeSetor=usersCache.filter(u=>u.setor===c.setor);
+  const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
+  const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
+  const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
+  const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
+
+  const camposGerenciaveis=podeGerir?`
+    <label>Descrição</label>
+    <textarea id="ddDescricao" rows="2">${escHtml(c.descricao)}</textarea>
+    <label>Links externos (um por linha)</label>
+    <textarea id="ddLinks" rows="2">${escHtml(c.links)}</textarea>
+    <label>Tipo</label>
+    <select id="ddTipo">${TIPO_OPTS.map(([v,l])=>`<option value="${v}"${v===c.tipo?' selected':''}>${l}</option>`).join('')}</select>
+    <label>Prioridade</label>
+    <select id="ddPrioridade">${PRIO_OPTS.map(([v,l])=>`<option value="${v}"${v===c.prioridade?' selected':''}>${l}</option>`).join('')}</select>
+    <label>Responsável</label>
+    <select id="ddResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}"${u.usuario===c.responsavel?' selected':''}>${u.nome}</option>`).join('')}</select>
+    <label>Prazo de início</label>
+    <input id="ddPrazoInicio" type="date" value="${c.prazoInicio||''}"/>
+    <label>Prazo de término</label>
+    <input id="ddPrazo" type="date" value="${c.prazo||''}"/>
+  `:`
+    ${c.descricao?`<div class="kcard-desc" style="margin-bottom:.75rem;">${escHtml(c.descricao)}</div>`:''}
+    ${c.links?`<div class="kcard-links" style="margin-bottom:.75rem;">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${escHtml(l)}" target="_blank" rel="noopener">${escHtml(l)}</a>`).join('')}</div>`:''}
+    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;">
+      <span class="prio prio-${c.prioridade}">${prioLabel}</span> · Responsável: ${resp?resp.nome:'—'}
+      ${c.prazoInicio?` · Início: ${fmtDataCard(c.prazoInicio)}`:''}
+      ${c.prazo?` · Prazo: ${fmtDataCard(c.prazo)}`:''}
+    </div>
+  `;
+
+  document.getElementById('modalDetalheContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalDetalheCard">
+      <div class="modal">
+        ${podeGerir
+          ? `<label>Título</label><input id="ddTitulo" type="text" value="${escHtml(c.titulo)}"/>`
+          : `<h3>${escHtml(c.titulo)}</h3>`
+        }
+        <div style="font-size:11px;color:var(--text3);margin-top:-.75rem;margin-bottom:1rem;">${tipoLabel} · Delegado por ${escHtml(c.criadoPor||'—')}</div>
+        ${camposGerenciaveis}
+        <label>Observação${c.status!=='concluido'?' (ex: motivo do atraso)':''}</label>
+        <textarea id="ddObservacao" rows="2">${escHtml(c.observacao)}</textarea>
+        <div class="modal-btns" style="justify-content:space-between;">
+          <div>${podeGerir?`<button class="btn-cancel" style="color:var(--red);border-color:var(--red);" onclick="excluirCard('${c.id}')">Excluir</button>`:'<span></span>'}</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-cancel" onclick="fecharDetalheCard()">Fechar</button>
+            ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}');fecharDetalheCard();">${nextLabel}</button>`:''}
+            <button class="btn-confirm" onclick="salvarDetalheCard('${c.id}')">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function fecharDetalheCard(){document.getElementById('modalDetalheContainer').innerHTML='';}
+
+async function salvarDetalheCard(id){
+  const payload={id,observacao:document.getElementById('ddObservacao').value};
+  const podeGerir=st.isAdm||st.isLider;
+  if(podeGerir){
+    payload.edit={
+      titulo:document.getElementById('ddTitulo').value.trim(),
+      descricao:document.getElementById('ddDescricao').value.trim(),
+      links:document.getElementById('ddLinks').value.trim(),
+      tipo:document.getElementById('ddTipo').value,
+      prioridade:document.getElementById('ddPrioridade').value,
+      responsavel:document.getElementById('ddResponsavel').value,
+      prazoInicio:document.getElementById('ddPrazoInicio').value||null,
+      prazo:document.getElementById('ddPrazo').value||null,
+    };
+    Object.assign(payload,st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha});
+  }
+  await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  fecharDetalheCard();
+  await fetchCards();
+  renderProd();
+}
+
+async function excluirCard(id){
+  if(!confirm('Excluir esta demanda? Essa ação não pode ser desfeita.'))return;
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  await api('/api/cards',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id})});
+  fecharDetalheCard();
   await fetchCards();
   renderProd();
 }
