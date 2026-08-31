@@ -7,8 +7,8 @@ const { redisGetJSON, redisSetJSON } = require('./_redis');
 // cadastro de equipe nem exportam relatórios — isso continua só admin).
 const SEED_USERS = [
   { usuario: 'ecom19', nome: 'Miguel 2', setor: 'mercado', senha: 'ecom19@gmc', lider: false },
-  { usuario: 'ecom10', nome: 'Thiago', setor: 'mercado', senha: 'ecom10@gmc', lider: true },
-  { usuario: 'ecom6', nome: 'Vitória', setor: 'operacional', senha: 'ecom6@gmc', lider: true },
+  { usuario: 'ecom10', nome: 'Thiago', setor: 'operacional_estrategico', senha: 'ecom10@gmc', lider: true },
+  { usuario: 'ecom6', nome: 'Vitória', setor: 'operacional_estrategico', senha: 'ecom6@gmc', lider: true },
   { usuario: 'ecom16', nome: 'Miguel', setor: 'anuncios', senha: 'ecom16@gmc', lider: false },
   { usuario: 'ecom2', nome: 'Leonardo', setor: 'mercado', senha: 'ecom2@gmc', lider: false },
   { usuario: 'ecom12', nome: 'Alex', setor: 'anuncios', senha: 'ecom12@gmc', lider: false },
@@ -81,6 +81,6 @@ module.exports = async (req, res) => {
       },
     });
   } catch (e) {
-    res.status(500).json({ ok: false, erro: e.message });
+    res.status(500).json({ error: e.message });
   }
 };
