@@ -114,25 +114,36 @@ module.exports = async (req, res) => {
       if (observacao !== undefined) {
         cards[idx].observacao = observacao;
       }
-      // Editar os dados da demanda (título, prazos, responsável etc.) exige
-      // ser admin ou líder — colaborador comum não edita depois de criar.
+      // Editar os dados da demanda: admin/líder editam tudo (inclusive
+      // reatribuir responsável). O dono da própria demanda (mesmo sendo
+      // colaborador comum) também pode editar os campos operacionais —
+      // título, descrição, links, tipo, prioridade, prazos — mas não
+      // reatribuir responsável nem setor.
       if (edit) {
         const auth = await podeGerenciar(body);
-        if (!auth.ok || auth.restrito) {
+        if (!auth.ok) {
           res.status(401).json({ error: 'não autorizado' });
           return;
         }
-        const permitidos = [
-          'titulo',
-          'descricao',
-          'links',
-          'tipo',
-          'prioridade',
-          'responsavel',
-          'prazoInicio',
-          'prazo',
-          'setor',
-        ];
+        let permitidos;
+        if (!auth.restrito) {
+          permitidos = [
+            'titulo',
+            'descricao',
+            'links',
+            'tipo',
+            'prioridade',
+            'responsavel',
+            'prazoInicio',
+            'prazo',
+            'setor',
+          ];
+        } else if (cards[idx].responsavel === auth.usuarioAutenticado) {
+          permitidos = ['titulo', 'descricao', 'links', 'tipo', 'prioridade', 'prazoInicio', 'prazo'];
+        } else {
+          res.status(401).json({ error: 'não autorizado' });
+          return;
+        }
         for (const campo of permitidos) {
           if (edit[campo] !== undefined) cards[idx][campo] = edit[campo];
         }
