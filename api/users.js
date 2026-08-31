@@ -49,15 +49,14 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'PATCH') {
-      // Ações administrativas de equipe (trocar setor, promover/despromover
-      // líder) continuam só para admin — Thiago e Vitória não gerenciam
-      // cadastro de equipe.
+      // Ações administrativas de equipe continuam só para admin — Thiago
+      // e Vitória não gerenciam cadastro de equipe.
       const body = parseBody(req);
       if (body.senha_adm !== SENHA_ADM) {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { usuario, setor, lider } = body;
+      const { usuario, nome, setor, lider } = body;
       if (!usuario) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -68,8 +67,27 @@ module.exports = async (req, res) => {
         res.status(404).json({ error: 'usuário não encontrado' });
         return;
       }
+      if (nome !== undefined && nome.trim()) users[idx].nome = nome.trim();
       if (setor !== undefined) users[idx].setor = setor;
       if (lider !== undefined) users[idx].lider = !!lider;
+      await redisSetJSON('aclon_users', users);
+      res.status(200).json({ ok: true, users: semSenha(users) });
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      const body = parseBody(req);
+      if (body.senha_adm !== SENHA_ADM) {
+        res.status(401).json({ error: 'não autorizado' });
+        return;
+      }
+      const { usuario } = body;
+      if (!usuario) {
+        res.status(400).json({ error: 'dados incompletos' });
+        return;
+      }
+      let users = await redisGetJSON('aclon_users', []);
+      users = users.filter((u) => u.usuario !== usuario);
       await redisSetJSON('aclon_users', users);
       res.status(200).json({ ok: true, users: semSenha(users) });
       return;
