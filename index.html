@@ -276,6 +276,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .btn-confirm{background:var(--text);color:#fff;border:none;border-radius:var(--radius-md);padding:9px;font-size:14px;font-weight:600;cursor:pointer;}
 
 @media(max-width:520px){body{padding:0;}.hub{border-radius:0;}.result-hero,.promo-grid{grid-template-columns:1fr;}.hero-value{font-size:24px;}}
+
+/* ── PRODUTIVIDADE ── */
+:root{--prod:#0f6e5c;--prod-bg:#e5f5f1;--prod-dark:#0a4a3d;}
+.mkt-tab.prod-active{color:var(--prod-dark);border-bottom-color:var(--prod);background:var(--prod-bg);}
+.mkt-tab.prod-active .mkt-dot{background:var(--prod);}
+.prod-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
+.prod-sub-tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.prod-sub-tab{font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;}
+.prod-sub-tab.active{background:var(--text);color:#fff;border-color:var(--text);}
+.prod-sub-tab .dot{width:6px;height:6px;border-radius:50%;background:var(--border2);}
+.prod-sub-tab.live .dot{background:var(--green);}
+.btn-primary{background:var(--prod);color:#fff;border:none;border-radius:var(--radius-md);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-primary:hover{opacity:.9;}
+.prod-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.prod-kpi{background:var(--bg2);border-radius:var(--radius-md);padding:.9rem 1rem;}
+.prod-kpi .n{font-size:22px;font-weight:800;color:var(--text);}
+.prod-kpi .l{font-size:11px;color:var(--text2);margin-top:2px;}
+.kanban-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.kanban-col-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px;}
+.kanban-col-title .count{color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0;}
+.kanban-cards{display:flex;flex-direction:column;gap:8px;min-height:60px;}
+.kcard{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:.75rem .85rem;box-shadow:var(--shadow-sm);}
+.kcard.overdue{border-color:var(--red);}
+.kcard-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:4px;}
+.kcard-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;}
+.kcard-desc{font-size:12px;color:var(--text2);margin-bottom:6px;}
+.kcard-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px;}
+.kcard-resp{font-size:11px;color:var(--text2);}
+.kcard-prazo{font-size:11px;color:var(--text3);margin-top:2px;}
+.kcard-prazo.late{color:var(--red);font-weight:600;}
+.prio{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.prio-alta{background:var(--red-bg);color:var(--red);}
+.prio-media{background:var(--amber-bg);color:var(--amber);}
+.prio-baixa{background:var(--blue-bg);color:var(--blue);}
+.prod-empty{color:var(--text3);font-size:12px;padding:1.5rem 0;text-align:center;}
+.prod-placeholder{padding:3rem 1rem;text-align:center;color:var(--text2);font-size:13px;}
+.mini-rank{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.mini-rank .name{font-size:12px;color:var(--text2);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini-rank .bar-bg{flex:1;height:7px;background:var(--bg2);border-radius:20px;overflow:hidden;}
+.mini-rank .bar-fill{height:100%;background:var(--prod);border-radius:20px;}
+.mini-rank .val{font-size:12px;color:var(--text);width:20px;text-align:right;}
 </style>
 </head>
 <body>
@@ -320,6 +361,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     </button>
     <button class="mkt-tab" id="mtab-az" onclick="switchMkt('az')">
       <span class="mkt-dot"></span> Amazon
+    </button>
+    <button class="mkt-tab" id="mtab-prod" onclick="switchMkt('prod')">
+      <span class="mkt-dot"></span> Produtividade
     </button>
     <button class="mkt-tab" id="mtab-adm" style="display:none" onclick="switchMkt('adm')">
       ADM
@@ -918,6 +962,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAINEL PRODUTIVIDADE -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="mkt-panel" id="mp-prod">
+    <div class="content" id="prodContent">
+      <div class="prod-empty">Carregando...</div>
+    </div>
+  </div>
+
 </div><!-- /main-screen -->
 
 <!-- MODAL EDIT SETOR -->
@@ -942,36 +995,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 
 </div><!-- /hub -->
 <script>
-const SENHA_ADM='adm@2026';
 const META=0.15;
 
-const FIXED_USERS=[
-  {usuario:'ecom19',nome:'Miguel 2',  setor:'mercado',     senha:'ecom19@gmc'},
-  {usuario:'ecom10',nome:'Thiago',    setor:'mercado',     senha:'ecom10@gmc'},
-  {usuario:'ecom6', nome:'Vitória',   setor:'operacional', senha:'ecom6@gmc' },
-  {usuario:'ecom16',nome:'Miguel',    setor:'anuncios',    senha:'ecom16@gmc'},
-  {usuario:'ecom2', nome:'Leonardo',  setor:'mercado',     senha:'ecom2@gmc' },
-  {usuario:'ecom12',nome:'Alex',      setor:'anuncios',    senha:'ecom12@gmc'},
-  {usuario:'ecom18',nome:'Laize',     setor:'prevenda',    senha:'ecom18@gmc'},
-  {usuario:'ecom14',nome:'Felipe',    setor:'mercado',     senha:'ecom14@gmc'},
-];
-
-function loadCfg(){try{const s=localStorage.getItem('aclon5');if(s)return JSON.parse(s);}catch(e){}return null;}
-function saveCfg(){try{localStorage.setItem('aclon5',JSON.stringify({setores:st.setores}));}catch(e){}}
-const cfg=loadCfg();
-
 let st={
-  isAdm:false,userName:'',
+  isAdm:false,userName:'',usuario:'',setor:'',senha:null,
   mkt:'ml', // aba mkt ativa
   cf:{ml:{p:5,l:5},sh:{p:5,l:5},az:{p:5,l:5}},
   filial:{ml:{p:'GMC SP',l:'GMC SP'},sh:{p:'GMC SP',l:'GMC SP'},az:{p:'GMC SP',l:'GMC SP'}},
   ultimo:{ml:{preco:null,cmv:null,comPct:0.12,anuncio:'classico',cf:5,filial:'GMC SP'},
           sh:{preco:null,cmv:null,comPct:0.14,cf:5,filial:'GMC SP'},
           az:{preco:null,cmv:null,modal:'DBA',cf:5,filial:'GMC SP'}},
-  setores:cfg?cfg.setores:{},
 };
 
-function getUsers(){return FIXED_USERS.map(u=>({...u,setor:st.setores[u.usuario]||u.setor}));}
+let usersCache=[];
+let cardsCache=[];
+async function api(path,opts){const r=await fetch(path,opts);return r.json();}
+async function fetchUsers(){const d=await api('/api/users');usersCache=d.users||[];return usersCache;}
+async function fetchCards(){const d=await api('/api/cards');cardsCache=d.cards||[];return cardsCache;}
+
 const fmt=v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtP=v=>parseFloat(v).toFixed(2)+'%';
 
@@ -984,20 +1025,29 @@ function getFr(p,mkt,modal){if(mkt==='ml')return frML(p);if(mkt==='sh')return fr
 function getImp(mkt,side){return parseFloat(document.getElementById(mkt+'_'+(side==='p'?'p':'l')+'_imp').value)||9;}
 
 /* ── LOGIN ── */
-function doLogin(){
+async function doLogin(){
   const user=document.getElementById('loginUser').value.trim();
   const pass=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
+  const btn=document.querySelector('.login-btn');
   err.style.display='none';
   if(!user){err.textContent='Informe seu usuário.';err.style.display='block';return;}
-  const isAdm=pass===SENHA_ADM&&user.toLowerCase()==='adm';
-  const found=getUsers().find(u=>(u.usuario.toLowerCase()===user.toLowerCase()||u.nome.trim().toLowerCase()===user.trim().toLowerCase())&&u.senha===pass);
-  if(!isAdm&&!found){err.style.display='block';err.textContent='Usuário ou senha incorretos.';return;}
-  st.isAdm=isAdm; st.userName=isAdm?'ADM':found.nome;
+  btn.disabled=true;btn.style.opacity=.6;
+  let d;
+  try{
+    d=await api('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:user,senha:pass})});
+  }catch(e){
+    btn.disabled=false;btn.style.opacity=1;
+    err.style.display='block';err.textContent='Não consegui conectar. Tenta de novo.';return;
+  }
+  btn.disabled=false;btn.style.opacity=1;
+  if(!d.ok){err.style.display='block';err.textContent=d.erro||'Usuário ou senha incorretos.';return;}
+  st.isAdm=d.user.isAdm; st.userName=d.user.nome; st.usuario=d.user.usuario; st.setor=d.user.setor; st.senha=pass;
   document.getElementById('topUser').textContent=st.userName;
-  document.getElementById('mtab-adm').style.display=isAdm?'':'none';
+  document.getElementById('mtab-adm').style.display=st.isAdm?'':'none';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainScreen').style.display='block';
+  await fetchUsers();
   renderUserTable();
 }
 function doLogout(){
@@ -1005,16 +1055,18 @@ function doLogout(){
   document.getElementById('mainScreen').style.display='none';
   document.getElementById('loginPass').value='';
   document.getElementById('loginUser').value='';
+  st.senha=null;
 }
 
 /* ── NAVEGAÇÃO MKT ── */
 function switchMkt(mkt){
-  ['ml','sh','az','adm'].forEach(m=>{
+  ['ml','sh','az','prod','adm'].forEach(m=>{
     document.getElementById('mtab-'+m).className='mkt-tab'+(m===mkt?' '+m+'-active':'');
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mkt);
   });
   st.mkt=mkt;
+  if(mkt==='prod') renderProd();
 }
 
 /* ── NAVEGAÇÃO SUB ── */
@@ -1450,14 +1502,224 @@ function copiarPrecosPxQ(){
 }
 
 /* ── ADM ── */
+const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
 let editIdx=null;
-function openEditSetor(i){editIdx=i;const u=getUsers()[i];document.getElementById('editNomeDisplay').textContent=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('modalEditSetor').classList.add('open');}
-function saveEditSetor(){if(editIdx===null)return;st.setores[FIXED_USERS[editIdx].usuario]=document.getElementById('editSetor').value;editIdx=null;saveCfg();renderUserTable();closeModal('modalEditSetor');}
+function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNomeDisplay').textContent=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('modalEditSetor').classList.add('open');}
+async function saveEditSetor(){
+  if(editIdx===null)return;
+  const u=usersCache[editIdx];
+  const novoSetor=document.getElementById('editSetor').value;
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,setor:novoSetor})});
+  editIdx=null;
+  await fetchUsers();
+  renderUserTable();
+  closeModal('modalEditSetor');
+}
 function renderUserTable(){
-  const lb={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
-  document.getElementById('userTableBody').innerHTML=getUsers().map((u,i)=>{const[label,cls]=lb[u.setor]||[u.setor,'full'];return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;}).join('');
+  document.getElementById('userTableBody').innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${u.nome}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Setor</button></td></tr>`;}).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ── PRODUTIVIDADE ── */
+const SETORES_PROD=[
+  {id:'anuncios',label:'Anúncios',ativo:true},
+  {id:'mercado',label:'Análise de Mercado',ativo:false},
+  {id:'prevenda',label:'Pré-venda',ativo:false},
+  {id:'full',label:'Full',ativo:false},
+];
+const STATUS_COLS=[{id:'a_fazer',label:'A Fazer'},{id:'fazendo',label:'Fazendo'},{id:'concluido',label:'Concluído'}];
+let prodSetorAtivo='anuncios';
+
+function hojeISO(){return new Date().toISOString().slice(0,10);}
+function inicioSemanaISO(){const d=new Date();const dia=d.getDay();const diff=(dia===0?-6:1)-dia;d.setDate(d.getDate()+diff);d.setHours(0,0,0,0);return d.toISOString();}
+function fmtDataCard(iso){const p=iso.split('-');return p[2]+'/'+p[1];}
+
+async function renderProd(){
+  const el=document.getElementById('prodContent');
+  el.innerHTML='<div class="prod-empty">Carregando...</div>';
+  await Promise.all([fetchUsers(),fetchCards()]);
+  if(st.isAdm) renderProdAdmin(el);
+  else renderProdColaborador(el);
+}
+
+function renderProdAdmin(el){
+  const tabsHtml=SETORES_PROD.map(s=>`<button class="prod-sub-tab${s.id===prodSetorAtivo?' active':''}${s.ativo?' live':''}" onclick="switchProdSetor('${s.id}')"><span class="dot"></span>${s.label}</button>`).join('');
+  const setorInfo=SETORES_PROD.find(s=>s.id===prodSetorAtivo);
+  let corpo;
+  if(setorInfo.ativo){
+    corpo=renderKanbanAdmin(setorInfo);
+  }else{
+    corpo=`<div class="prod-placeholder">${setorInfo.label} ainda não está ativo neste hub.<br>Entra em operação na próxima etapa.</div>`;
+  }
+  el.innerHTML=`
+    <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
+    ${renderProdOverview()}
+    <div class="prod-sub-tabs">${tabsHtml}</div>
+    ${corpo}
+    <div class="modal-overlay" id="modalNovaDemanda">
+      <div class="modal">
+        <h3>Nova demanda — ${setorInfo.label}</h3>
+        <label>Título</label>
+        <input id="ndTitulo" type="text"/>
+        <label>Descrição (opcional)</label>
+        <input id="ndDescricao" type="text"/>
+        <label>Tipo</label>
+        <select id="ndTipo"><option value="semanal">Semanal</option><option value="esporadica">Esporádica</option></select>
+        <label>Prioridade</label>
+        <select id="ndPrioridade"><option value="alta">Alta</option><option value="media" selected>Média</option><option value="baixa">Baixa</option></select>
+        <label>Responsável</label>
+        <select id="ndResponsavel">${usersCache.filter(u=>u.setor===prodSetorAtivo).map(u=>`<option value="${u.usuario}">${u.nome}</option>`).join('')}</select>
+        <label>Prazo</label>
+        <input id="ndPrazo" type="date" value="${hojeISO()}"/>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modalNovaDemanda')">Cancelar</button>
+          <button class="btn-confirm" onclick="criarDemanda()">Criar</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="modalNovoColaborador">
+      <div class="modal">
+        <h3>Cadastrar colaborador</h3>
+        <label>Nome</label><input id="ncNome" type="text"/>
+        <label>Usuário de acesso</label><input id="ncUsuario" type="text"/>
+        <label>Senha temporária</label><input id="ncSenha" type="text"/>
+        <label>Setor</label>
+        <select id="ncSetor">${SETORES_PROD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}<option value="operacional">Operacional</option></select>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modalNovoColaborador')">Cancelar</button>
+          <button class="btn-confirm" onclick="cadastrarColaborador()">Cadastrar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderProdOverview(){
+  const hoje=hojeISO();
+  const semana=inicioSemanaISO();
+  const abertos=cardsCache.filter(c=>c.status!=='concluido');
+  const hojeCount=abertos.filter(c=>c.prazo===hoje).length;
+  const prioritarias=abertos.filter(c=>c.prioridade==='alta');
+  const atrasadas=abertos.filter(c=>c.prazo&&c.prazo<hoje);
+  const concluidasSemana=cardsCache.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=semana);
+  const ranking=usersCache.map(u=>({nome:u.nome,n:concluidasSemana.filter(c=>c.responsavel===u.usuario).length})).sort((a,b)=>b.n-a.n);
+  const maxN=Math.max(1,...ranking.map(r=>r.n));
+  const rankingHtml=ranking.length?ranking.map(r=>`<div class="mini-rank"><span class="name">${r.nome}</span><div class="bar-bg"><div class="bar-fill" style="width:${(r.n/maxN)*100}%"></div></div><span class="val">${r.n}</span></div>`).join(''):'<div class="prod-empty">Cadastre colaboradores para ver a produtividade.</div>';
+  return `
+    <div class="prod-kpis">
+      <div class="prod-kpi"><div class="n">${hojeCount}</div><div class="l">Demandas de hoje</div></div>
+      <div class="prod-kpi"><div class="n">${prioritarias.length}</div><div class="l">Prioritárias em aberto</div></div>
+      <div class="prod-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
+      <div class="prod-kpi"><div class="n">${concluidasSemana.length}</div><div class="l">Concluídas na semana</div></div>
+    </div>
+    <div class="section-label">Produtividade da semana</div>
+    ${rankingHtml}
+  `;
+}
+
+function renderKanbanAdmin(setorInfo){
+  const cards=cardsCache.filter(c=>c.setor===setorInfo.id);
+  const cols=STATUS_COLS.map(col=>{
+    const colCards=cards.filter(c=>c.status===col.id);
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+  }).join('');
+  return `
+    <div class="prod-toolbar">
+      <div style="font-size:12px;color:var(--text2);">${cards.length} demanda${cards.length===1?'':'s'} no quadro</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="abrirNovoColaborador()">+ Colaborador</button>
+        <button class="btn-primary" onclick="abrirNovaDemanda()">+ Nova demanda</button>
+      </div>
+    </div>
+    <div class="kanban-cols">${cols}</div>
+  `;
+}
+
+function renderKcard(c){
+  const resp=usersCache.find(u=>u.usuario===c.responsavel);
+  const atrasado=c.prazo&&c.prazo<hojeISO()&&c.status!=='concluido';
+  const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
+  const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
+  const prioLabel={alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
+  return `<div class="kcard${atrasado?' overdue':''}">
+    <div class="kcard-top"><span class="kcard-title">${c.titulo}</span><span class="prio prio-${c.prioridade}">${prioLabel}</span></div>
+    ${c.descricao?`<div class="kcard-desc">${c.descricao}</div>`:''}
+    <div class="kcard-foot">
+      <div><div class="kcard-resp">${resp?resp.nome:'—'}</div>${c.prazo?`<div class="kcard-prazo${atrasado?' late':''}">${fmtDataCard(c.prazo)}</div>`:''}</div>
+      ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}')">${nextLabel}</button>`:''}
+    </div>
+  </div>`;
+}
+
+function switchProdSetor(id){prodSetorAtivo=id;renderProd();}
+
+function abrirNovaDemanda(){document.getElementById('modalNovaDemanda').classList.add('open');}
+async function criarDemanda(){
+  const titulo=document.getElementById('ndTitulo').value.trim();
+  const responsavel=document.getElementById('ndResponsavel').value;
+  if(!titulo||!responsavel){alert('Preencha título e responsável.');return;}
+  const novo={
+    titulo,
+    descricao:document.getElementById('ndDescricao').value.trim(),
+    setor:prodSetorAtivo,
+    tipo:document.getElementById('ndTipo').value,
+    responsavel,
+    prioridade:document.getElementById('ndPrioridade').value,
+    prazo:document.getElementById('ndPrazo').value,
+  };
+  await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
+  closeModal('modalNovaDemanda');
+  await fetchCards();
+  renderProd();
+}
+
+function abrirNovoColaborador(){document.getElementById('modalNovoColaborador').classList.add('open');}
+async function cadastrarColaborador(){
+  const novo={
+    nome:document.getElementById('ncNome').value.trim(),
+    usuario:document.getElementById('ncUsuario').value.trim(),
+    senha:document.getElementById('ncSenha').value,
+    setor:document.getElementById('ncSetor').value,
+  };
+  if(!novo.nome||!novo.usuario||!novo.senha){alert('Preencha todos os campos.');return;}
+  const d=await api('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
+  if(d.error){alert(d.error==='usuário já existe'?'Esse usuário já existe.':'Não foi possível cadastrar.');return;}
+  closeModal('modalNovoColaborador');
+  await fetchUsers();
+  renderUserTable();
+  renderProd();
+}
+
+async function moverCard(id,status){
+  await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status})});
+  await fetchCards();
+  renderProd();
+}
+
+function renderProdColaborador(el){
+  const setorInfo=SETORES_PROD.find(s=>s.id===st.setor);
+  if(!setorInfo||!setorInfo.ativo){
+    el.innerHTML=`<div class="adm-title" style="border:none;">Minhas demandas</div><div class="prod-placeholder">Seu setor ainda não está ativo neste hub.<br>Entra em operação em breve.</div>`;
+    return;
+  }
+  const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
+  const hoje=hojeISO();
+  const semana=inicioSemanaISO();
+  const concluidasSemana=meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=semana).length;
+  const atrasadas=meus.filter(c=>c.prazo&&c.prazo<hoje&&c.status!=='concluido').length;
+  const cols=STATUS_COLS.map(col=>{
+    const colCards=meus.filter(c=>c.status===col.id);
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="adm-title" style="border:none;">Minhas demandas — ${setorInfo.label}</div>
+    <div class="prod-kpis" style="grid-template-columns:repeat(2,1fr);max-width:340px;">
+      <div class="prod-kpi"><div class="n">${concluidasSemana}</div><div class="l">Concluídas na semana</div></div>
+      <div class="prod-kpi"><div class="n">${atrasadas}</div><div class="l">Em atraso</div></div>
+    </div>
+    <div class="kanban-cols">${cols}</div>
+  `;
+}
 </script>
 </body>
 </html>
