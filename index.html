@@ -998,7 +998,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 <div class="modal-overlay" id="modalEditSetor">
   <div class="modal">
     <h3>Editar colaborador</h3>
-    <div style="font-size:14px;font-weight:600;margin-bottom:1rem;" id="editNomeDisplay"></div>
+    <label>Nome</label>
+    <input type="text" id="editNome"/>
     <label>Setor</label>
     <select id="editSetor">
       <option value="prevenda">Pré-venda</option>
@@ -1011,9 +1012,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
       <input type="checkbox" id="editLider" style="width:auto;margin:0;"/>
       <span style="text-transform:none;font-weight:500;color:var(--text2);letter-spacing:0;">Líder (vê e cria demandas para toda a equipe)</span>
     </label>
-    <div class="modal-btns" style="margin-top:1rem;">
-      <button class="btn-cancel" onclick="closeModal('modalEditSetor')">Cancelar</button>
-      <button class="btn-confirm" onclick="saveEditSetor()">Salvar</button>
+    <div class="modal-btns" style="margin-top:1rem;justify-content:space-between;">
+      <button class="btn-cancel" style="color:var(--red);border-color:var(--red);" onclick="excluirColaborador()">Excluir</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-cancel" onclick="closeModal('modalEditSetor')">Cancelar</button>
+        <button class="btn-confirm" onclick="saveEditSetor()">Salvar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1544,13 +1548,25 @@ function copiarPrecosPxQ(){
 /* ── ADM ── */
 const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
 let editIdx=null;
-function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNomeDisplay').textContent=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
+function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNome').value=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
 async function saveEditSetor(){
   if(editIdx===null)return;
   const u=usersCache[editIdx];
+  const novoNome=document.getElementById('editNome').value.trim();
   const novoSetor=document.getElementById('editSetor').value;
   const novoLider=document.getElementById('editLider').checked;
-  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,setor:novoSetor,lider:novoLider})});
+  if(!novoNome){alert('O nome não pode ficar vazio.');return;}
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,nome:novoNome,setor:novoSetor,lider:novoLider})});
+  editIdx=null;
+  await fetchUsers();
+  renderUserTable();
+  closeModal('modalEditSetor');
+}
+async function excluirColaborador(){
+  if(editIdx===null)return;
+  const u=usersCache[editIdx];
+  if(!confirm(`Excluir ${u.nome}? As demandas já criadas para ${u.nome} continuam no quadro, só sem um responsável válido.`))return;
+  await api('/api/users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario})});
   editIdx=null;
   await fetchUsers();
   renderUserTable();
