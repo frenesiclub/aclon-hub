@@ -1711,7 +1711,7 @@ function renderKanbanAdmin(setorInfo){
   const cards=cardsCache.filter(c=>c.setor===setorInfo.id);
   const cols=STATUS_COLS.map(col=>{
     const colCards=cards.filter(c=>c.status===col.id);
-    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
   return `
     <div class="prod-toolbar">
@@ -1735,7 +1735,7 @@ function renderKcard(c){
   const linksHtml=c.links?`<div class="kcard-links">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${escHtml(l)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(l)}</a>`).join('')}</div>`:'';
   const prazoHtml=(c.prazoInicio||c.prazo)?`<div class="kcard-prazo${atrasado?' late':''}">${c.prazoInicio?fmtDataCard(c.prazoInicio)+' → ':''}${c.prazo?fmtDataCard(c.prazo):''}</div>`:'';
   const obsHtml=c.observacao?`<div class="kcard-obs">${escHtml(c.observacao)}</div>`:'';
-  return `<div class="kcard${atrasado?' overdue':''}" onclick="abrirDetalheCard('${c.id}')" style="cursor:pointer;">
+  return `<div class="kcard${atrasado?' overdue':''}" draggable="true" ondragstart="dragCardStart(event,'${c.id}')" onclick="abrirDetalheCard('${c.id}')" style="cursor:grab;">
     <div class="kcard-tipo">${tipoLabel}${c.criadoPor?' · Delegado por '+escHtml(c.criadoPor):''}</div>
     <div class="kcard-top"><span class="kcard-title">${escHtml(c.titulo)}</span><span class="prio prio-${c.prioridade}">${prioLabel}</span></div>
     ${c.descricao?`<div class="kcard-desc">${escHtml(c.descricao)}</div>`:''}
@@ -1759,6 +1759,8 @@ function abrirDetalheCard(id){
   const equipeSetor=usersCache.filter(u=>u.setor===c.setor);
   const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
   const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
+  const prev={fazendo:'a_fazer',concluido:'fazendo',a_fazer:null}[c.status];
+  const prevLabel={fazendo:'Voltar p/ A Fazer',concluido:'Voltar p/ Fazendo'}[c.status];
   const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
   const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
 
@@ -1800,8 +1802,9 @@ function abrirDetalheCard(id){
         <textarea id="ddObservacao" rows="2">${escHtml(c.observacao)}</textarea>
         <div class="modal-btns" style="justify-content:space-between;">
           <div>${podeGerir?`<button class="btn-cancel" style="color:var(--red);border-color:var(--red);" onclick="excluirCard('${c.id}')">Excluir</button>`:'<span></span>'}</div>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn-cancel" onclick="fecharDetalheCard()">Fechar</button>
+            ${prev?`<button class="btn-sm" onclick="moverCard('${c.id}','${prev}');fecharDetalheCard();">${prevLabel}</button>`:''}
             ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}');fecharDetalheCard();">${nextLabel}</button>`:''}
             <button class="btn-confirm" onclick="salvarDetalheCard('${c.id}')">Salvar</button>
           </div>
@@ -1892,6 +1895,16 @@ async function moverCard(id,status){
   renderProd();
 }
 
+let draggedCardId=null;
+function dragCardStart(e,id){draggedCardId=id;e.dataTransfer.effectAllowed='move';}
+async function dragCardDrop(e,status){
+  e.preventDefault();
+  if(!draggedCardId)return;
+  const id=draggedCardId;
+  draggedCardId=null;
+  await moverCard(id,status);
+}
+
 function renderDashboardColaborador(setorInfo){
   const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
   const mes=inicioMesISO();
@@ -1932,7 +1945,7 @@ function renderProdColaborador(el){
   const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
   const cols=STATUS_COLS.map(col=>{
     const colCards=meus.filter(c=>c.status===col.id);
-    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
   el.innerHTML=`
     <div class="adm-title" style="border:none;">Minhas demandas — ${setorInfo.label}</div>
