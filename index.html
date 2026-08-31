@@ -1047,6 +1047,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
   </div>
 </div>
 
+<div id="modalNovaDemandaContainer"></div>
+
 <div id="modalDetalheContainer"></div>
 
 </div><!-- /hub -->
@@ -1612,6 +1614,7 @@ const SETORES_PROD=[
 const STATUS_COLS=[{id:'a_fazer',label:'A Fazer'},{id:'fazendo',label:'Fazendo'},{id:'concluido',label:'Concluído'}];
 let prodSetorAtivo='anuncios';
 let prodView='kanban'; // 'kanban' | 'dashboard'
+let prodFiltroColaborador=null; // null = ainda não escolhido (default: o próprio usuário)
 
 function hojeISO(){return new Date().toISOString().slice(0,10);}
 function inicioMesISO(){const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d.toISOString();}
@@ -1657,41 +1660,6 @@ function renderProdAdmin(el){
     <div class="section-label" style="margin-top:0;">Setor</div>
     <div class="prod-sub-tabs">${tabsHtml}</div>
     ${corpo}
-    <div class="modal-overlay" id="modalNovaDemanda">
-      <div class="modal">
-        <h3>Nova demanda — ${setorInfo.label}</h3>
-        <label>Título</label>
-        <input id="ndTitulo" type="text"/>
-        <label>Descrição (opcional)</label>
-        <input id="ndDescricao" type="text"/>
-        <label>Links externos (opcional, um por linha)</label>
-        <textarea id="ndLinks" rows="2"></textarea>
-        <label>Tipo</label>
-        <select id="ndTipo">
-          <option value="diario">Diário</option>
-          <option value="semanal" selected>Semanal</option>
-          <option value="quinzenal">Quinzenal</option>
-          <option value="esporadica">Esporádica</option>
-        </select>
-        <label>Prioridade</label>
-        <select id="ndPrioridade">
-          <option value="urgente">Urgente</option>
-          <option value="alta">Alta</option>
-          <option value="media" selected>Média</option>
-          <option value="baixa">Baixa</option>
-        </select>
-        <label>Responsável</label>
-        <select id="ndResponsavel">${usersCache.filter(u=>u.setor===prodSetorAtivo).map(u=>`<option value="${u.usuario}">${u.nome}</option>`).join('')}</select>
-        <label>Prazo de início (opcional)</label>
-        <input id="ndPrazoInicio" type="date"/>
-        <label>Prazo de término</label>
-        <input id="ndPrazo" type="date" value="${hojeISO()}"/>
-        <div class="modal-btns">
-          <button class="btn-cancel" onclick="closeModal('modalNovaDemanda')">Cancelar</button>
-          <button class="btn-confirm" onclick="criarDemanda()">Criar</button>
-        </div>
-      </div>
-    </div>
   `;
 }
 
@@ -1745,7 +1713,7 @@ function renderKanbanAdmin(setorInfo){
       <div style="font-size:12px;color:var(--text2);">${cards.length} demanda${cards.length===1?'':'s'} no quadro</div>
       <div style="display:flex;gap:8px;">
         ${st.isAdm?'<button class="btn-sm" onclick="abrirNovoColaborador()">+ Colaborador</button>':''}
-        <button class="btn-primary" onclick="abrirNovaDemanda()">+ Nova demanda</button>
+        <button class="btn-primary" onclick="abrirNovaDemanda('${setorInfo.id}',null)">+ Nova demanda</button>
       </div>
     </div>
     <div class="kanban-cols">${cols}</div>
@@ -1782,6 +1750,7 @@ function abrirDetalheCard(id){
   const c=cardsCache.find(x=>x.id===id);
   if(!c)return;
   const podeGerir=st.isAdm||st.isLider;
+  const podeAgir=podeGerir||c.responsavel===st.usuario;
   const resp=usersCache.find(u=>u.usuario===c.responsavel);
   const equipeSetor=usersCache.filter(u=>u.setor===c.setor);
   const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
@@ -1825,15 +1794,17 @@ function abrirDetalheCard(id){
         }
         <div style="font-size:11px;color:var(--text3);margin-top:-.75rem;margin-bottom:1rem;">${tipoLabel} · Delegado por ${escHtml(c.criadoPor||'—')}</div>
         ${camposGerenciaveis}
+        ${podeAgir?`
         <label>Observação${c.status!=='concluido'?' (ex: motivo do atraso)':''}</label>
         <textarea id="ddObservacao" rows="2">${escHtml(c.observacao)}</textarea>
+        `:(c.observacao?`<label>Observação</label><div class="kcard-obs" style="margin-bottom:1rem;">${escHtml(c.observacao)}</div>`:'')}
         <div class="modal-btns" style="justify-content:space-between;">
           <div>${podeGerir?`<button class="btn-cancel" style="color:var(--red);border-color:var(--red);" onclick="excluirCard('${c.id}')">Excluir</button>`:'<span></span>'}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn-cancel" onclick="fecharDetalheCard()">Fechar</button>
-            ${prev?`<button class="btn-sm" onclick="moverCard('${c.id}','${prev}');fecharDetalheCard();">${prevLabel}</button>`:''}
-            ${next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}');fecharDetalheCard();">${nextLabel}</button>`:''}
-            <button class="btn-confirm" onclick="salvarDetalheCard('${c.id}')">Salvar</button>
+            ${podeAgir&&prev?`<button class="btn-sm" onclick="moverCard('${c.id}','${prev}');fecharDetalheCard();">${prevLabel}</button>`:''}
+            ${podeAgir&&next?`<button class="btn-sm" onclick="moverCard('${c.id}','${next}');fecharDetalheCard();">${nextLabel}</button>`:''}
+            ${(podeGerir||podeAgir)?`<button class="btn-confirm" onclick="salvarDetalheCard('${c.id}')">Salvar</button>`:''}
           </div>
         </div>
       </div>
@@ -1844,7 +1815,9 @@ function abrirDetalheCard(id){
 function fecharDetalheCard(){document.getElementById('modalDetalheContainer').innerHTML='';}
 
 async function salvarDetalheCard(id){
-  const payload={id,observacao:document.getElementById('ddObservacao').value};
+  const payload={id};
+  const obsEl=document.getElementById('ddObservacao');
+  if(obsEl) payload.observacao=obsEl.value;
   const podeGerir=st.isAdm||st.isLider;
   if(podeGerir){
     payload.edit={
@@ -1876,16 +1849,66 @@ async function excluirCard(id){
 
 function switchProdSetor(id){prodSetorAtivo=id;renderProd();}
 
-function abrirNovaDemanda(){document.getElementById('modalNovaDemanda').classList.add('open');}
+let ndSetorAlvo=null;
+let ndResponsavelFixo=null;
+
+function abrirNovaDemanda(setorId,responsavelFixo){
+  ndSetorAlvo=setorId;
+  ndResponsavelFixo=responsavelFixo||null;
+  const setorInfo=SETORES_PROD.find(s=>s.id===setorId)||{label:'Meu setor'};
+  const equipeSetor=usersCache.filter(u=>u.setor===setorId);
+  const campoResponsavel=ndResponsavelFixo?'':`
+    <label>Responsável</label>
+    <select id="ndResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}">${u.nome}</option>`).join('')}</select>
+  `;
+  document.getElementById('modalNovaDemandaContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalNovaDemanda">
+      <div class="modal">
+        <h3>Nova demanda — ${setorInfo.label}</h3>
+        <label>Título</label>
+        <input id="ndTitulo" type="text"/>
+        <label>Descrição (opcional)</label>
+        <input id="ndDescricao" type="text"/>
+        <label>Links externos (opcional, um por linha)</label>
+        <textarea id="ndLinks" rows="2"></textarea>
+        <label>Tipo</label>
+        <select id="ndTipo">
+          <option value="diario">Diário</option>
+          <option value="semanal" selected>Semanal</option>
+          <option value="quinzenal">Quinzenal</option>
+          <option value="esporadica">Esporádica</option>
+        </select>
+        <label>Prioridade</label>
+        <select id="ndPrioridade">
+          <option value="urgente">Urgente</option>
+          <option value="alta">Alta</option>
+          <option value="media" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+        ${campoResponsavel}
+        <label>Prazo de início (opcional)</label>
+        <input id="ndPrazoInicio" type="date"/>
+        <label>Prazo de término</label>
+        <input id="ndPrazo" type="date" value="${hojeISO()}"/>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="fecharNovaDemanda()">Cancelar</button>
+          <button class="btn-confirm" onclick="criarDemanda()">Criar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharNovaDemanda(){document.getElementById('modalNovaDemandaContainer').innerHTML='';}
+
 async function criarDemanda(){
   const titulo=document.getElementById('ndTitulo').value.trim();
-  const responsavel=document.getElementById('ndResponsavel').value;
+  const responsavel=ndResponsavelFixo||document.getElementById('ndResponsavel').value;
   if(!titulo||!responsavel){alert('Preencha título e responsável.');return;}
   const novo={
     titulo,
     descricao:document.getElementById('ndDescricao').value.trim(),
     links:document.getElementById('ndLinks').value.trim(),
-    setor:prodSetorAtivo,
+    setor:ndSetorAlvo,
     tipo:document.getElementById('ndTipo').value,
     responsavel,
     prioridade:document.getElementById('ndPrioridade').value,
@@ -1893,8 +1916,9 @@ async function criarDemanda(){
     prazo:document.getElementById('ndPrazo').value,
   };
   const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
-  await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
-  closeModal('modalNovaDemanda');
+  const r=await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+  if(r&&r.error){alert('Não foi possível criar a demanda.');return;}
+  fecharNovaDemanda();
   await fetchCards();
   renderProd();
 }
@@ -1969,17 +1993,39 @@ function renderProdColaborador(el){
     `;
     return;
   }
-  const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
+  if(!prodFiltroColaborador) prodFiltroColaborador=st.usuario;
+  // Colegas do mesmo setor, sem líderes — Thiago e Vitória ficam de fora
+  // da visão dos colaboradores comuns de propósito.
+  const colegas=usersCache.filter(u=>u.setor===st.setor&&!u.lider);
+  const souEu=prodFiltroColaborador===st.usuario;
+  const pessoaSelecionada=usersCache.find(u=>u.usuario===prodFiltroColaborador);
+
+  const filtroHtml=colegas.length>1?`
+    <div style="margin-bottom:1.25rem;">
+      <select onchange="mudarFiltroColaborador(this.value)" style="width:auto;display:inline-block;padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:13px;color:var(--text);background:var(--bg);outline:none;">
+        ${colegas.map(u=>`<option value="${u.usuario}"${u.usuario===prodFiltroColaborador?' selected':''}>${u.usuario===st.usuario?'Minhas demandas':u.nome}</option>`).join('')}
+      </select>
+    </div>
+  `:'';
+
+  const cards=cardsCache.filter(c=>c.responsavel===prodFiltroColaborador);
   const cols=STATUS_COLS.map(col=>{
-    const colCards=meus.filter(c=>c.status===col.id);
-    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+    const colCards=cards.filter(c=>c.status===col.id);
+    const dropAttrs=souEu?`ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')"`:'';
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ${dropAttrs}>${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
+
   el.innerHTML=`
-    <div class="adm-title" style="border:none;">Minhas demandas — ${setorInfo.label}</div>
+    <div class="prod-toolbar">
+      <div class="adm-title" style="border:none;margin:0;padding:0;">${souEu?'Minhas demandas':'Demandas de '+escHtml(pessoaSelecionada?pessoaSelecionada.nome:'')} — ${setorInfo.label}</div>
+      ${souEu?`<button class="btn-primary" onclick="abrirNovaDemanda('${st.setor}','${st.usuario}')">+ Nova demanda</button>`:''}
+    </div>
     ${prodViewTabsHtml()}
+    ${filtroHtml}
     <div class="kanban-cols">${cols}</div>
   `;
 }
+function mudarFiltroColaborador(usuario){prodFiltroColaborador=usuario;renderProd();}
 </script>
 </body>
 </html>
