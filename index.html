@@ -975,7 +975,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
   <!-- ══════════════════════════════════════════════════════════ -->
   <div class="mkt-panel" id="mp-adm">
     <div class="content">
-      <div class="adm-title">Colaboradores</div>
+      <div class="prod-toolbar" style="margin-bottom:1.25rem;">
+        <div class="adm-title" style="margin:0;border:none;padding:0;">Colaboradores</div>
+        <button class="btn-primary" onclick="abrirNovoColaborador()">+ Colaborador</button>
+      </div>
       <table class="user-table">
         <thead><tr><th style="width:30%">Nome</th><th style="width:20%">Usuário</th><th style="width:30%">Setor</th><th style="width:20%"></th></tr></thead>
         <tbody id="userTableBody"></tbody>
@@ -1018,6 +1021,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
         <button class="btn-cancel" onclick="closeModal('modalEditSetor')">Cancelar</button>
         <button class="btn-confirm" onclick="saveEditSetor()">Salvar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO COLABORADOR -->
+<div class="modal-overlay" id="modalNovoColaborador">
+  <div class="modal">
+    <h3>Cadastrar colaborador</h3>
+    <label>Nome</label><input id="ncNome" type="text"/>
+    <label>Usuário de acesso</label><input id="ncUsuario" type="text"/>
+    <label>Senha temporária</label><input id="ncSenha" type="text"/>
+    <label>Setor</label>
+    <select id="ncSetor">
+      <option value="prevenda">Pré-venda</option>
+      <option value="anuncios">Anúncios</option>
+      <option value="mercado">Análise de Mercado</option>
+      <option value="operacional">Operacional</option>
+      <option value="full">Full</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('modalNovoColaborador')">Cancelar</button>
+      <button class="btn-confirm" onclick="cadastrarColaborador()">Cadastrar</button>
     </div>
   </div>
 </div>
@@ -1664,20 +1689,6 @@ function renderProdAdmin(el){
         <div class="modal-btns">
           <button class="btn-cancel" onclick="closeModal('modalNovaDemanda')">Cancelar</button>
           <button class="btn-confirm" onclick="criarDemanda()">Criar</button>
-        </div>
-      </div>
-    </div>
-    <div class="modal-overlay" id="modalNovoColaborador">
-      <div class="modal">
-        <h3>Cadastrar colaborador</h3>
-        <label>Nome</label><input id="ncNome" type="text"/>
-        <label>Usuário de acesso</label><input id="ncUsuario" type="text"/>
-        <label>Senha temporária</label><input id="ncSenha" type="text"/>
-        <label>Setor</label>
-        <select id="ncSetor">${SETORES_PROD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}<option value="operacional">Operacional</option></select>
-        <div class="modal-btns">
-          <button class="btn-cancel" onclick="closeModal('modalNovoColaborador')">Cancelar</button>
-          <button class="btn-confirm" onclick="cadastrarColaborador()">Cadastrar</button>
         </div>
       </div>
     </div>
