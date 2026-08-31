@@ -17,6 +17,8 @@
   --blue:#1a5fa8;--blue-bg:#e8f1fc;--blue-border:#b8d4f8;
   --amber:#8a4e00;--amber-bg:#fdf3e3;--amber-border:#f5c87a;
   --orange:#c2540c;--orange-bg:#fef0e3;
+  /* Identidade Aclon Hub — verde petróleo */
+  --brand:#0F3D3B;--brand-dark:#0A2C2A;--brand-light:#1C7A73;--brand-tint:#E6F2F1;
   --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
   --shadow-md:0 4px 20px rgba(0,0,0,0.10);
   /* ML amarelo */
@@ -28,6 +30,8 @@
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#e8e8e6;color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;}
 .hub{background:var(--bg);border-radius:var(--radius-xl);width:100%;max-width:940px;min-height:640px;box-shadow:var(--shadow-md);overflow:hidden;}
+body.app-active{padding:0;display:block;}
+body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:none;}
 
 /* ── LOGIN ── */
 .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:2rem;background:var(--bg);}
@@ -38,7 +42,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .login-card label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;letter-spacing:0.07em;text-transform:uppercase;}
 .login-card input{width:100%;margin-bottom:1rem;padding:11px 14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
 .login-card input:focus{border-color:var(--text);}
-.login-btn{width:100%;padding:12px;background:var(--text);color:#fff;border:none;border-radius:var(--radius-md);font-size:14px;font-weight:700;cursor:pointer;margin-top:.25rem;transition:opacity .15s;}
+.login-btn{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-md);font-size:14px;font-weight:700;cursor:pointer;margin-top:.25rem;transition:opacity .15s;}
 .login-btn:hover{opacity:.85;}
 .login-error{font-size:13px;color:var(--red);margin-top:.75rem;text-align:center;display:none;}
 
@@ -276,12 +280,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .modal-btns{display:flex;gap:8px;margin-top:.5rem;}
 .modal-btns button{flex:1;}
 .btn-cancel{background:none;border:0.5px solid var(--border);border-radius:var(--radius-md);padding:9px;font-size:14px;cursor:pointer;color:var(--text2);}
-.btn-confirm{background:var(--text);color:#fff;border:none;border-radius:var(--radius-md);padding:9px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-confirm{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-md);padding:9px;font-size:14px;font-weight:600;cursor:pointer;}
 
 @media(max-width:520px){body{padding:0;}.hub{border-radius:0;}.result-hero,.promo-grid{grid-template-columns:1fr;}.hero-value{font-size:24px;}}
 
 /* ── PRODUTIVIDADE ── */
-:root{--prod:#0f6e5c;--prod-bg:#e5f5f1;--prod-dark:#0a4a3d;}
+:root{--prod:#1C7A73;--prod-bg:#E6F2F1;--prod-dark:#0A2C2A;}
 .mkt-tab.prod-active{color:var(--prod-dark);border-bottom-color:var(--prod);background:var(--prod-bg);}
 .mkt-tab.prod-active .mkt-dot{background:var(--prod);}
 .mkt-tab.calc-active{color:var(--text);border-bottom-color:var(--text);background:var(--bg);}
@@ -331,6 +335,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .mini-rank .bar-fill{height:100%;background:var(--prod);border-radius:20px;}
 .mini-rank .val{font-size:12px;color:var(--text);width:20px;text-align:right;}
 
+/* ── SIDEBAR (identidade Aclon Hub) ── */
+.app-shell{display:flex;min-height:100vh;}
+.app-sidebar{width:236px;flex-shrink:0;background:var(--brand-dark);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;align-self:flex-start;height:100vh;}
+.app-logo{font-size:17px;font-weight:800;letter-spacing:.01em;color:#fff;padding:1.3rem 1.3rem 1rem;}
+.app-nav{flex:1;overflow-y:auto;padding:.3rem .7rem;}
+.app-nav-group{margin-bottom:2px;}
+.app-nav-item{width:100%;display:flex;align-items:center;justify-content:space-between;padding:.65rem .8rem;border-radius:var(--radius-md);background:none;border:none;color:rgba(255,255,255,.82);font-size:13px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s;}
+.app-nav-item:hover{background:rgba(255,255,255,.08);}
+.app-nav-item.active{background:rgba(255,255,255,.12);color:#fff;}
+.app-nav-flat{margin-top:.35rem;}
+.app-nav-chevron{font-size:10px;opacity:.55;transition:transform .15s;display:inline-block;}
+.app-nav-chevron.open{transform:rotate(90deg);}
+.app-nav-sub{max-height:0;overflow:hidden;transition:max-height .2s ease;padding-left:.5rem;}
+.app-nav-sub.open{max-height:220px;}
+.app-nav-subitem{width:100%;display:block;padding:.5rem .8rem;border-radius:var(--radius-md);background:none;border:none;color:rgba(255,255,255,.6);font-size:12.5px;font-weight:500;cursor:pointer;text-align:left;margin-top:1px;transition:background .15s,color .15s;}
+.app-nav-subitem:hover{background:rgba(255,255,255,.06);color:#fff;}
+.app-nav-subitem.active{background:rgba(255,255,255,.14);color:#fff;font-weight:700;}
+.app-sidebar-user{padding:.9rem 1.1rem 1.1rem;border-top:1px solid rgba(255,255,255,.12);}
+.app-user-name{font-size:13px;font-weight:700;color:#fff;}
+.app-user-role{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;margin-bottom:.6rem;}
+.app-logout-btn{font-size:11px;color:rgba(255,255,255,.75);background:rgba(255,255,255,.08);border:none;border-radius:var(--radius-md);padding:5px 10px;cursor:pointer;}
+.app-logout-btn:hover{background:rgba(255,255,255,.16);}
+.app-main{flex:1;min-width:0;background:var(--bg);}
+.app-topbar-mini{display:flex;justify-content:flex-end;padding:.9rem 1.4rem 0;}
+
+
 /* ── RELATÓRIO PDF (impressão) ── */
 #relatorioPrintContainer{display:none;}
 .rp-header{background:#0D1B2E;color:#fff;padding:24px 28px;}
@@ -372,46 +402,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 
 <!-- MAIN -->
 <div class="main-screen" id="mainScreen">
+<div class="app-shell">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-logo">Aclon Hub</span>
-      <span style="color:var(--border2)">·</span>
-      <span class="user-chip" id="topUser"></span>
+  <!-- SIDEBAR -->
+  <aside class="app-sidebar">
+    <div class="app-logo">Aclon Hub</div>
+    <nav class="app-nav">
+      <div class="app-nav-group">
+        <button class="app-nav-item" onclick="toggleNavGroup('calc')">
+          <span>Calculadoras</span><span class="app-nav-chevron open" id="navchev-calc">›</span>
+        </button>
+        <div class="app-nav-sub open" id="navsub-calc">
+          <button class="app-nav-subitem active" id="navsub-calc-ml" onclick="irParaCalc('ml')">Mercado Livre</button>
+          <button class="app-nav-subitem" id="navsub-calc-sh" onclick="irParaCalc('sh')">Shopee</button>
+          <button class="app-nav-subitem" id="navsub-calc-az" onclick="irParaCalc('az')">Amazon</button>
+        </div>
+      </div>
+      <div class="app-nav-group">
+        <button class="app-nav-item" onclick="toggleNavGroup('prod')">
+          <span>Produtividade</span><span class="app-nav-chevron" id="navchev-prod">›</span>
+        </button>
+        <div class="app-nav-sub" id="navsub-prod">
+          <button class="app-nav-subitem" id="navsub-prod-kanban" onclick="irParaProd('kanban')">Kanban</button>
+          <button class="app-nav-subitem" id="navsub-prod-dashboard" onclick="irParaProd('dashboard')">Dashboard</button>
+        </div>
+      </div>
+      <button class="app-nav-item app-nav-flat" id="navitem-adm" style="display:none" onclick="irParaAdm()">
+        <span>ADM</span>
+      </button>
+    </nav>
+    <div class="app-sidebar-user">
+      <div class="app-user-name" id="topUser"></div>
+      <div class="app-user-role" id="topUserRole"></div>
+      <button class="app-logout-btn" onclick="doLogout()">Sair</button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar-mini">
       <span class="filial-badge-top" id="topFilialBadge">GMC SP</span>
     </div>
-    <button class="btn-logout" onclick="doLogout()">Sair</button>
-  </div>
-
-  <!-- TELAS PRINCIPAIS -->
-  <div class="mkt-tabs">
-    <button class="mkt-tab calc-active" id="mtab-calc" onclick="switchMkt('calc')">
-      <span class="mkt-dot"></span> Calculadoras
-    </button>
-    <button class="mkt-tab" id="mtab-prod" onclick="switchMkt('prod')">
-      <span class="mkt-dot"></span> Produtividade
-    </button>
-    <button class="mkt-tab" id="mtab-adm" style="display:none" onclick="switchMkt('adm')">
-      ADM
-    </button>
-  </div>
 
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- TELA CALCULADORAS -->
   <!-- ══════════════════════════════════════════════════════════ -->
   <div class="mkt-panel active" id="mp-calc">
-    <div class="mkt-tabs" style="border-top:0.5px solid var(--border);">
-      <button class="mkt-tab ml-active" id="ctab-ml" onclick="switchCalcMkt('ml')">
-        <span class="mkt-dot"></span> Mercado Livre
-      </button>
-      <button class="mkt-tab" id="ctab-sh" onclick="switchCalcMkt('sh')">
-        <span class="mkt-dot"></span> Shopee
-      </button>
-      <button class="mkt-tab" id="ctab-az" onclick="switchCalcMkt('az')">
-        <span class="mkt-dot"></span> Amazon
-      </button>
-    </div>
 
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- PAINEL MERCADO LIVRE -->
@@ -1019,6 +1054,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     </div>
   </div>
 
+  </main>
+</div><!-- /app-shell -->
 </div><!-- /main-screen -->
 
 <!-- MODAL EDIT SETOR -->
@@ -1132,38 +1169,83 @@ async function doLogin(){
   if(!d.ok){err.style.display='block';err.textContent=d.erro||'Usuário ou senha incorretos.';return;}
   st.isAdm=d.user.isAdm; st.isLider=!!d.user.isLider; st.userName=d.user.nome; st.usuario=d.user.usuario; st.setor=d.user.setor; st.senha=pass;
   document.getElementById('topUser').textContent=st.userName;
-  document.getElementById('mtab-adm').style.display=st.isAdm?'':'none';
+  document.getElementById('topUserRole').textContent=st.isAdm?'Administradora':(st.isLider?'Líder':(SETOR_LB[st.setor]?SETOR_LB[st.setor][0]:''));
+  document.getElementById('navitem-adm').style.display=st.isAdm?'':'none';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainScreen').style.display='block';
+  document.body.classList.add('app-active');
+  ativarModulo('calc');
+  atualizarSidebarAtiva();
   await fetchUsers();
   renderUserTable();
 }
 function doLogout(){
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainScreen').style.display='none';
+  document.body.classList.remove('app-active');
   document.getElementById('loginPass').value='';
   document.getElementById('loginUser').value='';
   st.senha=null;
 }
 
-/* ── NAVEGAÇÃO TELAS PRINCIPAIS ── */
-const MOD_ACTIVE_CLASS={calc:'calc-active',prod:'prod-active',adm:'adm-active'};
-function switchMkt(mod){
+/* ── NAVEGAÇÃO TELAS PRINCIPAIS (sidebar) ── */
+let navGroupsAbertos={calc:true,prod:false};
+
+function ativarModulo(mod){
   ['calc','prod','adm'].forEach(m=>{
-    const tab=document.getElementById('mtab-'+m);
-    if(tab) tab.className='mkt-tab'+(m===mod?' '+MOD_ACTIVE_CLASS[m]:'');
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mod);
   });
   st.mod=mod;
   document.getElementById('topFilialBadge').style.display=mod==='calc'?'':'none';
+}
+function switchMkt(mod){
+  ativarModulo(mod);
   if(mod==='prod') renderProd();
+  atualizarSidebarAtiva();
+}
+function toggleNavGroup(grupo){
+  navGroupsAbertos[grupo]=!navGroupsAbertos[grupo];
+  atualizarSidebarAtiva();
+}
+function irParaCalc(mkt){
+  ativarModulo('calc');
+  switchCalcMkt(mkt);
+  navGroupsAbertos.calc=true;
+  atualizarSidebarAtiva();
+}
+function irParaProd(view){
+  ativarModulo('prod');
+  prodView=view;
+  navGroupsAbertos.prod=true;
+  renderProd();
+  atualizarSidebarAtiva();
+}
+function irParaAdm(){
+  switchMkt('adm');
+}
+function atualizarSidebarAtiva(){
+  ['calc','prod'].forEach(g=>{
+    const sub=document.getElementById('navsub-'+g);
+    const chev=document.getElementById('navchev-'+g);
+    if(sub) sub.classList.toggle('open',navGroupsAbertos[g]);
+    if(chev) chev.classList.toggle('open',navGroupsAbertos[g]);
+  });
+  ['ml','sh','az'].forEach(m=>{
+    const el=document.getElementById('navsub-calc-'+m);
+    if(el) el.classList.toggle('active',st.mod==='calc'&&st.mkt===m);
+  });
+  ['kanban','dashboard'].forEach(v=>{
+    const el=document.getElementById('navsub-prod-'+v);
+    if(el) el.classList.toggle('active',st.mod==='prod'&&prodView===v);
+  });
+  const admEl=document.getElementById('navitem-adm');
+  if(admEl) admEl.classList.toggle('active',st.mod==='adm');
 }
 
 /* ── NAVEGAÇÃO DENTRO DE CALCULADORAS ── */
 function switchCalcMkt(mkt){
   ['ml','sh','az'].forEach(m=>{
-    document.getElementById('ctab-'+m).className='mkt-tab'+(m===mkt?' '+m+'-active':'');
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mkt);
   });
@@ -1674,7 +1756,6 @@ function renderProdAdmin(el){
   if(prodView==='dashboard'){
     el.innerHTML=`
       <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
-      ${prodViewTabsHtml()}
       ${renderDashboardAdmin()}
     `;
     return;
@@ -1689,7 +1770,6 @@ function renderProdAdmin(el){
   }
   el.innerHTML=`
     <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
-    ${prodViewTabsHtml()}
     <div class="section-label" style="margin-top:0;">Setor</div>
     <div class="prod-sub-tabs">${tabsHtml}</div>
     ${corpo}
@@ -2165,7 +2245,6 @@ function renderProdColaborador(el){
   if(prodView==='dashboard'){
     el.innerHTML=`
       <div class="adm-title" style="border:none;">Minha produtividade — ${setorInfo.label}</div>
-      ${prodViewTabsHtml()}
       ${renderDashboardColaborador(setorInfo)}
     `;
     return;
@@ -2197,7 +2276,6 @@ function renderProdColaborador(el){
       <div class="adm-title" style="border:none;margin:0;padding:0;">${souEu?'Minhas demandas':'Demandas de '+escHtml(pessoaSelecionada?pessoaSelecionada.nome:'')} — ${setorInfo.label}</div>
       ${souEu?`<button class="btn-primary" onclick="abrirNovaDemanda('${st.setor}','${st.usuario}')">+ Nova demanda</button>`:''}
     </div>
-    ${prodViewTabsHtml()}
     ${filtroHtml}
     <div class="kanban-cols">${cols}</div>
   `;
