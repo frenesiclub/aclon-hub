@@ -18,17 +18,19 @@ function genId() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
-// Quem pode criar demanda: admin (senha_adm) ou um colaborador marcado
-// como "líder" (usuario+senha validados contra o cadastro). Devolve o
-// nome de quem criou, para a tag "Delegado por".
+// Quem pode gerenciar demandas, e o quanto:
+// - admin (senha_adm): tudo.
+// - líder (usuario+senha, marcado como líder): tudo, para qualquer colaborador.
+// - colaborador comum (usuario+senha, sem líder): só pode criar/mexer em
+//   demandas onde ele mesmo é o responsável — isso é a autogestão.
 async function podeGerenciar(body) {
-  if (body.senha_adm === SENHA_ADM) return { ok: true, criadoPor: 'ADM' };
+  if (body.senha_adm === SENHA_ADM) return { ok: true, criadoPor: 'ADM', restrito: false };
   const { usuario, senha } = body;
   if (!usuario || !senha) return { ok: false };
   const users = await redisGetJSON('aclon_users', []);
-  const found = users.find((u) => u.usuario === usuario && u.senha === senha && u.lider);
+  const found = users.find((u) => u.usuario === usuario && u.senha === senha);
   if (!found) return { ok: false };
-  return { ok: true, criadoPor: found.nome };
+  return { ok: true, criadoPor: found.nome, restrito: !found.lider, usuarioAutenticado: usuario };
 }
 
 module.exports = async (req, res) => {
@@ -59,6 +61,11 @@ module.exports = async (req, res) => {
       } = body.novo || {};
       if (!titulo || !setor || !responsavel) {
         res.status(400).json({ error: 'dados incompletos' });
+        return;
+      }
+      // Colaborador comum (não líder) só pode criar demanda pra si mesmo.
+      if (auth.restrito && responsavel !== auth.usuarioAutenticado) {
+        res.status(403).json({ error: 'você só pode criar demandas para você mesmo' });
         return;
       }
       const cards = await redisGetJSON('aclon_cards', []);
@@ -108,10 +115,10 @@ module.exports = async (req, res) => {
         cards[idx].observacao = observacao;
       }
       // Editar os dados da demanda (título, prazos, responsável etc.) exige
-      // ser admin ou líder.
+      // ser admin ou líder — colaborador comum não edita depois de criar.
       if (edit) {
         const auth = await podeGerenciar(body);
-        if (!auth.ok) {
+        if (!auth.ok || auth.restrito) {
           res.status(401).json({ error: 'não autorizado' });
           return;
         }
@@ -136,9 +143,11 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'DELETE') {
+      // Excluir continua exclusivo de admin/líder — autogestão não inclui
+      // apagar demanda.
       const body = parseBody(req);
       const auth = await podeGerenciar(body);
-      if (!auth.ok) {
+      if (!auth.ok || auth.restrito) {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
