@@ -2,15 +2,18 @@ const { redisGetJSON, redisSetJSON } = require('./_redis');
 
 // Seed usado apenas na primeira chamada, para migrar o time que já existia
 // no HTML antigo para dentro do banco. Depois disso o banco manda.
+// "lider" = Thiago e Vitória: enxergam a produtividade de toda a equipe
+// e podem criar demandas para qualquer colaborador (mas não gerenciam
+// cadastro de equipe nem exportam relatórios — isso continua só admin).
 const SEED_USERS = [
-  { usuario: 'ecom19', nome: 'Miguel 2', setor: 'mercado', senha: 'ecom19@gmc' },
-  { usuario: 'ecom10', nome: 'Thiago', setor: 'mercado', senha: 'ecom10@gmc' },
-  { usuario: 'ecom6', nome: 'Vitória', setor: 'operacional', senha: 'ecom6@gmc' },
-  { usuario: 'ecom16', nome: 'Miguel', setor: 'anuncios', senha: 'ecom16@gmc' },
-  { usuario: 'ecom2', nome: 'Leonardo', setor: 'mercado', senha: 'ecom2@gmc' },
-  { usuario: 'ecom12', nome: 'Alex', setor: 'anuncios', senha: 'ecom12@gmc' },
-  { usuario: 'ecom18', nome: 'Laize', setor: 'prevenda', senha: 'ecom18@gmc' },
-  { usuario: 'ecom14', nome: 'Felipe', setor: 'mercado', senha: 'ecom14@gmc' },
+  { usuario: 'ecom19', nome: 'Miguel 2', setor: 'mercado', senha: 'ecom19@gmc', lider: false },
+  { usuario: 'ecom10', nome: 'Thiago', setor: 'mercado', senha: 'ecom10@gmc', lider: true },
+  { usuario: 'ecom6', nome: 'Vitória', setor: 'operacional', senha: 'ecom6@gmc', lider: true },
+  { usuario: 'ecom16', nome: 'Miguel', setor: 'anuncios', senha: 'ecom16@gmc', lider: false },
+  { usuario: 'ecom2', nome: 'Leonardo', setor: 'mercado', senha: 'ecom2@gmc', lider: false },
+  { usuario: 'ecom12', nome: 'Alex', setor: 'anuncios', senha: 'ecom12@gmc', lider: false },
+  { usuario: 'ecom18', nome: 'Laize', setor: 'prevenda', senha: 'ecom18@gmc', lider: false },
+  { usuario: 'ecom14', nome: 'Felipe', setor: 'mercado', senha: 'ecom14@gmc', lider: false },
 ];
 
 const SENHA_ADM = process.env.ACLON_ADM_SENHA || 'adm@2026';
@@ -49,7 +52,7 @@ module.exports = async (req, res) => {
     if (usuario.toLowerCase() === 'adm' && senha === SENHA_ADM) {
       res.status(200).json({
         ok: true,
-        user: { usuario: 'adm', nome: 'ADM', setor: 'adm', isAdm: true },
+        user: { usuario: 'adm', nome: 'ADM', setor: 'adm', isAdm: true, isLider: false },
       });
       return;
     }
@@ -69,7 +72,13 @@ module.exports = async (req, res) => {
 
     res.status(200).json({
       ok: true,
-      user: { usuario: found.usuario, nome: found.nome, setor: found.setor, isAdm: false },
+      user: {
+        usuario: found.usuario,
+        nome: found.nome,
+        setor: found.setor,
+        isAdm: false,
+        isLider: !!found.lider,
+      },
     });
   } catch (e) {
     res.status(500).json({ ok: false, erro: e.message });
