@@ -263,6 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .badge-mercado{background:#f8eafa;color:#6b2fa0;}
 .badge-full{background:#f0f0ed;color:#444;}
 .badge-operacional{background:#f0ecfc;color:#5b3fa8;}
+.badge-operacional_estrategico{background:#e6eaf0;color:#22344d;}
 
 /* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center;}
@@ -1009,6 +1010,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
       <option value="anuncios">Anúncios</option>
       <option value="mercado">Análise de Mercado</option>
       <option value="operacional">Operacional</option>
+      <option value="operacional_estrategico">Operacional Estratégico</option>
       <option value="full">Full</option>
     </select>
     <label style="display:flex;align-items:center;gap:7px;margin-top:.25rem;">
@@ -1038,6 +1040,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
       <option value="anuncios">Anúncios</option>
       <option value="mercado">Análise de Mercado</option>
       <option value="operacional">Operacional</option>
+      <option value="operacional_estrategico">Operacional Estratégico</option>
       <option value="full">Full</option>
     </select>
     <div class="modal-btns">
@@ -1573,7 +1576,7 @@ function copiarPrecosPxQ(){
 }
 
 /* ── ADM ── */
-const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional']};
+const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional'],operacional_estrategico:['Operacional Estratégico','operacional_estrategico']};
 let editIdx=null;
 function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNome').value=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
 async function saveEditSetor(){
@@ -1607,6 +1610,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 /* ── PRODUTIVIDADE ── */
 const SETORES_PROD=[
   {id:'anuncios',label:'Anúncios',ativo:true},
+  {id:'operacional_estrategico',label:'Operacional Estratégico',ativo:true},
   {id:'mercado',label:'Análise de Mercado',ativo:false},
   {id:'prevenda',label:'Pré-venda',ativo:false},
   {id:'full',label:'Full',ativo:false},
