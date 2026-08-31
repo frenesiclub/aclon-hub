@@ -86,11 +86,8 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'PATCH') {
-      // Sem senha aqui de propósito: mover status e adicionar observação
-      // é ação do dia a dia de qualquer colaborador logado, não só de
-      // quem criou a demanda.
       const body = parseBody(req);
-      const { id, status, observacao } = body;
+      const { id, status, observacao, edit } = body;
       if (!id) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -101,6 +98,8 @@ module.exports = async (req, res) => {
         res.status(404).json({ error: 'card não encontrado' });
         return;
       }
+      // Mover status e escrever observação: ação do dia a dia, sem senha —
+      // qualquer colaborador logado pode fazer isso na sua própria demanda.
       if (status !== undefined) {
         cards[idx].status = status;
         cards[idx].concluidoEm = status === 'concluido' ? new Date().toISOString() : null;
@@ -108,6 +107,48 @@ module.exports = async (req, res) => {
       if (observacao !== undefined) {
         cards[idx].observacao = observacao;
       }
+      // Editar os dados da demanda (título, prazos, responsável etc.) exige
+      // ser admin ou líder.
+      if (edit) {
+        const auth = await podeGerenciar(body);
+        if (!auth.ok) {
+          res.status(401).json({ error: 'não autorizado' });
+          return;
+        }
+        const permitidos = [
+          'titulo',
+          'descricao',
+          'links',
+          'tipo',
+          'prioridade',
+          'responsavel',
+          'prazoInicio',
+          'prazo',
+          'setor',
+        ];
+        for (const campo of permitidos) {
+          if (edit[campo] !== undefined) cards[idx][campo] = edit[campo];
+        }
+      }
+      await redisSetJSON('aclon_cards', cards);
+      res.status(200).json({ ok: true, cards });
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      const body = parseBody(req);
+      const auth = await podeGerenciar(body);
+      if (!auth.ok) {
+        res.status(401).json({ error: 'não autorizado' });
+        return;
+      }
+      const { id } = body;
+      if (!id) {
+        res.status(400).json({ error: 'dados incompletos' });
+        return;
+      }
+      let cards = await redisGetJSON('aclon_cards', []);
+      cards = cards.filter((c) => c.id !== id);
       await redisSetJSON('aclon_cards', cards);
       res.status(200).json({ ok: true, cards });
       return;
