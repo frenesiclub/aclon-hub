@@ -1079,6 +1079,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 
 <div id="relatorioPrintContainer"></div>
 
+<div id="modalExportExcelContainer"></div>
+
 </div><!-- /hub -->
 <script>
 const META=0.15;
@@ -1731,8 +1733,8 @@ function renderDashboardAdmin(){
   return `
     ${st.isAdm?`
     <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
-      <button class="btn-sm" onclick="exportarPDF()">Exportar PDF</button>
-      <button class="btn-sm" onclick="exportarExcel()">Exportar Excel</button>
+      <button class="btn-sm" onclick="abrirExportPeriodo('pdf')">Exportar PDF</button>
+      <button class="btn-sm" onclick="abrirExportPeriodo('excel')">Exportar Excel</button>
     </div>
     `:''}
     ${alertaHtml}
@@ -1749,8 +1751,52 @@ function renderDashboardAdmin(){
 }
 
 /* ── EXPORTAÇÃO (só admin) ── */
-function exportarExcel(){
-  const linhas=cardsCache.map(c=>{
+let exportTipoAtual=null;
+
+function abrirExportPeriodo(tipo){
+  exportTipoAtual=tipo;
+  const titulo=tipo==='pdf'?'Exportar PDF':'Exportar Excel';
+  document.getElementById('modalExportExcelContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalExportPeriodo">
+      <div class="modal">
+        <h3>${titulo}</h3>
+        <label>De</label>
+        <input id="expDe" type="date" value="${inicioMesISO().slice(0,10)}"/>
+        <label>Até</label>
+        <input id="expAte" type="date" value="${hojeISO()}"/>
+        <p style="font-size:11px;color:var(--text3);margin:-.5rem 0 1rem;">Filtra pela data de criação da demanda.</p>
+        <div class="modal-btns" style="justify-content:space-between;">
+          <button class="btn-cancel" onclick="confirmarExportPeriodo(true)">Exportar tudo, sem filtro</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-cancel" onclick="fecharExportExcel()">Cancelar</button>
+            <button class="btn-confirm" onclick="confirmarExportPeriodo(false)">Exportar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharExportExcel(){document.getElementById('modalExportExcelContainer').innerHTML='';}
+function confirmarExportPeriodo(tudo){
+  let de=null,ate=null;
+  if(!tudo){
+    de=document.getElementById('expDe').value;
+    ate=document.getElementById('expAte').value;
+  }
+  if(exportTipoAtual==='excel') exportarExcel(de,ate);
+  else exportarPDF(de,ate);
+  fecharExportExcel();
+}
+
+function exportarExcel(de,ate){
+  let cards=cardsCache;
+  if(de&&ate){
+    cards=cardsCache.filter(c=>{
+      const dataCriacao=c.criadoEm?c.criadoEm.slice(0,10):null;
+      return dataCriacao&&dataCriacao>=de&&dataCriacao<=ate;
+    });
+  }
+  const linhas=cards.map(c=>{
     const resp=usersCache.find(u=>u.usuario===c.responsavel);
     const setorLabel=(SETOR_LB[c.setor]||[c.setor])[0];
     return{
@@ -1770,40 +1816,48 @@ function exportarExcel(){
       'Concluído em':c.concluidoEm?c.concluidoEm.slice(0,10):'',
     };
   });
-  if(linhas.length===0){alert('Ainda não há nenhuma demanda registrada.');return;}
+  if(linhas.length===0){alert('Nenhuma demanda encontrada nesse período.');return;}
   const ws=XLSX.utils.json_to_sheet(linhas);
   ws['!cols']=[{wch:28},{wch:32},{wch:28},{wch:18},{wch:10},{wch:10},{wch:16},{wch:10},{wch:14},{wch:14},{wch:28},{wch:14},{wch:12},{wch:12}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Demandas');
-  XLSX.writeFile(wb,`aclon-hub-demandas-${hojeISO()}.xlsx`);
+  const sufixo=de&&ate?`${de}_a_${ate}`:'todas';
+  XLSX.writeFile(wb,`aclon-hub-demandas-${sufixo}.xlsx`);
 }
 
-function exportarPDF(){
+function exportarPDF(de,ate){
+  let cards=cardsCache;
+  if(de&&ate){
+    cards=cardsCache.filter(c=>{
+      const dataCriacao=c.criadoEm?c.criadoEm.slice(0,10):null;
+      return dataCriacao&&dataCriacao>=de&&dataCriacao<=ate;
+    });
+  }
+  const periodoLabel=(de&&ate)?`${fmtDataCard(de)} a ${fmtDataCard(ate)}`:'Todo o período';
   const hoje=hojeISO();
-  const mes=inicioMesISO();
-  const abertos=cardsCache.filter(c=>c.status!=='concluido');
+  const abertos=cards.filter(c=>c.status!=='concluido');
   const pendentes=abertos.filter(c=>c.status==='a_fazer');
   const andamento=abertos.filter(c=>c.status==='fazendo');
-  const concluidasMes=cardsCache.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes);
+  const concluidas=cards.filter(c=>c.status==='concluido');
   const atrasadas=abertos.filter(c=>c.prazo&&c.prazo<hoje);
   const porPessoa=usersCache.map(u=>{
-    const meus=cardsCache.filter(c=>c.responsavel===u.usuario);
-    return{nome:u.nome,pendente:meus.filter(c=>c.status==='a_fazer').length,andamento:meus.filter(c=>c.status==='fazendo').length,concluido:meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes).length};
+    const meus=cards.filter(c=>c.responsavel===u.usuario);
+    return{nome:u.nome,pendente:meus.filter(c=>c.status==='a_fazer').length,andamento:meus.filter(c=>c.status==='fazendo').length,concluido:meus.filter(c=>c.status==='concluido').length};
   });
   document.getElementById('relatorioPrintContainer').innerHTML=`
     <div class="rp-header">
       <div class="rp-header-title">Aclon Hub — Relatório de Produtividade</div>
-      <div class="rp-header-sub">${nomeMesAtual()}</div>
+      <div class="rp-header-sub">${periodoLabel}</div>
     </div>
     <div class="rp-kpis">
       <div class="rp-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
       <div class="rp-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
-      <div class="rp-kpi"><div class="n">${concluidasMes.length}</div><div class="l">Concluídas no mês</div></div>
+      <div class="rp-kpi"><div class="n">${concluidas.length}</div><div class="l">Concluídas</div></div>
       <div class="rp-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
     </div>
     <div class="rp-section-label">Produtividade por colaborador</div>
     <table class="rp-table">
-      <thead><tr><th>Colaborador</th><th>Pendente</th><th>Em andamento</th><th>Concluído no mês</th></tr></thead>
+      <thead><tr><th>Colaborador</th><th>Pendente</th><th>Em andamento</th><th>Concluído</th></tr></thead>
       <tbody>${porPessoa.map(p=>`<tr><td>${escHtml(p.nome)}</td><td>${p.pendente}</td><td>${p.andamento}</td><td>${p.concluido}</td></tr>`).join('')}</tbody>
     </table>
     <div class="rp-footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
