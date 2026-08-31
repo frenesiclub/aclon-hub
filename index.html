@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Aclon Hub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -329,6 +330,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .mini-rank .bar-bg{flex:1;height:7px;background:var(--bg2);border-radius:20px;overflow:hidden;}
 .mini-rank .bar-fill{height:100%;background:var(--prod);border-radius:20px;}
 .mini-rank .val{font-size:12px;color:var(--text);width:20px;text-align:right;}
+
+/* ── RELATÓRIO PDF (impressão) ── */
+#relatorioPrintContainer{display:none;}
+.rp-header{background:#0D1B2E;color:#fff;padding:24px 28px;}
+.rp-header-title{font-size:20px;font-weight:700;}
+.rp-header-sub{font-size:13px;color:#F59E0B;margin-top:4px;}
+.rp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 28px;}
+.rp-kpi{border:1px solid #e2e2e2;border-radius:8px;padding:14px;text-align:center;}
+.rp-kpi .n{font-size:24px;font-weight:800;color:#0D1B2E;}
+.rp-kpi .l{font-size:11px;color:#666;margin-top:4px;}
+.rp-section-label{padding:0 28px;font-size:12px;font-weight:700;color:#0D1B2E;margin-bottom:8px;}
+.rp-table{border-collapse:collapse;margin:0 28px 20px;width:calc(100% - 56px);}
+.rp-table th{background:#0D1B2E;color:#fff;font-size:11px;text-align:left;padding:8px 10px;}
+.rp-table td{border-bottom:1px solid #eee;padding:8px 10px;font-size:12px;}
+.rp-footer{padding:0 28px 24px;font-size:10px;color:#999;}
+@media print{
+  body *{visibility:hidden;}
+  #relatorioPrintContainer,#relatorioPrintContainer *{visibility:visible;}
+  #relatorioPrintContainer.active{position:absolute;left:0;top:0;width:100%;display:block !important;}
+}
 </style>
 </head>
 <body>
@@ -1056,6 +1077,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 
 <div id="modalDetalheContainer"></div>
 
+<div id="relatorioPrintContainer"></div>
+
 </div><!-- /hub -->
 <script>
 const META=0.15;
@@ -1706,6 +1729,12 @@ function renderDashboardAdmin(){
   `:'';
 
   return `
+    ${st.isAdm?`
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+      <button class="btn-sm" onclick="exportarPDF()">Exportar PDF</button>
+      <button class="btn-sm" onclick="exportarExcel()">Exportar Excel</button>
+    </div>
+    `:''}
     ${alertaHtml}
     <div class="prod-kpis">
       <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes (a fazer)</div></div>
@@ -1718,6 +1747,75 @@ function renderDashboardAdmin(){
     ${tabelaHtml}
   `;
 }
+
+/* ── EXPORTAÇÃO (só admin) ── */
+function exportarExcel(){
+  const linhas=cardsCache.map(c=>{
+    const resp=usersCache.find(u=>u.usuario===c.responsavel);
+    const setorLabel=(SETOR_LB[c.setor]||[c.setor])[0];
+    return{
+      'Título':c.titulo,
+      'Descrição':c.descricao||'',
+      'Links':c.links||'',
+      'Setor':setorLabel,
+      'Tipo':{diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo,
+      'Prioridade':{urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade,
+      'Responsável':resp?resp.nome:c.responsavel,
+      'Status':{a_fazer:'A Fazer',fazendo:'Fazendo',concluido:'Concluído'}[c.status]||c.status,
+      'Prazo de início':c.prazoInicio||'',
+      'Prazo de término':c.prazo||'',
+      'Observação':c.observacao||'',
+      'Delegado por':c.criadoPor||'',
+      'Criado em':c.criadoEm?c.criadoEm.slice(0,10):'',
+      'Concluído em':c.concluidoEm?c.concluidoEm.slice(0,10):'',
+    };
+  });
+  if(linhas.length===0){alert('Ainda não há nenhuma demanda registrada.');return;}
+  const ws=XLSX.utils.json_to_sheet(linhas);
+  ws['!cols']=[{wch:28},{wch:32},{wch:28},{wch:18},{wch:10},{wch:10},{wch:16},{wch:10},{wch:14},{wch:14},{wch:28},{wch:14},{wch:12},{wch:12}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Demandas');
+  XLSX.writeFile(wb,`aclon-hub-demandas-${hojeISO()}.xlsx`);
+}
+
+function exportarPDF(){
+  const hoje=hojeISO();
+  const mes=inicioMesISO();
+  const abertos=cardsCache.filter(c=>c.status!=='concluido');
+  const pendentes=abertos.filter(c=>c.status==='a_fazer');
+  const andamento=abertos.filter(c=>c.status==='fazendo');
+  const concluidasMes=cardsCache.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes);
+  const atrasadas=abertos.filter(c=>c.prazo&&c.prazo<hoje);
+  const porPessoa=usersCache.map(u=>{
+    const meus=cardsCache.filter(c=>c.responsavel===u.usuario);
+    return{nome:u.nome,pendente:meus.filter(c=>c.status==='a_fazer').length,andamento:meus.filter(c=>c.status==='fazendo').length,concluido:meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes).length};
+  });
+  document.getElementById('relatorioPrintContainer').innerHTML=`
+    <div class="rp-header">
+      <div class="rp-header-title">Aclon Hub — Relatório de Produtividade</div>
+      <div class="rp-header-sub">${nomeMesAtual()}</div>
+    </div>
+    <div class="rp-kpis">
+      <div class="rp-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
+      <div class="rp-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
+      <div class="rp-kpi"><div class="n">${concluidasMes.length}</div><div class="l">Concluídas no mês</div></div>
+      <div class="rp-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
+    </div>
+    <div class="rp-section-label">Produtividade por colaborador</div>
+    <table class="rp-table">
+      <thead><tr><th>Colaborador</th><th>Pendente</th><th>Em andamento</th><th>Concluído no mês</th></tr></thead>
+      <tbody>${porPessoa.map(p=>`<tr><td>${escHtml(p.nome)}</td><td>${p.pendente}</td><td>${p.andamento}</td><td>${p.concluido}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="rp-footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+  `;
+  const cont=document.getElementById('relatorioPrintContainer');
+  cont.classList.add('active');
+  setTimeout(()=>{window.print();},150);
+}
+window.addEventListener('afterprint',()=>{
+  const cont=document.getElementById('relatorioPrintContainer');
+  if(cont)cont.classList.remove('active');
+});
 
 function renderKanbanAdmin(setorInfo){
   const cards=cardsCache.filter(c=>c.setor===setorInfo.id);
