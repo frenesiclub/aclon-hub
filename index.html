@@ -281,6 +281,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 :root{--prod:#0f6e5c;--prod-bg:#e5f5f1;--prod-dark:#0a4a3d;}
 .mkt-tab.prod-active{color:var(--prod-dark);border-bottom-color:var(--prod);background:var(--prod-bg);}
 .mkt-tab.prod-active .mkt-dot{background:var(--prod);}
+.mkt-tab.calc-active{color:var(--text);border-bottom-color:var(--text);background:var(--bg);}
 .prod-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
 .prod-sub-tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
 .prod-sub-tab{font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;}
@@ -351,16 +352,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     <button class="btn-logout" onclick="doLogout()">Sair</button>
   </div>
 
-  <!-- MKT TABS PRINCIPAIS -->
+  <!-- TELAS PRINCIPAIS -->
   <div class="mkt-tabs">
-    <button class="mkt-tab ml-active" id="mtab-ml" onclick="switchMkt('ml')">
-      <span class="mkt-dot"></span> Mercado Livre
-    </button>
-    <button class="mkt-tab" id="mtab-sh" onclick="switchMkt('sh')">
-      <span class="mkt-dot"></span> Shopee
-    </button>
-    <button class="mkt-tab" id="mtab-az" onclick="switchMkt('az')">
-      <span class="mkt-dot"></span> Amazon
+    <button class="mkt-tab calc-active" id="mtab-calc" onclick="switchMkt('calc')">
+      <span class="mkt-dot"></span> Calculadoras
     </button>
     <button class="mkt-tab" id="mtab-prod" onclick="switchMkt('prod')">
       <span class="mkt-dot"></span> Produtividade
@@ -369,6 +364,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
       ADM
     </button>
   </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- TELA CALCULADORAS -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="mkt-panel active" id="mp-calc">
+    <div class="mkt-tabs" style="border-top:0.5px solid var(--border);">
+      <button class="mkt-tab ml-active" id="ctab-ml" onclick="switchCalcMkt('ml')">
+        <span class="mkt-dot"></span> Mercado Livre
+      </button>
+      <button class="mkt-tab" id="ctab-sh" onclick="switchCalcMkt('sh')">
+        <span class="mkt-dot"></span> Shopee
+      </button>
+      <button class="mkt-tab" id="ctab-az" onclick="switchCalcMkt('az')">
+        <span class="mkt-dot"></span> Amazon
+      </button>
+    </div>
 
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- PAINEL MERCADO LIVRE -->
@@ -949,6 +960,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     </div>
   </div><!-- /mp-az -->
 
+  </div><!-- /mp-calc -->
+
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- PAINEL ADM -->
   <!-- ══════════════════════════════════════════════════════════ -->
@@ -1058,15 +1071,27 @@ function doLogout(){
   st.senha=null;
 }
 
-/* ── NAVEGAÇÃO MKT ── */
-function switchMkt(mkt){
-  ['ml','sh','az','prod','adm'].forEach(m=>{
-    document.getElementById('mtab-'+m).className='mkt-tab'+(m===mkt?' '+m+'-active':'');
+/* ── NAVEGAÇÃO TELAS PRINCIPAIS ── */
+const MOD_ACTIVE_CLASS={calc:'calc-active',prod:'prod-active',adm:'adm-active'};
+function switchMkt(mod){
+  ['calc','prod','adm'].forEach(m=>{
+    const tab=document.getElementById('mtab-'+m);
+    if(tab) tab.className='mkt-tab'+(m===mod?' '+MOD_ACTIVE_CLASS[m]:'');
+    const p=document.getElementById('mp-'+m);
+    if(p) p.classList.toggle('active',m===mod);
+  });
+  st.mod=mod;
+  if(mod==='prod') renderProd();
+}
+
+/* ── NAVEGAÇÃO DENTRO DE CALCULADORAS ── */
+function switchCalcMkt(mkt){
+  ['ml','sh','az'].forEach(m=>{
+    document.getElementById('ctab-'+m).className='mkt-tab'+(m===mkt?' '+m+'-active':'');
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mkt);
   });
   st.mkt=mkt;
-  if(mkt==='prod') renderProd();
 }
 
 /* ── NAVEGAÇÃO SUB ── */
@@ -1529,10 +1554,12 @@ const SETORES_PROD=[
 ];
 const STATUS_COLS=[{id:'a_fazer',label:'A Fazer'},{id:'fazendo',label:'Fazendo'},{id:'concluido',label:'Concluído'}];
 let prodSetorAtivo='anuncios';
+let prodView='kanban'; // 'kanban' | 'dashboard'
 
 function hojeISO(){return new Date().toISOString().slice(0,10);}
-function inicioSemanaISO(){const d=new Date();const dia=d.getDay();const diff=(dia===0?-6:1)-dia;d.setDate(d.getDate()+diff);d.setHours(0,0,0,0);return d.toISOString();}
+function inicioMesISO(){const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d.toISOString();}
 function fmtDataCard(iso){const p=iso.split('-');return p[2]+'/'+p[1];}
+function nomeMesAtual(){const s=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1);}
 
 async function renderProd(){
   const el=document.getElementById('prodContent');
@@ -1542,7 +1569,23 @@ async function renderProd(){
   else renderProdColaborador(el);
 }
 
+function switchProdView(v){prodView=v;renderProd();}
+function prodViewTabsHtml(){
+  return `<div class="prod-sub-tabs" style="margin-bottom:1.5rem;">
+    <button class="prod-sub-tab${prodView==='kanban'?' active':''}" onclick="switchProdView('kanban')">Kanban</button>
+    <button class="prod-sub-tab${prodView==='dashboard'?' active':''}" onclick="switchProdView('dashboard')">Dashboard</button>
+  </div>`;
+}
+
 function renderProdAdmin(el){
+  if(prodView==='dashboard'){
+    el.innerHTML=`
+      <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
+      ${prodViewTabsHtml()}
+      ${renderDashboardAdmin()}
+    `;
+    return;
+  }
   const tabsHtml=SETORES_PROD.map(s=>`<button class="prod-sub-tab${s.id===prodSetorAtivo?' active':''}${s.ativo?' live':''}" onclick="switchProdSetor('${s.id}')"><span class="dot"></span>${s.label}</button>`).join('');
   const setorInfo=SETORES_PROD.find(s=>s.id===prodSetorAtivo);
   let corpo;
@@ -1553,7 +1596,8 @@ function renderProdAdmin(el){
   }
   el.innerHTML=`
     <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
-    ${renderProdOverview()}
+    ${prodViewTabsHtml()}
+    <div class="section-label" style="margin-top:0;">Setor</div>
     <div class="prod-sub-tabs">${tabsHtml}</div>
     ${corpo}
     <div class="modal-overlay" id="modalNovaDemanda">
@@ -1594,26 +1638,42 @@ function renderProdAdmin(el){
   `;
 }
 
-function renderProdOverview(){
+function renderDashboardAdmin(){
   const hoje=hojeISO();
-  const semana=inicioSemanaISO();
+  const mes=inicioMesISO();
   const abertos=cardsCache.filter(c=>c.status!=='concluido');
-  const hojeCount=abertos.filter(c=>c.prazo===hoje).length;
-  const prioritarias=abertos.filter(c=>c.prioridade==='alta');
+  const pendentes=abertos.filter(c=>c.status==='a_fazer');
+  const andamento=abertos.filter(c=>c.status==='fazendo');
+  const concluidasMes=cardsCache.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes);
   const atrasadas=abertos.filter(c=>c.prazo&&c.prazo<hoje);
-  const concluidasSemana=cardsCache.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=semana);
-  const ranking=usersCache.map(u=>({nome:u.nome,n:concluidasSemana.filter(c=>c.responsavel===u.usuario).length})).sort((a,b)=>b.n-a.n);
-  const maxN=Math.max(1,...ranking.map(r=>r.n));
-  const rankingHtml=ranking.length?ranking.map(r=>`<div class="mini-rank"><span class="name">${r.nome}</span><div class="bar-bg"><div class="bar-fill" style="width:${(r.n/maxN)*100}%"></div></div><span class="val">${r.n}</span></div>`).join(''):'<div class="prod-empty">Cadastre colaboradores para ver a produtividade.</div>';
+
+  const porPessoa=usersCache.map(u=>{
+    const meus=cardsCache.filter(c=>c.responsavel===u.usuario);
+    return{
+      nome:u.nome,
+      pendente:meus.filter(c=>c.status==='a_fazer').length,
+      andamento:meus.filter(c=>c.status==='fazendo').length,
+      concluido:meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes).length,
+    };
+  });
+  const maxN=Math.max(1,...porPessoa.map(p=>p.concluido));
+  const rankingHtml=porPessoa.length?porPessoa.map(p=>`<div class="mini-rank"><span class="name">${p.nome}</span><div class="bar-bg"><div class="bar-fill" style="width:${(p.concluido/maxN)*100}%"></div></div><span class="val">${p.concluido}</span></div>`).join(''):'<div class="prod-empty">Cadastre colaboradores para ver a produtividade.</div>';
+  const tabelaHtml=porPessoa.length?`
+    <table class="user-table" style="margin-top:1.25rem;">
+      <thead><tr><th>Colaborador</th><th style="text-align:center;">Pendente</th><th style="text-align:center;">Em andamento</th><th style="text-align:center;">Concluído no mês</th></tr></thead>
+      <tbody>${porPessoa.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center;">${p.pendente}</td><td style="text-align:center;">${p.andamento}</td><td style="text-align:center;">${p.concluido}</td></tr>`).join('')}</tbody>
+    </table>`:'';
+
   return `
     <div class="prod-kpis">
-      <div class="prod-kpi"><div class="n">${hojeCount}</div><div class="l">Demandas de hoje</div></div>
-      <div class="prod-kpi"><div class="n">${prioritarias.length}</div><div class="l">Prioritárias em aberto</div></div>
+      <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes (a fazer)</div></div>
+      <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
+      <div class="prod-kpi"><div class="n">${concluidasMes.length}</div><div class="l">Concluídas em ${nomeMesAtual()}</div></div>
       <div class="prod-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
-      <div class="prod-kpi"><div class="n">${concluidasSemana.length}</div><div class="l">Concluídas na semana</div></div>
     </div>
-    <div class="section-label">Produtividade da semana</div>
+    <div class="section-label">Produtividade de ${nomeMesAtual()}, por colaborador</div>
     ${rankingHtml}
+    ${tabelaHtml}
   `;
 }
 
@@ -1696,27 +1756,51 @@ async function moverCard(id,status){
   renderProd();
 }
 
+function renderDashboardColaborador(setorInfo){
+  const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
+  const mes=inicioMesISO();
+  const hoje=hojeISO();
+  const pendentes=meus.filter(c=>c.status==='a_fazer');
+  const andamento=meus.filter(c=>c.status==='fazendo');
+  const concluidasMes=meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes);
+  const atrasadas=meus.filter(c=>c.prazo&&c.prazo<hoje&&c.status!=='concluido');
+  const listaHtml=concluidasMes.length?`
+    <div class="section-label">Concluídas em ${nomeMesAtual()}</div>
+    <div class="kanban-cards">${concluidasMes.map(c=>renderKcard(c)).join('')}</div>
+  `:'';
+  return `
+    <div class="prod-kpis">
+      <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
+      <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
+      <div class="prod-kpi"><div class="n">${concluidasMes.length}</div><div class="l">Concluídas em ${nomeMesAtual()}</div></div>
+      <div class="prod-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
+    </div>
+    ${listaHtml}
+  `;
+}
+
 function renderProdColaborador(el){
   const setorInfo=SETORES_PROD.find(s=>s.id===st.setor);
   if(!setorInfo||!setorInfo.ativo){
     el.innerHTML=`<div class="adm-title" style="border:none;">Minhas demandas</div><div class="prod-placeholder">Seu setor ainda não está ativo neste hub.<br>Entra em operação em breve.</div>`;
     return;
   }
+  if(prodView==='dashboard'){
+    el.innerHTML=`
+      <div class="adm-title" style="border:none;">Minha produtividade — ${setorInfo.label}</div>
+      ${prodViewTabsHtml()}
+      ${renderDashboardColaborador(setorInfo)}
+    `;
+    return;
+  }
   const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
-  const hoje=hojeISO();
-  const semana=inicioSemanaISO();
-  const concluidasSemana=meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=semana).length;
-  const atrasadas=meus.filter(c=>c.prazo&&c.prazo<hoje&&c.status!=='concluido').length;
   const cols=STATUS_COLS.map(col=>{
     const colCards=meus.filter(c=>c.status===col.id);
     return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
   el.innerHTML=`
     <div class="adm-title" style="border:none;">Minhas demandas — ${setorInfo.label}</div>
-    <div class="prod-kpis" style="grid-template-columns:repeat(2,1fr);max-width:340px;">
-      <div class="prod-kpi"><div class="n">${concluidasSemana}</div><div class="l">Concluídas na semana</div></div>
-      <div class="prod-kpi"><div class="n">${atrasadas}</div><div class="l">Em atraso</div></div>
-    </div>
+    ${prodViewTabsHtml()}
     <div class="kanban-cols">${cols}</div>
   `;
 }
