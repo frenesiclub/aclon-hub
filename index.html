@@ -301,7 +301,17 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .prod-kpi{background:var(--bg2);border-radius:var(--radius-md);padding:.9rem 1rem;}
 .prod-kpi .n{font-size:22px;font-weight:800;color:var(--text);}
 .prod-kpi .l{font-size:11px;color:var(--text2);margin-top:2px;}
-.kanban-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.kanban-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.demanda-mes-card{background:var(--bg2);border:1px dashed var(--border2);border-radius:var(--radius-md);padding:.65rem .75rem;margin-bottom:8px;}
+.demanda-mes-card .dm-meta{font-size:10px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.demanda-mes-card .dm-titulo{font-size:12px;font-weight:700;color:var(--text);line-height:1.3;}
+.demanda-mes-card .dm-desc{font-size:11px;color:var(--text2);margin:3px 0 7px;line-height:1.4;}
+.demanda-mes-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.demanda-mes-apply{font-size:10.5px;font-weight:700;color:var(--prod-dark);background:var(--prod-bg);border:none;border-radius:6px;padding:4px 9px;cursor:pointer;}
+.demanda-mes-apply:hover{opacity:.85;}
+.demanda-mes-empty{color:var(--text3);font-size:11px;padding:1rem .2rem;}
+.demanda-mes-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.demanda-mes-add{font-size:10px;font-weight:600;color:var(--text2);background:none;border:0.5px solid var(--border2);border-radius:6px;padding:2px 7px;cursor:pointer;}
 .kanban-col-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px;}
 .kanban-col-title .count{color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0;}
 .kanban-cards{display:flex;flex-direction:column;gap:8px;min-height:60px;}
@@ -1118,6 +1128,8 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 
 <div id="modalExportExcelContainer"></div>
 
+<div id="modalDemandaMesContainer"></div>
+
 </div><!-- /hub -->
 <script>
 const META=0.15;
@@ -1134,9 +1146,11 @@ let st={
 
 let usersCache=[];
 let cardsCache=[];
+let templatesCache=[];
 async function api(path,opts){const r=await fetch(path,opts);return r.json();}
 async function fetchUsers(){const d=await api('/api/users');usersCache=d.users||[];return usersCache;}
 async function fetchCards(){const d=await api('/api/cards');cardsCache=d.cards||[];return cardsCache;}
+async function fetchTemplates(){const d=await api('/api/templates');templatesCache=d.templates||[];return templatesCache;}
 
 const fmt=v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtP=v=>parseFloat(v).toFixed(2)+'%';
@@ -1720,9 +1734,9 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 const SETORES_PROD=[
   {id:'anuncios',label:'Anúncios',ativo:true},
   {id:'operacional_estrategico',label:'Operacional Estratégico',ativo:true},
-  {id:'mercado',label:'Análise de Mercado',ativo:false},
-  {id:'prevenda',label:'Pré-venda',ativo:false},
-  {id:'full',label:'Full',ativo:false},
+  {id:'mercado',label:'Análise de Mercado',ativo:true},
+  {id:'prevenda',label:'Pré-venda',ativo:true},
+  {id:'full',label:'Full',ativo:true},
 ];
 const STATUS_COLS=[{id:'a_fazer',label:'A Fazer'},{id:'fazendo',label:'Fazendo'},{id:'concluido',label:'Concluído'}];
 let prodSetorAtivo='anuncios';
@@ -1739,7 +1753,7 @@ function nomeMesAtual(){const s=new Date().toLocaleDateString('pt-BR',{month:'lo
 async function renderProd(){
   const el=document.getElementById('prodContent');
   el.innerHTML='<div class="prod-empty">Carregando...</div>';
-  await Promise.all([fetchUsers(),fetchCards()]);
+  await Promise.all([fetchUsers(),fetchCards(),fetchTemplates()]);
   if(st.isAdm||st.isLider) renderProdAdmin(el);
   else renderProdColaborador(el);
 }
@@ -1965,8 +1979,132 @@ function renderKanbanAdmin(setorInfo){
         <button class="btn-primary" onclick="abrirNovaDemanda('${setorInfo.id}',null)">+ Nova demanda</button>
       </div>
     </div>
-    <div class="kanban-cols">${cols}</div>
+    <div class="kanban-cols">${renderDemandaMesCol(setorInfo.id,true)}${cols}</div>
   `;
+}
+
+function renderDemandaMesCol(setorId,podeGerir){
+  const templates=templatesCache.filter(t=>t.setor===setorId);
+  const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'};
+  const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'};
+  const cardsHtml=templates.length?templates.map(t=>`
+    <div class="demanda-mes-card">
+      <div class="dm-meta">${tipoLabel[t.tipo]||t.tipo} <span class="prio prio-${t.prioridade}" style="font-size:9px;padding:1px 5px;">${prioLabel[t.prioridade]||t.prioridade}</span></div>
+      <div class="dm-titulo">${escHtml(t.titulo)}</div>
+      ${t.descricao?`<div class="dm-desc">${escHtml(t.descricao)}</div>`:''}
+      <div class="demanda-mes-btns">
+        <button class="demanda-mes-apply" onclick="aplicarDemandaMes('${t.id}')">Aplicar em Fazendo</button>
+        ${podeGerir?`<button class="demanda-mes-add" onclick="editarDemandaMes('${t.id}')">Editar</button>`:''}
+      </div>
+    </div>
+  `).join(''):'<div class="demanda-mes-empty">Nenhuma demanda fixa cadastrada pra esse setor ainda.</div>';
+  return `<div>
+    <div class="demanda-mes-col-head">
+      <div class="kanban-col-title" style="margin:0;">Demanda do Mês</div>
+      ${podeGerir?`<button class="demanda-mes-add" onclick="abrirNovaDemandaMes('${setorId}')">+ Adicionar</button>`:''}
+    </div>
+    <div class="kanban-cards">${cardsHtml}</div>
+  </div>`;
+}
+
+async function aplicarDemandaMes(id){
+  const t=templatesCache.find(x=>x.id===id);
+  if(!t)return;
+  const novo={
+    titulo:t.titulo,
+    descricao:t.descricao,
+    links:'',
+    setor:t.setor,
+    tipo:t.tipo,
+    responsavel:st.usuario,
+    prioridade:t.prioridade,
+    prazoInicio:null,
+    prazo:null,
+  };
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  const r=await api('/api/cards',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+  if(!r||r.error){alert('Não foi possível aplicar essa demanda.');return;}
+  const criado=(r.cards||[]).slice(-1)[0];
+  if(criado){
+    await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:criado.id,status:'fazendo'})});
+  }
+  await fetchCards();
+  renderProd();
+}
+
+let dmSetorAlvo=null;
+let dmEditandoId=null;
+
+function abrirNovaDemandaMes(setorId){
+  dmSetorAlvo=setorId;
+  dmEditandoId=null;
+  const setorInfo=SETORES_PROD.find(s=>s.id===setorId)||{label:'Setor'};
+  document.getElementById('modalDemandaMesContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalDemandaMes">
+      <div class="modal">
+        <h3 id="dmModalTitulo">Demanda fixa do mês — ${setorInfo.label}</h3>
+        <label>Título</label>
+        <input id="dmTitulo" type="text"/>
+        <label>Descrição</label>
+        <textarea id="dmDescricao" rows="3"></textarea>
+        <label>Tipo</label>
+        <select id="dmTipo">
+          <option value="diario">Diário</option>
+          <option value="semanal" selected>Semanal</option>
+          <option value="quinzenal">Quinzenal</option>
+          <option value="esporadica">Esporádica</option>
+        </select>
+        <label>Prioridade sugerida</label>
+        <select id="dmPrioridade">
+          <option value="urgente">Urgente</option>
+          <option value="alta">Alta</option>
+          <option value="media" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+        <div class="modal-btns" id="dmModalBtns">
+          <button class="btn-cancel" onclick="fecharDemandaMes()">Cancelar</button>
+          <button class="btn-confirm" onclick="salvarDemandaMes()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharDemandaMes(){document.getElementById('modalDemandaMesContainer').innerHTML='';}
+
+function editarDemandaMes(id){
+  const t=templatesCache.find(x=>x.id===id);
+  if(!t)return;
+  abrirNovaDemandaMes(t.setor);
+  dmEditandoId=id;
+  document.getElementById('dmTitulo').value=t.titulo;
+  document.getElementById('dmDescricao').value=t.descricao||'';
+  document.getElementById('dmTipo').value=t.tipo;
+  document.getElementById('dmPrioridade').value=t.prioridade;
+  document.getElementById('dmModalTitulo').textContent='Editar demanda fixa';
+  document.getElementById('dmModalBtns').insertAdjacentHTML('afterbegin',`<button class="btn-cancel" style="color:var(--red);border-color:var(--red);" onclick="excluirDemandaMes('${id}')">Excluir</button>`);
+}
+
+async function salvarDemandaMes(){
+  const titulo=document.getElementById('dmTitulo').value.trim();
+  if(!titulo){alert('Preencha o título.');return;}
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  if(dmEditandoId){
+    await api('/api/templates',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id:dmEditandoId,titulo,descricao:document.getElementById('dmDescricao').value.trim(),tipo:document.getElementById('dmTipo').value,prioridade:document.getElementById('dmPrioridade').value})});
+  }else{
+    const novo={titulo,descricao:document.getElementById('dmDescricao').value.trim(),setor:dmSetorAlvo,tipo:document.getElementById('dmTipo').value,prioridade:document.getElementById('dmPrioridade').value};
+    await api('/api/templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+  }
+  fecharDemandaMes();
+  await fetchTemplates();
+  renderProd();
+}
+async function excluirDemandaMes(id){
+  if(!confirm('Excluir esta demanda fixa do mês?'))return;
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  await api('/api/templates',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id})});
+  fecharDemandaMes();
+  await fetchTemplates();
+  renderProd();
 }
 
 function escHtml(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2009,7 +2147,7 @@ function abrirDetalheCard(id){
   const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
   const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
 
-  const camposGerenciaveis=podeGerir?`
+  const camposGerenciaveis=podeAgir?`
     <label>Descrição</label>
     <textarea id="ddDescricao" rows="2">${escHtml(c.descricao)}</textarea>
     <label>Links externos (um por linha)</label>
@@ -2018,8 +2156,10 @@ function abrirDetalheCard(id){
     <select id="ddTipo">${TIPO_OPTS.map(([v,l])=>`<option value="${v}"${v===c.tipo?' selected':''}>${l}</option>`).join('')}</select>
     <label>Prioridade</label>
     <select id="ddPrioridade">${PRIO_OPTS.map(([v,l])=>`<option value="${v}"${v===c.prioridade?' selected':''}>${l}</option>`).join('')}</select>
+    ${podeGerir?`
     <label>Responsável</label>
     <select id="ddResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}"${u.usuario===c.responsavel?' selected':''}>${u.nome}</option>`).join('')}</select>
+    `:''}
     <label>Prazo de início</label>
     <input id="ddPrazoInicio" type="date" value="${c.prazoInicio||''}"/>
     <label>Prazo de término</label>
@@ -2037,7 +2177,7 @@ function abrirDetalheCard(id){
   document.getElementById('modalDetalheContainer').innerHTML=`
     <div class="modal-overlay open" id="modalDetalheCard">
       <div class="modal">
-        ${podeGerir
+        ${podeAgir
           ? `<label>Título</label><input id="ddTitulo" type="text" value="${escHtml(c.titulo)}"/>`
           : `<h3>${escHtml(c.titulo)}</h3>`
         }
@@ -2067,18 +2207,19 @@ async function salvarDetalheCard(id){
   const payload={id};
   const obsEl=document.getElementById('ddObservacao');
   if(obsEl) payload.observacao=obsEl.value;
-  const podeGerir=st.isAdm||st.isLider;
-  if(podeGerir){
+  const tituloEl=document.getElementById('ddTitulo');
+  if(tituloEl){
     payload.edit={
-      titulo:document.getElementById('ddTitulo').value.trim(),
+      titulo:tituloEl.value.trim(),
       descricao:document.getElementById('ddDescricao').value.trim(),
       links:document.getElementById('ddLinks').value.trim(),
       tipo:document.getElementById('ddTipo').value,
       prioridade:document.getElementById('ddPrioridade').value,
-      responsavel:document.getElementById('ddResponsavel').value,
       prazoInicio:document.getElementById('ddPrazoInicio').value||null,
       prazo:document.getElementById('ddPrazo').value||null,
     };
+    const respEl=document.getElementById('ddResponsavel');
+    if(respEl) payload.edit.responsavel=respEl.value;
     Object.assign(payload,st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha});
   }
   await api('/api/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -2277,7 +2418,7 @@ function renderProdColaborador(el){
       ${souEu?`<button class="btn-primary" onclick="abrirNovaDemanda('${st.setor}','${st.usuario}')">+ Nova demanda</button>`:''}
     </div>
     ${filtroHtml}
-    <div class="kanban-cols">${cols}</div>
+    <div class="kanban-cols">${renderDemandaMesCol(st.setor,false)}${cols}</div>
   `;
 }
 function mudarFiltroColaborador(usuario){prodFiltroColaborador=usuario;renderProd();}
