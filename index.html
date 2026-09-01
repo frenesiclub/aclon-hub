@@ -1118,7 +1118,6 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="Analista Jr">Analista Jr</option>
       <option value="Analista Pleno">Analista Pleno</option>
       <option value="Analista Senior">Analista Senior</option>
-      <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
     </select>
     <label>Data de início</label>
     <input type="date" id="editDataInicio"/>
@@ -1175,7 +1174,6 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="Analista Jr">Analista Jr</option>
       <option value="Analista Pleno">Analista Pleno</option>
       <option value="Analista Senior">Analista Senior</option>
-      <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
     </select>
     <label>Data de início</label>
     <input id="ncDataInicio" type="date"/>
@@ -1888,7 +1886,7 @@ function renderUserTable(){
     const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];
     const proximasFerias=(Array.isArray(u.ferias)?u.ferias:[]).filter(f=>f.fim>=hoje).sort((a,b)=>a.inicio.localeCompare(b.inicio))[0];
     const feriasHint=proximasFerias?`<div style="font-size:10px;color:var(--text3);margin-top:2px;">Férias: ${fmtDataCompleta(proximasFerias.inicio)} → ${fmtDataCompleta(proximasFerias.fim)}</div>`:'';
-    return`<tr><td>${escHtml(u.nome)}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}${feriasHint}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td style="font-size:12px;color:var(--text2);">${escHtml(u.cargo)||'—'}</td><td style="font-size:12px;color:var(--text2);">${u.dataInicio?fmtDataCompleta(u.dataInicio):'—'}</td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;
+    return`<tr><td>${escHtml(u.nome)}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}${feriasHint}</td><td style="font-size:12px;color:var(--text2);">${escHtml(u.cargo)||'—'}</td><td style="font-size:12px;color:var(--text2);">${u.dataInicio?fmtDataCompleta(u.dataInicio):'—'}</td><td><span class="badge badge-${cls}">${label}</span></td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;
   }).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -1910,7 +1908,7 @@ function renderGestaoColaboradores(el){
       <button class="btn-primary" onclick="abrirNovoColaborador()">+ Colaborador</button>
     </div>
     <table class="user-table">
-      <thead><tr><th style="width:24%">Nome</th><th style="width:14%">Usuário</th><th style="width:15%">Setor</th><th style="width:17%">Cargo</th><th style="width:13%">Início</th><th style="width:17%"></th></tr></thead>
+      <thead><tr><th style="width:24%">Nome</th><th style="width:17%">Cargo</th><th style="width:13%">Início</th><th style="width:15%">Setor</th><th style="width:14%">Usuário</th><th style="width:17%"></th></tr></thead>
       <tbody id="userTableBody"></tbody>
     </table>
   `;
