@@ -336,8 +336,20 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .kcard-obs{font-size:11px;color:var(--text2);background:var(--bg2);border-radius:6px;padding:5px 8px;margin-top:6px;}
 .kcard-obs-btn{font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;margin-top:6px;text-decoration:underline;}
 .prod-empty{color:var(--text3);font-size:12px;padding:1.5rem 0;text-align:center;}
-.prod-alert{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);padding:.9rem 1rem;margin-bottom:1.25rem;}
-.prod-alert-title{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:.6rem;}
+.prod-alert{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);margin-bottom:.7rem;overflow:hidden;}
+.prod-alert-red{background:var(--red-bg);border-color:var(--red);}
+.prod-alert-red .prod-alert-header{color:var(--red);}
+.prod-alert-red .prod-alert-row{border-top-color:var(--red);}
+.prod-alert-header{display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;cursor:pointer;font-size:12px;font-weight:700;color:var(--amber);}
+.prod-alert-chevron{font-size:10px;transition:transform .15s;display:inline-block;}
+.prod-alert-chevron.open{transform:rotate(90deg);}
+.prod-alert-body{max-height:0;overflow:hidden;transition:max-height .2s ease;}
+.prod-alert-body.open{max-height:280px;overflow-y:auto;}
+.prod-alert-row{display:flex;align-items:center;gap:10px;padding:.5rem .9rem;border-top:0.5px solid var(--amber-border);font-size:12px;cursor:pointer;}
+.prod-alert-row:hover{background:rgba(255,255,255,.5);}
+.prod-alert-row .are-titulo{flex:1;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prod-alert-row .are-resp{color:var(--text2);font-size:11px;width:84px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prod-alert-row .are-prazo{color:var(--text3);font-size:11px;width:36px;flex-shrink:0;}
 .prod-placeholder{padding:3rem 1rem;text-align:center;color:var(--text2);font-size:13px;}
 .mini-rank{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
 .mini-rank .name{font-size:12px;color:var(--text2);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1748,6 +1760,30 @@ function inicioMesISO(){const d=new Date();d.setDate(1);d.setHours(0,0,0,0);retu
 function fmtDataCard(iso){const p=iso.split('-');return p[2]+'/'+p[1];}
 function prazoLimiteAlerta(){const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);}
 function cardsVencendoEmBreve(cards){const hoje=hojeISO();const limite=prazoLimiteAlerta();return cards.filter(c=>c.status!=='concluido'&&c.prazo&&c.prazo>=hoje&&c.prazo<=limite);}
+
+let alertasAbertos={};
+function toggleAlerta(key){alertasAbertos[key]=!alertasAbertos[key];renderProd();}
+function renderAlertaVencendo(cards,label,key,cor){
+  if(!cards.length)return'';
+  const aberto=!!alertasAbertos[key];
+  const rows=cards.map(c=>{
+    const resp=usersCache.find(u=>u.usuario===c.responsavel);
+    return `<div class="prod-alert-row" onclick="abrirDetalheCard('${c.id}')">
+      <span class="are-titulo">${escHtml(c.titulo)}</span>
+      <span class="are-resp">${resp?escHtml(resp.nome):'—'}</span>
+      <span class="are-prazo">${c.prazo?fmtDataCard(c.prazo):''}</span>
+    </div>`;
+  }).join('');
+  return `
+    <div class="prod-alert${cor==='red'?' prod-alert-red':''}">
+      <div class="prod-alert-header" onclick="toggleAlerta('${key}')">
+        <span>⚠ ${cards.length} ${label}</span>
+        <span class="prod-alert-chevron${aberto?' open':''}">›</span>
+      </div>
+      <div class="prod-alert-body${aberto?' open':''}">${rows}</div>
+    </div>
+  `;
+}
 function nomeMesAtual(){const s=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1);}
 
 async function renderProd(){
@@ -1817,12 +1853,8 @@ function renderDashboardAdmin(){
     </table>`:'';
 
   const vencendoEmBreve=cardsVencendoEmBreve(cardsCache);
-  const alertaHtml=vencendoEmBreve.length?`
-    <div class="prod-alert">
-      <div class="prod-alert-title">⚠ ${vencendoEmBreve.length} demanda${vencendoEmBreve.length===1?'':'s'} da equipe vencendo nos próximos 3 dias</div>
-      <div class="kanban-cards">${vencendoEmBreve.map(c=>renderKcard(c)).join('')}</div>
-    </div>
-  `:'';
+  const alertaAtraso=renderAlertaVencendo(atrasadas,`demanda${atrasadas.length===1?'':'s'} da equipe em atraso`,'admin-atraso','red');
+  const alertaVencendo=renderAlertaVencendo(vencendoEmBreve,`demanda${vencendoEmBreve.length===1?'':'s'} da equipe vencendo nos próximos 3 dias`,'admin-vencendo');
 
   return `
     ${st.isAdm?`
@@ -1831,7 +1863,6 @@ function renderDashboardAdmin(){
       <button class="btn-sm" onclick="abrirExportPeriodo('excel')">Exportar Excel</button>
     </div>
     `:''}
-    ${alertaHtml}
     <div class="prod-kpis">
       <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes (a fazer)</div></div>
       <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
@@ -1841,6 +1872,9 @@ function renderDashboardAdmin(){
     <div class="section-label">Produtividade de ${nomeMesAtual()}, por colaborador</div>
     ${rankingHtml}
     ${tabelaHtml}
+    ${(atrasadas.length||vencendoEmBreve.length)?'<div class="section-label">Atenção</div>':''}
+    ${alertaAtraso}
+    ${alertaVencendo}
   `;
 }
 
@@ -2359,14 +2393,9 @@ function renderDashboardColaborador(setorInfo){
     <div class="kanban-cards">${concluidasMes.map(c=>renderKcard(c)).join('')}</div>
   `:'';
   const vencendoEmBreve=cardsVencendoEmBreve(meus);
-  const alertaHtml=vencendoEmBreve.length?`
-    <div class="prod-alert">
-      <div class="prod-alert-title">⚠ ${vencendoEmBreve.length} demanda${vencendoEmBreve.length===1?'':'s'} sua${vencendoEmBreve.length===1?'':'s'} vencendo nos próximos 3 dias</div>
-      <div class="kanban-cards">${vencendoEmBreve.map(c=>renderKcard(c)).join('')}</div>
-    </div>
-  `:'';
+  const alertaAtraso=renderAlertaVencendo(atrasadas,`demanda${atrasadas.length===1?'':'s'} sua${atrasadas.length===1?'':'s'} em atraso`,'colab-atraso','red');
+  const alertaVencendo=renderAlertaVencendo(vencendoEmBreve,`demanda${vencendoEmBreve.length===1?'':'s'} sua${vencendoEmBreve.length===1?'':'s'} vencendo nos próximos 3 dias`,'colab-vencendo');
   return `
-    ${alertaHtml}
     <div class="prod-kpis">
       <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
       <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
@@ -2374,6 +2403,9 @@ function renderDashboardColaborador(setorInfo){
       <div class="prod-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
     </div>
     ${listaHtml}
+    ${(atrasadas.length||vencendoEmBreve.length)?'<div class="section-label">Atenção</div>':''}
+    ${alertaAtraso}
+    ${alertaVencendo}
   `;
 }
 
