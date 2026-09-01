@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { usuario, nome, setor, senha, lider, cargo } = body.novo || {};
+      const { usuario, nome, setor, senha, lider, cargo, dataInicio } = body.novo || {};
       if (!usuario || !nome || !setor || !senha) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -42,7 +42,16 @@ module.exports = async (req, res) => {
         res.status(409).json({ error: 'usuário já existe' });
         return;
       }
-      users.push({ usuario, nome, setor, senha, lider: !!lider, cargo: cargo || '' });
+      users.push({
+        usuario,
+        nome,
+        setor,
+        senha,
+        lider: !!lider,
+        cargo: cargo || '',
+        dataInicio: dataInicio || '',
+        ferias: [],
+      });
       await redisSetJSON('aclon_users', users);
       res.status(200).json({ ok: true, users: semSenha(users) });
       return;
@@ -56,7 +65,7 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { usuario, nome, setor, lider, cargo } = body;
+      const { usuario, nome, setor, lider, cargo, dataInicio, feriasAdd, feriasRemoveId } = body;
       if (!usuario) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -71,6 +80,18 @@ module.exports = async (req, res) => {
       if (setor !== undefined) users[idx].setor = setor;
       if (lider !== undefined) users[idx].lider = !!lider;
       if (cargo !== undefined) users[idx].cargo = cargo;
+      if (dataInicio !== undefined) users[idx].dataInicio = dataInicio;
+      if (!Array.isArray(users[idx].ferias)) users[idx].ferias = [];
+      if (feriasAdd && feriasAdd.inicio && feriasAdd.fim) {
+        users[idx].ferias.push({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          inicio: feriasAdd.inicio,
+          fim: feriasAdd.fim,
+        });
+      }
+      if (feriasRemoveId) {
+        users[idx].ferias = users[idx].ferias.filter((f) => f.id !== feriasRemoveId);
+      }
       await redisSetJSON('aclon_users', users);
       res.status(200).json({ ok: true, users: semSenha(users) });
       return;
