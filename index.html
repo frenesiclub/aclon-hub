@@ -1176,6 +1176,19 @@ function getFr(p,mkt,modal){if(mkt==='ml')return frML(p);if(mkt==='sh')return fr
 function getImp(mkt,side){return parseFloat(document.getElementById(mkt+'_'+(side==='p'?'p':'l')+'_imp').value)||9;}
 
 /* ── LOGIN ── */
+function aplicarSessaoLogada(user,senha){
+  st.isAdm=user.isAdm; st.isLider=!!user.isLider; st.userName=user.nome; st.usuario=user.usuario; st.setor=user.setor; st.senha=senha;
+  document.getElementById('topUser').textContent=st.userName;
+  document.getElementById('topUserRole').textContent=st.isAdm?'Administradora':(st.isLider?'Líder':(SETOR_LB[st.setor]?SETOR_LB[st.setor][0]:''));
+  document.getElementById('navitem-adm').style.display=st.isAdm?'':'none';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainScreen').style.display='block';
+  document.body.classList.add('app-active');
+  try{sessionStorage.setItem('aclon_session',JSON.stringify({usuario:user.usuario,senha}));}catch(e){}
+  ativarModulo('calc');
+  atualizarSidebarAtiva();
+}
+
 async function doLogin(){
   const user=document.getElementById('loginUser').value.trim();
   const pass=document.getElementById('loginPass').value;
@@ -1193,24 +1206,41 @@ async function doLogin(){
   }
   btn.disabled=false;btn.style.opacity=1;
   if(!d.ok){err.style.display='block';err.textContent=d.erro||'Usuário ou senha incorretos.';return;}
-  st.isAdm=d.user.isAdm; st.isLider=!!d.user.isLider; st.userName=d.user.nome; st.usuario=d.user.usuario; st.setor=d.user.setor; st.senha=pass;
-  document.getElementById('topUser').textContent=st.userName;
-  document.getElementById('topUserRole').textContent=st.isAdm?'Administradora':(st.isLider?'Líder':(SETOR_LB[st.setor]?SETOR_LB[st.setor][0]:''));
-  document.getElementById('navitem-adm').style.display=st.isAdm?'':'none';
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('mainScreen').style.display='block';
-  document.body.classList.add('app-active');
-  ativarModulo('calc');
-  atualizarSidebarAtiva();
+  aplicarSessaoLogada(d.user,pass);
   await fetchUsers();
   renderUserTable();
 }
+
+async function tentarRestaurarSessao(){
+  let sess;
+  try{
+    const raw=sessionStorage.getItem('aclon_session');
+    if(!raw)return;
+    sess=JSON.parse(raw);
+  }catch(e){return;}
+  if(!sess||!sess.usuario)return;
+  try{
+    const d=await api('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:sess.usuario,senha:sess.senha})});
+    if(d&&d.ok){
+      aplicarSessaoLogada(d.user,sess.senha);
+      await fetchUsers();
+      renderUserTable();
+    }else{
+      sessionStorage.removeItem('aclon_session');
+    }
+  }catch(e){
+    // sem rede no momento do reload: fica na tela de login, sem travar nada
+  }
+}
+tentarRestaurarSessao();
+
 function doLogout(){
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainScreen').style.display='none';
   document.body.classList.remove('app-active');
   document.getElementById('loginPass').value='';
   document.getElementById('loginUser').value='';
+  try{sessionStorage.removeItem('aclon_session');}catch(e){}
   st.senha=null;
 }
 
