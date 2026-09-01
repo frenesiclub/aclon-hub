@@ -1120,6 +1120,21 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="Analista Senior">Analista Senior</option>
       <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
     </select>
+    <label>Data de início</label>
+    <input type="date" id="editDataInicio"/>
+    <label>Férias</label>
+    <div id="editFeriasList" style="margin-bottom:.5rem;"></div>
+    <div style="display:flex;gap:6px;align-items:end;margin-bottom:1rem;">
+      <div style="flex:1;">
+        <label style="font-size:9px;margin-bottom:3px;">Início</label>
+        <input type="date" id="editFeriasInicio" style="margin-bottom:0;"/>
+      </div>
+      <div style="flex:1;">
+        <label style="font-size:9px;margin-bottom:3px;">Fim</label>
+        <input type="date" id="editFeriasFim" style="margin-bottom:0;"/>
+      </div>
+      <button class="btn-sm" style="margin-bottom:0;white-space:nowrap;" onclick="adicionarFerias()">+ Período</button>
+    </div>
     <label style="display:flex;align-items:center;gap:7px;margin-top:.25rem;">
       <input type="checkbox" id="editLider" style="width:auto;margin:0;"/>
       <span style="text-transform:none;font-weight:500;color:var(--text2);letter-spacing:0;">Líder (vê e cria demandas para toda a equipe)</span>
@@ -1162,6 +1177,8 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="Analista Senior">Analista Senior</option>
       <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
     </select>
+    <label>Data de início</label>
+    <input id="ncDataInicio" type="date"/>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('modalNovoColaborador')">Cancelar</button>
       <button class="btn-confirm" onclick="cadastrarColaborador()">Cadastrar</button>
@@ -1790,20 +1807,68 @@ function copiarPrecosPxQ(){
 /* ── ADM ── */
 const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional'],operacional_estrategico:['Operacional Estratégico','operacional_estrategico']};
 let editIdx=null;
-function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNome').value=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editCargo').value=u.cargo||'';document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
+function fmtDataCompleta(iso){const p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+
+function renderFeriasList(u){
+  const el=document.getElementById('editFeriasList');
+  if(!el)return;
+  const lista=Array.isArray(u.ferias)?u.ferias:[];
+  if(!lista.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);margin-bottom:.25rem;">Nenhum período cadastrado.</div>';return;}
+  el.innerHTML=lista.slice().sort((a,b)=>a.inicio.localeCompare(b.inicio)).map(f=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:5px 8px;background:var(--bg2);border-radius:6px;margin-bottom:4px;">
+      <span>${fmtDataCompleta(f.inicio)} → ${fmtDataCompleta(f.fim)}</span>
+      <button class="demanda-mes-add" onclick="removerFerias('${f.id}')">Remover</button>
+    </div>
+  `).join('');
+}
+
+function openEditSetor(i){
+  editIdx=i;
+  const u=usersCache[i];
+  document.getElementById('editNome').value=u.nome;
+  document.getElementById('editSetor').value=u.setor;
+  document.getElementById('editCargo').value=u.cargo||'';
+  document.getElementById('editDataInicio').value=u.dataInicio||'';
+  document.getElementById('editLider').checked=!!u.lider;
+  renderFeriasList(u);
+  document.getElementById('modalEditSetor').classList.add('open');
+}
 async function saveEditSetor(){
   if(editIdx===null)return;
   const u=usersCache[editIdx];
   const novoNome=document.getElementById('editNome').value.trim();
   const novoSetor=document.getElementById('editSetor').value;
   const novoCargo=document.getElementById('editCargo').value;
+  const novaDataInicio=document.getElementById('editDataInicio').value;
   const novoLider=document.getElementById('editLider').checked;
   if(!novoNome){alert('O nome não pode ficar vazio.');return;}
-  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,nome:novoNome,setor:novoSetor,cargo:novoCargo,lider:novoLider})});
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,nome:novoNome,setor:novoSetor,cargo:novoCargo,dataInicio:novaDataInicio,lider:novoLider})});
   editIdx=null;
   await fetchUsers();
   renderUserTable();
   closeModal('modalEditSetor');
+}
+async function adicionarFerias(){
+  if(editIdx===null)return;
+  const u=usersCache[editIdx];
+  const inicio=document.getElementById('editFeriasInicio').value;
+  const fim=document.getElementById('editFeriasFim').value;
+  if(!inicio||!fim){alert('Preencha início e fim do período.');return;}
+  if(fim<inicio){alert('A data de fim não pode ser antes do início.');return;}
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,feriasAdd:{inicio,fim}})});
+  await fetchUsers();
+  document.getElementById('editFeriasInicio').value='';
+  document.getElementById('editFeriasFim').value='';
+  renderFeriasList(usersCache[editIdx]);
+  renderUserTable();
+}
+async function removerFerias(id){
+  if(editIdx===null)return;
+  const u=usersCache[editIdx];
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,feriasRemoveId:id})});
+  await fetchUsers();
+  renderFeriasList(usersCache[editIdx]);
+  renderUserTable();
 }
 async function excluirColaborador(){
   if(editIdx===null)return;
@@ -1818,7 +1883,13 @@ async function excluirColaborador(){
 function renderUserTable(){
   const tbody=document.getElementById('userTableBody');
   if(!tbody)return;
-  tbody.innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${escHtml(u.nome)}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td style="font-size:12px;color:var(--text2);">${escHtml(u.cargo)||'—'}</td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;}).join('');
+  const hoje=hojeISO();
+  tbody.innerHTML=usersCache.map((u,i)=>{
+    const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];
+    const proximasFerias=(Array.isArray(u.ferias)?u.ferias:[]).filter(f=>f.fim>=hoje).sort((a,b)=>a.inicio.localeCompare(b.inicio))[0];
+    const feriasHint=proximasFerias?`<div style="font-size:10px;color:var(--text3);margin-top:2px;">Férias: ${fmtDataCompleta(proximasFerias.inicio)} → ${fmtDataCompleta(proximasFerias.fim)}</div>`:'';
+    return`<tr><td>${escHtml(u.nome)}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}${feriasHint}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td style="font-size:12px;color:var(--text2);">${escHtml(u.cargo)||'—'}</td><td style="font-size:12px;color:var(--text2);">${u.dataInicio?fmtDataCompleta(u.dataInicio):'—'}</td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;
+  }).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
@@ -1839,7 +1910,7 @@ function renderGestaoColaboradores(el){
       <button class="btn-primary" onclick="abrirNovoColaborador()">+ Colaborador</button>
     </div>
     <table class="user-table">
-      <thead><tr><th style="width:26%">Nome</th><th style="width:16%">Usuário</th><th style="width:18%">Setor</th><th style="width:20%">Cargo</th><th style="width:20%"></th></tr></thead>
+      <thead><tr><th style="width:24%">Nome</th><th style="width:14%">Usuário</th><th style="width:15%">Setor</th><th style="width:17%">Cargo</th><th style="width:13%">Início</th><th style="width:17%"></th></tr></thead>
       <tbody id="userTableBody"></tbody>
     </table>
   `;
@@ -2719,6 +2790,7 @@ async function cadastrarColaborador(){
     senha:document.getElementById('ncSenha').value,
     setor:document.getElementById('ncSetor').value,
     cargo:document.getElementById('ncCargo').value,
+    dataInicio:document.getElementById('ncDataInicio').value,
   };
   if(!novo.nome||!novo.usuario||!novo.senha){alert('Preencha todos os campos.');return;}
   const d=await api('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
