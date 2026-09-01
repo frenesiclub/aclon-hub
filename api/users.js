@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { usuario, nome, setor, senha, lider } = body.novo || {};
+      const { usuario, nome, setor, senha, lider, cargo } = body.novo || {};
       if (!usuario || !nome || !setor || !senha) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
         res.status(409).json({ error: 'usuário já existe' });
         return;
       }
-      users.push({ usuario, nome, setor, senha, lider: !!lider });
+      users.push({ usuario, nome, setor, senha, lider: !!lider, cargo: cargo || '' });
       await redisSetJSON('aclon_users', users);
       res.status(200).json({ ok: true, users: semSenha(users) });
       return;
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { usuario, nome, setor, lider } = body;
+      const { usuario, nome, setor, lider, cargo } = body;
       if (!usuario) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -70,6 +70,7 @@ module.exports = async (req, res) => {
       if (nome !== undefined && nome.trim()) users[idx].nome = nome.trim();
       if (setor !== undefined) users[idx].setor = setor;
       if (lider !== undefined) users[idx].lider = !!lider;
+      if (cargo !== undefined) users[idx].cargo = cargo;
       await redisSetJSON('aclon_users', users);
       res.status(200).json({ ok: true, users: semSenha(users) });
       return;
