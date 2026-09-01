@@ -357,6 +357,19 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .mini-rank .bar-fill{height:100%;background:var(--prod);border-radius:20px;}
 .mini-rank .val{font-size:12px;color:var(--text);width:20px;text-align:right;}
 
+/* ── GESTÃO DE PESSOAS ── */
+.fm-destaques{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.5rem;}
+.fm-destaque-card{background:var(--bg2);border-radius:var(--radius-md);padding:.85rem .9rem;}
+.fm-destaque-card .l{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.fm-destaque-card .n{font-size:14px;font-weight:700;color:var(--text);}
+.fm-destaque-geral{background:var(--prod-bg);}
+.fm-destaque-geral .l{color:var(--prod-dark);}
+.fm-historico-row{display:flex;align-items:center;gap:12px;padding:.55rem .2rem;border-bottom:0.5px solid var(--border);font-size:12px;}
+.fm-historico-row .mes{width:150px;flex-shrink:0;color:var(--text2);}
+.fm-historico-row .venc{flex:1;font-weight:600;color:var(--text);}
+.fm-historico-row .tag{font-size:10px;color:var(--text3);font-weight:500;margin-left:6px;}
+.fm-historico-row .tag-cat{font-size:10px;color:var(--text2);font-weight:500;background:var(--bg2);border-radius:5px;padding:1px 6px;margin-left:5px;}
+
 /* ── SIDEBAR (identidade Aclon Hub) ── */
 .app-shell{display:flex;min-height:100vh;}
 .app-sidebar{width:236px;flex-shrink:0;background:var(--brand-dark);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;align-self:flex-start;height:100vh;}
@@ -449,9 +462,16 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
           <button class="app-nav-subitem" id="navsub-prod-dashboard" onclick="irParaProd('dashboard')">Dashboard</button>
         </div>
       </div>
-      <button class="app-nav-item app-nav-flat" id="navitem-adm" style="display:none" onclick="irParaAdm()">
-        <span>ADM</span>
-      </button>
+      <div class="app-nav-group" id="navgroup-gestao" style="display:none">
+        <button class="app-nav-item" onclick="toggleNavGroup('gestao')">
+          <span>Gestão de Pessoas</span><span class="app-nav-chevron" id="navchev-gestao">›</span>
+        </button>
+        <div class="app-nav-sub" id="navsub-gestao">
+          <button class="app-nav-subitem" id="navsub-gestao-colaboradores" onclick="irParaGestao('colaboradores')">Colaboradores</button>
+          <button class="app-nav-subitem" id="navsub-gestao-funcionario" onclick="irParaGestao('funcionario')">Funcionário do Mês</button>
+          <button class="app-nav-subitem" id="navsub-gestao-feedbacks" onclick="irParaGestao('feedbacks')">Feedbacks</button>
+        </div>
+      </div>
     </nav>
     <div class="app-sidebar-user">
       <div class="app-user-name" id="topUser"></div>
@@ -1052,18 +1072,11 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
   </div><!-- /mp-calc -->
 
   <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- PAINEL ADM -->
+  <!-- PAINEL GESTÃO DE PESSOAS (só admin) -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <div class="mkt-panel" id="mp-adm">
-    <div class="content">
-      <div class="prod-toolbar" style="margin-bottom:1.25rem;">
-        <div class="adm-title" style="margin:0;border:none;padding:0;">Colaboradores</div>
-        <button class="btn-primary" onclick="abrirNovoColaborador()">+ Colaborador</button>
-      </div>
-      <table class="user-table">
-        <thead><tr><th style="width:30%">Nome</th><th style="width:20%">Usuário</th><th style="width:30%">Setor</th><th style="width:20%"></th></tr></thead>
-        <tbody id="userTableBody"></tbody>
-      </table>
+  <div class="mkt-panel" id="mp-gestao">
+    <div class="content" id="gestaoContent">
+      <div class="prod-empty">Carregando...</div>
     </div>
   </div>
 
@@ -1095,6 +1108,18 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="operacional_estrategico">Operacional Estratégico</option>
       <option value="full">Full</option>
     </select>
+    <label>Cargo</label>
+    <select id="editCargo">
+      <option value="">—</option>
+      <option value="Auxiliar">Auxiliar</option>
+      <option value="Assistente Jr">Assistente Jr</option>
+      <option value="Assistente Pleno">Assistente Pleno</option>
+      <option value="Assistente Senior">Assistente Senior</option>
+      <option value="Analista Jr">Analista Jr</option>
+      <option value="Analista Pleno">Analista Pleno</option>
+      <option value="Analista Senior">Analista Senior</option>
+      <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
+    </select>
     <label style="display:flex;align-items:center;gap:7px;margin-top:.25rem;">
       <input type="checkbox" id="editLider" style="width:auto;margin:0;"/>
       <span style="text-transform:none;font-weight:500;color:var(--text2);letter-spacing:0;">Líder (vê e cria demandas para toda a equipe)</span>
@@ -1125,6 +1150,18 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
       <option value="operacional_estrategico">Operacional Estratégico</option>
       <option value="full">Full</option>
     </select>
+    <label>Cargo</label>
+    <select id="ncCargo">
+      <option value="">—</option>
+      <option value="Auxiliar">Auxiliar</option>
+      <option value="Assistente Jr">Assistente Jr</option>
+      <option value="Assistente Pleno">Assistente Pleno</option>
+      <option value="Assistente Senior">Assistente Senior</option>
+      <option value="Analista Jr">Analista Jr</option>
+      <option value="Analista Pleno">Analista Pleno</option>
+      <option value="Analista Senior">Analista Senior</option>
+      <option value="Líder Operacional e Análise Estratégica">Líder Operacional e Análise Estratégica</option>
+    </select>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('modalNovoColaborador')">Cancelar</button>
       <button class="btn-confirm" onclick="cadastrarColaborador()">Cadastrar</button>
@@ -1141,6 +1178,10 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 <div id="modalExportExcelContainer"></div>
 
 <div id="modalDemandaMesContainer"></div>
+
+<div id="modalVencedorContainer"></div>
+
+<div id="modalFeedbackContainer"></div>
 
 </div><!-- /hub -->
 <script>
@@ -1180,7 +1221,7 @@ function aplicarSessaoLogada(user,senha){
   st.isAdm=user.isAdm; st.isLider=!!user.isLider; st.userName=user.nome; st.usuario=user.usuario; st.setor=user.setor; st.senha=senha;
   document.getElementById('topUser').textContent=st.userName;
   document.getElementById('topUserRole').textContent=st.isAdm?'Administradora':(st.isLider?'Líder':(SETOR_LB[st.setor]?SETOR_LB[st.setor][0]:''));
-  document.getElementById('navitem-adm').style.display=st.isAdm?'':'none';
+  document.getElementById('navgroup-gestao').style.display=st.isAdm?'':'none';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainScreen').style.display='block';
   document.body.classList.add('app-active');
@@ -1208,7 +1249,6 @@ async function doLogin(){
   if(!d.ok){err.style.display='block';err.textContent=d.erro||'Usuário ou senha incorretos.';return;}
   aplicarSessaoLogada(d.user,pass);
   await fetchUsers();
-  renderUserTable();
 }
 
 async function tentarRestaurarSessao(){
@@ -1224,7 +1264,6 @@ async function tentarRestaurarSessao(){
     if(d&&d.ok){
       aplicarSessaoLogada(d.user,sess.senha);
       await fetchUsers();
-      renderUserTable();
     }else{
       sessionStorage.removeItem('aclon_session');
     }
@@ -1245,10 +1284,11 @@ function doLogout(){
 }
 
 /* ── NAVEGAÇÃO TELAS PRINCIPAIS (sidebar) ── */
-let navGroupsAbertos={calc:true,prod:false};
+let navGroupsAbertos={calc:true,prod:false,gestao:false};
+let gestaoView='colaboradores';
 
 function ativarModulo(mod){
-  ['calc','prod','adm'].forEach(m=>{
+  ['calc','prod','gestao'].forEach(m=>{
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mod);
   });
@@ -1258,6 +1298,7 @@ function ativarModulo(mod){
 function switchMkt(mod){
   ativarModulo(mod);
   if(mod==='prod') renderProd();
+  if(mod==='gestao') renderGestao();
   atualizarSidebarAtiva();
 }
 function toggleNavGroup(grupo){
@@ -1277,11 +1318,15 @@ function irParaProd(view){
   renderProd();
   atualizarSidebarAtiva();
 }
-function irParaAdm(){
-  switchMkt('adm');
+function irParaGestao(view){
+  ativarModulo('gestao');
+  gestaoView=view;
+  navGroupsAbertos.gestao=true;
+  renderGestao();
+  atualizarSidebarAtiva();
 }
 function atualizarSidebarAtiva(){
-  ['calc','prod'].forEach(g=>{
+  ['calc','prod','gestao'].forEach(g=>{
     const sub=document.getElementById('navsub-'+g);
     const chev=document.getElementById('navchev-'+g);
     if(sub) sub.classList.toggle('open',navGroupsAbertos[g]);
@@ -1295,8 +1340,10 @@ function atualizarSidebarAtiva(){
     const el=document.getElementById('navsub-prod-'+v);
     if(el) el.classList.toggle('active',st.mod==='prod'&&prodView===v);
   });
-  const admEl=document.getElementById('navitem-adm');
-  if(admEl) admEl.classList.toggle('active',st.mod==='adm');
+  ['colaboradores','funcionario','feedbacks'].forEach(v=>{
+    const el=document.getElementById('navsub-gestao-'+v);
+    if(el) el.classList.toggle('active',st.mod==='gestao'&&gestaoView===v);
+  });
 }
 
 /* ── NAVEGAÇÃO DENTRO DE CALCULADORAS ── */
@@ -1743,15 +1790,16 @@ function copiarPrecosPxQ(){
 /* ── ADM ── */
 const SETOR_LB={adm:['ADM','adm'],prevenda:['Pré-venda','prevenda'],anuncios:['Anúncios','anuncios'],mercado:['Análise de Mercado','mercado'],full:['Full','full'],operacional:['Operacional','operacional'],operacional_estrategico:['Operacional Estratégico','operacional_estrategico']};
 let editIdx=null;
-function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNome').value=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
+function openEditSetor(i){editIdx=i;const u=usersCache[i];document.getElementById('editNome').value=u.nome;document.getElementById('editSetor').value=u.setor;document.getElementById('editCargo').value=u.cargo||'';document.getElementById('editLider').checked=!!u.lider;document.getElementById('modalEditSetor').classList.add('open');}
 async function saveEditSetor(){
   if(editIdx===null)return;
   const u=usersCache[editIdx];
   const novoNome=document.getElementById('editNome').value.trim();
   const novoSetor=document.getElementById('editSetor').value;
+  const novoCargo=document.getElementById('editCargo').value;
   const novoLider=document.getElementById('editLider').checked;
   if(!novoNome){alert('O nome não pode ficar vazio.');return;}
-  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,nome:novoNome,setor:novoSetor,lider:novoLider})});
+  await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,usuario:u.usuario,nome:novoNome,setor:novoSetor,cargo:novoCargo,lider:novoLider})});
   editIdx=null;
   await fetchUsers();
   renderUserTable();
@@ -1768,9 +1816,295 @@ async function excluirColaborador(){
   closeModal('modalEditSetor');
 }
 function renderUserTable(){
-  document.getElementById('userTableBody').innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${u.nome}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;}).join('');
+  const tbody=document.getElementById('userTableBody');
+  if(!tbody)return;
+  tbody.innerHTML=usersCache.map((u,i)=>{const[label,cls]=SETOR_LB[u.setor]||[u.setor,'full'];return`<tr><td>${escHtml(u.nome)}${u.lider?' <span class="badge badge-adm" style="margin-left:4px;">Líder</span>':''}</td><td><code style="font-size:12px;color:var(--text3);">${u.usuario}</code></td><td><span class="badge badge-${cls}">${label}</span></td><td style="font-size:12px;color:var(--text2);">${escHtml(u.cargo)||'—'}</td><td><button class="btn-sm" onclick="openEditSetor(${i})">Editar</button></td></tr>`;}).join('');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ── GESTÃO DE PESSOAS (só admin) ── */
+async function renderGestao(){
+  const el=document.getElementById('gestaoContent');
+  el.innerHTML='<div class="prod-empty">Carregando...</div>';
+  await fetchUsers();
+  if(gestaoView==='colaboradores') renderGestaoColaboradores(el);
+  else if(gestaoView==='funcionario') await renderGestaoFuncionario(el);
+  else if(gestaoView==='feedbacks') await renderGestaoFeedbacks(el);
+}
+
+function renderGestaoColaboradores(el){
+  el.innerHTML=`
+    <div class="prod-toolbar" style="margin-bottom:1.25rem;">
+      <div class="adm-title" style="margin:0;border:none;padding:0;">Colaboradores</div>
+      <button class="btn-primary" onclick="abrirNovoColaborador()">+ Colaborador</button>
+    </div>
+    <table class="user-table">
+      <thead><tr><th style="width:26%">Nome</th><th style="width:16%">Usuário</th><th style="width:18%">Setor</th><th style="width:20%">Cargo</th><th style="width:20%"></th></tr></thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  `;
+  renderUserTable();
+}
+
+/* ── FUNCIONÁRIO DO MÊS ── */
+let fmMesSelecionado=null;
+let avaliacoesCache=[];
+let vencedoresCache=[];
+async function fetchAvaliacoes(){const d=await api('/api/avaliacoes');avaliacoesCache=d.avaliacoes||[];return avaliacoesCache;}
+async function fetchVencedores(){const d=await api('/api/vencedores');vencedoresCache=d.vencedores||[];return vencedoresCache;}
+
+function mesAtualYYYYMM(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function labelMes(ym){
+  const p=ym.split('-');
+  const d=new Date(Number(p[0]),Number(p[1])-1,1);
+  const s=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+async function renderGestaoFuncionario(el){
+  if(!fmMesSelecionado) fmMesSelecionado=mesAtualYYYYMM();
+  await Promise.all([fetchAvaliacoes(),fetchVencedores()]);
+  const colaboradores=usersCache;
+  const notasDoMes=avaliacoesCache.filter(a=>a.mes===fmMesSelecionado);
+  const linhas=colaboradores.map(u=>{
+    const nota=notasDoMes.find(a=>a.colaborador===u.usuario)||{};
+    return {usuario:u.usuario,nome:u.nome,qualidade:nota.qualidade||'',produtividade:nota.produtividade||'',proatividade:nota.proatividade||'',equipe:nota.equipe||''};
+  });
+
+  const comMedia=notasDoMes.filter(a=>a.qualidade&&a.produtividade&&a.proatividade&&a.equipe).map(a=>({...a,media:(Number(a.qualidade)+Number(a.produtividade)+Number(a.proatividade)+Number(a.equipe))/4}));
+  const nomeDe=u=>{const c=usersCache.find(x=>x.usuario===u);return c?c.nome:u;};
+  function melhorEm(campo){
+    const validos=notasDoMes.filter(a=>Number(a[campo])>0);
+    if(!validos.length)return null;
+    return validos.reduce((a,b)=>Number(b[campo])>Number(a[campo])?b:a);
+  }
+  const destaqueGeral=comMedia.length?comMedia.reduce((a,b)=>b.media>a.media?b:a):null;
+  const destaqueQualidade=melhorEm('qualidade');
+  const destaqueProdutividade=melhorEm('produtividade');
+  const destaqueProatividade=melhorEm('proatividade');
+  const destaqueEquipe=melhorEm('equipe');
+
+  el.innerHTML=`
+    <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Funcionário do Mês</div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;">Mês</label>
+      <input type="month" value="${fmMesSelecionado}" onchange="mudarMesFuncionario(this.value)" style="padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:13px;"/>
+    </div>
+
+    <div class="section-label" style="margin-top:0;">Destaques de ${labelMes(fmMesSelecionado)}</div>
+    ${comMedia.length||destaqueQualidade||destaqueProdutividade||destaqueProatividade||destaqueEquipe?`
+    <div class="fm-destaques">
+      ${destaqueGeral?`<div class="fm-destaque-card fm-destaque-geral"><div class="l">Funcionário do Mês</div><div class="n">${escHtml(nomeDe(destaqueGeral.colaborador))}</div></div>`:'<div class="fm-destaque-card fm-destaque-geral"><div class="l">Funcionário do Mês</div><div class="n">—</div></div>'}
+      ${destaqueQualidade?`<div class="fm-destaque-card"><div class="l">Qualidade</div><div class="n">${escHtml(nomeDe(destaqueQualidade.colaborador))}</div></div>`:''}
+      ${destaqueProdutividade?`<div class="fm-destaque-card"><div class="l">Produtividade</div><div class="n">${escHtml(nomeDe(destaqueProdutividade.colaborador))}</div></div>`:''}
+      ${destaqueProatividade?`<div class="fm-destaque-card"><div class="l">Proatividade</div><div class="n">${escHtml(nomeDe(destaqueProatividade.colaborador))}</div></div>`:''}
+      ${destaqueEquipe?`<div class="fm-destaque-card"><div class="l">Equipe/Pessoal</div><div class="n">${escHtml(nomeDe(destaqueEquipe.colaborador))}</div></div>`:''}
+    </div>
+    `:'<div class="prod-empty">Ainda sem notas lançadas nesse mês.</div>'}
+
+    <div class="section-label">Avaliação — ${labelMes(fmMesSelecionado)}</div>
+    <table class="user-table" id="fmTabelaNotas">
+      <thead><tr><th>Colaborador</th><th style="text-align:center;">Qualidade</th><th style="text-align:center;">Produtividade</th><th style="text-align:center;">Proatividade</th><th style="text-align:center;">Equipe/Pessoal</th></tr></thead>
+      <tbody>
+        ${linhas.map(l=>`<tr>
+          <td>${escHtml(l.nome)}</td>
+          <td style="text-align:center;"><input type="number" min="1" max="5" data-usuario="${l.usuario}" data-campo="qualidade" value="${l.qualidade}" style="width:52px;text-align:center;padding:4px;border:0.5px solid var(--border2);border-radius:6px;"/></td>
+          <td style="text-align:center;"><input type="number" min="1" max="5" data-usuario="${l.usuario}" data-campo="produtividade" value="${l.produtividade}" style="width:52px;text-align:center;padding:4px;border:0.5px solid var(--border2);border-radius:6px;"/></td>
+          <td style="text-align:center;"><input type="number" min="1" max="5" data-usuario="${l.usuario}" data-campo="proatividade" value="${l.proatividade}" style="width:52px;text-align:center;padding:4px;border:0.5px solid var(--border2);border-radius:6px;"/></td>
+          <td style="text-align:center;"><input type="number" min="1" max="5" data-usuario="${l.usuario}" data-campo="equipe" value="${l.equipe}" style="width:52px;text-align:center;padding:4px;border:0.5px solid var(--border2);border-radius:6px;"/></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <button class="btn-primary" style="margin-top:1rem;" onclick="salvarNotasFuncionario()">Salvar notas do mês</button>
+
+    <div class="section-label" style="margin-top:2rem;">Histórico de vencedores</div>
+    <button class="btn-sm" style="margin-bottom:.75rem;" onclick="abrirNovoVencedorHistorico()">+ Adicionar vencedor de mês anterior</button>
+    <div>${renderHistoricoVencedores()}</div>
+  `;
+}
+
+function mudarMesFuncionario(v){fmMesSelecionado=v;renderGestao();}
+
+async function salvarNotasFuncionario(){
+  const inputs=document.querySelectorAll('#fmTabelaNotas input[data-usuario]');
+  const porColaborador={};
+  inputs.forEach(inp=>{
+    const u=inp.dataset.usuario,campo=inp.dataset.campo,val=inp.value;
+    if(!porColaborador[u]) porColaborador[u]={colaborador:u};
+    porColaborador[u][campo]=val;
+  });
+  const notas=Object.values(porColaborador).filter(n=>n.qualidade||n.produtividade||n.proatividade||n.equipe);
+  if(!notas.length){alert('Preencha ao menos uma nota antes de salvar.');return;}
+  await api('/api/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,mes:fmMesSelecionado,notas})});
+  await renderGestao();
+}
+
+function renderHistoricoVencedores(){
+  const mesesComNotas=[...new Set(avaliacoesCache.map(a=>a.mes))].sort().reverse();
+  const nomeDe=u=>{const c=usersCache.find(x=>x.usuario===u);return c?c.nome:u;};
+  const linhasComputadas=mesesComNotas.map(mes=>{
+    const doMes=avaliacoesCache.filter(a=>a.mes===mes&&a.qualidade&&a.produtividade&&a.proatividade&&a.equipe).map(a=>({...a,media:(Number(a.qualidade)+Number(a.produtividade)+Number(a.proatividade)+Number(a.equipe))/4}));
+    if(!doMes.length)return'';
+    const geral=doMes.reduce((a,b)=>b.media>a.media?b:a);
+    return `<div class="fm-historico-row"><span class="mes">${labelMes(mes)}</span><span class="venc">${escHtml(nomeDe(geral.colaborador))}</span><span class="tag">calculado das notas</span></div>`;
+  }).join('');
+
+  const catLabel={geral:'Geral',qualidade:'Qualidade',produtividade:'Produtividade',proatividade:'Proatividade',equipe:'Equipe/Pessoal'};
+  const linhasManuais=vencedoresCache.slice().sort((a,b)=>b.mes.localeCompare(a.mes)).map(v=>`
+    <div class="fm-historico-row">
+      <span class="mes">${labelMes(v.mes)}</span>
+      <span class="venc">${escHtml(v.nome)}<span class="tag-cat">${catLabel[v.categoria]||v.categoria}</span></span>
+      <button class="demanda-mes-add" onclick="excluirVencedorHistorico('${v.id}')">Excluir</button>
+    </div>
+  `).join('');
+
+  if(!linhasComputadas&&!linhasManuais) return '<div class="prod-empty">Nenhum vencedor registrado ainda.</div>';
+  return linhasComputadas+linhasManuais;
+}
+
+function abrirNovoVencedorHistorico(){
+  document.getElementById('modalVencedorContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalVencedor">
+      <div class="modal">
+        <h3>Vencedor de mês anterior</h3>
+        <label>Mês</label>
+        <input id="vhMes" type="month"/>
+        <label>Categoria</label>
+        <select id="vhCategoria">
+          <option value="geral">Geral (Funcionário do Mês)</option>
+          <option value="qualidade">Qualidade</option>
+          <option value="produtividade">Produtividade</option>
+          <option value="proatividade">Proatividade</option>
+          <option value="equipe">Equipe/Pessoal</option>
+        </select>
+        <label>Nome do vencedor</label>
+        <input id="vhNome" type="text"/>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="fecharVencedorHistorico()">Cancelar</button>
+          <button class="btn-confirm" onclick="salvarVencedorHistorico()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharVencedorHistorico(){document.getElementById('modalVencedorContainer').innerHTML='';}
+async function salvarVencedorHistorico(){
+  const mes=document.getElementById('vhMes').value;
+  const categoria=document.getElementById('vhCategoria').value;
+  const nome=document.getElementById('vhNome').value.trim();
+  if(!mes||!nome){alert('Preencha mês e nome.');return;}
+  await api('/api/vencedores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo:{mes,categoria,nome}})});
+  fecharVencedorHistorico();
+  await fetchVencedores();
+  renderGestao();
+}
+async function excluirVencedorHistorico(id){
+  if(!confirm('Excluir esse registro de vencedor?'))return;
+  await api('/api/vencedores',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,id})});
+  await fetchVencedores();
+  renderGestao();
+}
+
+/* ── FEEDBACKS (1:1) ── */
+let feedbacksCache=[];
+async function fetchFeedbacks(){const d=await api('/api/feedbacks');feedbacksCache=d.feedbacks||[];return feedbacksCache;}
+
+async function renderGestaoFeedbacks(el){
+  await fetchFeedbacks();
+  const linhas=feedbacksCache.slice().sort((a,b)=>b.data.localeCompare(a.data));
+  el.innerHTML=`
+    <div class="prod-toolbar" style="margin-bottom:1.25rem;">
+      <div class="adm-title" style="margin:0;border:none;padding:0;">Feedbacks (1:1)</div>
+      <button class="btn-primary" onclick="abrirNovoFeedback()">+ Nova rodada</button>
+    </div>
+    ${linhas.length?linhas.map(f=>renderFeedbackCard(f)).join(''):'<div class="prod-empty">Nenhuma rodada de feedback registrada ainda.</div>'}
+  `;
+}
+
+function renderFeedbackCard(f){
+  const u=usersCache.find(x=>x.usuario===f.colaborador);
+  return `<div class="demanda-mes-card" style="border-style:solid;margin-bottom:10px;">
+    <div class="dm-meta">${fmtDataCard(f.data)}${f.duracaoMinutos?' · '+f.duracaoMinutos+' min':''}${f.regra8020?' · regra 80/20 ok':''}</div>
+    <div class="dm-titulo">${escHtml(u?u.nome:f.colaborador)}</div>
+    ${f.pontosFortes?`<div class="dm-desc"><strong>Pontos fortes:</strong> ${escHtml(f.pontosFortes)}</div>`:''}
+    ${f.gargalo?`<div class="dm-desc"><strong>Gargalo:</strong> ${escHtml(f.gargalo)}${f.categoriaGargalo?' ('+escHtml(f.categoriaGargalo)+')':''}</div>`:''}
+    ${f.causaGestora?`<div class="dm-desc"><strong>Causa (gestora):</strong> ${escHtml(f.causaGestora)}</div>`:''}
+    ${f.causaColaborador?`<div class="dm-desc"><strong>Causa (colaborador):</strong> ${escHtml(f.causaColaborador)}</div>`:''}
+    ${f.acaoCombinada?`<div class="dm-desc"><strong>Ação combinada:</strong> ${escHtml(f.acaoCombinada)}</div>`:''}
+    ${f.statusAcaoAnterior?`<div class="dm-desc"><strong>Status ação anterior:</strong> ${escHtml(f.statusAcaoAnterior)}</div>`:''}
+    ${f.observacoes?`<div class="dm-desc"><strong>Obs:</strong> ${escHtml(f.observacoes)}</div>`:''}
+    <button class="demanda-mes-add" onclick="excluirFeedback('${f.id}')">Excluir</button>
+  </div>`;
+}
+
+function abrirNovoFeedback(){
+  const colaboradores=usersCache;
+  document.getElementById('modalFeedbackContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalFeedback">
+      <div class="modal">
+        <h3>Nova rodada de feedback</h3>
+        <label>Colaborador</label>
+        <select id="fbColaborador">${colaboradores.map(u=>`<option value="${u.usuario}">${escHtml(u.nome)}</option>`).join('')}</select>
+        <label>Data</label>
+        <input id="fbData" type="date" value="${hojeISO()}"/>
+        <label>Duração (minutos)</label>
+        <input id="fbDuracao" type="number" min="1" max="60" value="30"/>
+        <label>Pontos fortes</label>
+        <textarea id="fbPontosFortes" rows="2"></textarea>
+        <label>Gargalo</label>
+        <textarea id="fbGargalo" rows="2"></textarea>
+        <label>Categoria do gargalo</label>
+        <input id="fbCategoriaGargalo" type="text" placeholder="ex: técnico, comportamental, processo"/>
+        <label>Causa — visão da gestora</label>
+        <textarea id="fbCausaGestora" rows="2"></textarea>
+        <label>Causa — visão do colaborador</label>
+        <textarea id="fbCausaColaborador" rows="2"></textarea>
+        <label>Ação combinada</label>
+        <textarea id="fbAcaoCombinada" rows="2"></textarea>
+        <label>Status da ação da rodada anterior</label>
+        <input id="fbStatusAnterior" type="text"/>
+        <label style="display:flex;align-items:center;gap:7px;margin-top:.25rem;">
+          <input type="checkbox" id="fbRegra8020" style="width:auto;margin:0;"/>
+          <span style="text-transform:none;font-weight:500;color:var(--text2);letter-spacing:0;">Regra 80/20 respeitada</span>
+        </label>
+        <label>Observações</label>
+        <textarea id="fbObservacoes" rows="2"></textarea>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="fecharFeedback()">Cancelar</button>
+          <button class="btn-confirm" onclick="salvarFeedback()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharFeedback(){document.getElementById('modalFeedbackContainer').innerHTML='';}
+async function salvarFeedback(){
+  const novo={
+    colaborador:document.getElementById('fbColaborador').value,
+    data:document.getElementById('fbData').value,
+    duracaoMinutos:document.getElementById('fbDuracao').value,
+    pontosFortes:document.getElementById('fbPontosFortes').value.trim(),
+    gargalo:document.getElementById('fbGargalo').value.trim(),
+    categoriaGargalo:document.getElementById('fbCategoriaGargalo').value.trim(),
+    causaGestora:document.getElementById('fbCausaGestora').value.trim(),
+    causaColaborador:document.getElementById('fbCausaColaborador').value.trim(),
+    acaoCombinada:document.getElementById('fbAcaoCombinada').value.trim(),
+    statusAcaoAnterior:document.getElementById('fbStatusAnterior').value.trim(),
+    regra8020:document.getElementById('fbRegra8020').checked,
+    observacoes:document.getElementById('fbObservacoes').value.trim(),
+  };
+  if(!novo.colaborador||!novo.data){alert('Selecione o colaborador e a data.');return;}
+  await api('/api/feedbacks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
+  fecharFeedback();
+  await fetchFeedbacks();
+  renderGestao();
+}
+async function excluirFeedback(id){
+  if(!confirm('Excluir esta rodada de feedback?'))return;
+  await api('/api/feedbacks',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,id})});
+  await fetchFeedbacks();
+  renderGestao();
+}
 
 /* ── PRODUTIVIDADE ── */
 const SETORES_PROD=[
@@ -2384,6 +2718,7 @@ async function cadastrarColaborador(){
     usuario:document.getElementById('ncUsuario').value.trim(),
     senha:document.getElementById('ncSenha').value,
     setor:document.getElementById('ncSetor').value,
+    cargo:document.getElementById('ncCargo').value,
   };
   if(!novo.nome||!novo.usuario||!novo.senha){alert('Preencha todos os campos.');return;}
   const d=await api('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha_adm:st.senha,novo})});
