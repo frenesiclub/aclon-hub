@@ -370,6 +370,34 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .fm-historico-row .tag{font-size:10px;color:var(--text3);font-weight:500;margin-left:6px;}
 .fm-historico-row .tag-cat{font-size:10px;color:var(--text2);font-weight:500;background:var(--bg2);border-radius:5px;padding:1px 6px;margin-left:5px;}
 
+/* ── CALENDÁRIO ── */
+:root{--violet:#6b2fa0;--violet-bg:#f0ecfc;}
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
+.cal-mes-nav{display:flex;align-items:center;gap:12px;}
+.cal-mes-label{font-size:16px;font-weight:700;color:var(--text);min-width:170px;text-align:center;}
+.cal-nav-btn{background:var(--bg2);border:none;border-radius:8px;width:30px;height:30px;font-size:14px;color:var(--text2);cursor:pointer;}
+.cal-nav-btn:hover{background:var(--border2);}
+.cal-legenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.cal-legenda-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.cal-legenda-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border2);border:0.5px solid var(--border2);border-radius:var(--radius-md);overflow:hidden;margin-bottom:2rem;}
+.cal-weekday{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:7px 0;background:var(--bg2);}
+.cal-cel{background:var(--bg);min-height:96px;padding:6px;}
+.cal-cel-vazia{background:var(--bg2);}
+.cal-cel-hoje{background:var(--prod-bg);}
+.cal-cel-num{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:4px;}
+.cal-evt{font-size:10px;padding:2px 5px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;}
+.cal-evt-feriado{background:var(--red-bg);color:var(--red);}
+.cal-evt-home_office{background:var(--blue-bg);color:var(--blue);}
+.cal-evt-reuniao{background:var(--violet-bg);color:var(--violet);}
+.cal-evt-reposicao{background:var(--orange-bg);color:var(--orange);}
+.cal-evt-ferias{background:var(--green-bg);color:var(--green);}
+.cal-evt-list-row{display:flex;align-items:center;gap:10px;padding:.55rem .2rem;border-bottom:0.5px solid var(--border);font-size:12px;}
+.cal-evt-list-row .data{width:80px;flex-shrink:0;color:var(--text2);font-weight:600;}
+.cal-evt-list-row .badge-tipo{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+.cal-evt-list-row .titulo{flex:1;color:var(--text);}
+.cal-evt-list-row .status-repo{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--bg2);color:var(--text2);}
+
 /* ── SIDEBAR (identidade Aclon Hub) ── */
 .app-shell{display:flex;min-height:100vh;}
 .app-sidebar{width:236px;flex-shrink:0;background:var(--brand-dark);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;align-self:flex-start;height:100vh;}
@@ -443,16 +471,9 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
   <aside class="app-sidebar">
     <div class="app-logo">Aclon Hub</div>
     <nav class="app-nav">
-      <div class="app-nav-group">
-        <button class="app-nav-item" onclick="toggleNavGroup('calc')">
-          <span>Calculadoras</span><span class="app-nav-chevron open" id="navchev-calc">›</span>
-        </button>
-        <div class="app-nav-sub open" id="navsub-calc">
-          <button class="app-nav-subitem active" id="navsub-calc-ml" onclick="irParaCalc('ml')">Mercado Livre</button>
-          <button class="app-nav-subitem" id="navsub-calc-sh" onclick="irParaCalc('sh')">Shopee</button>
-          <button class="app-nav-subitem" id="navsub-calc-az" onclick="irParaCalc('az')">Amazon</button>
-        </div>
-      </div>
+      <button class="app-nav-item app-nav-flat" id="navitem-calendario" onclick="irParaCalendario()">
+        <span>Calendário</span>
+      </button>
       <div class="app-nav-group">
         <button class="app-nav-item" onclick="toggleNavGroup('prod')">
           <span>Produtividade</span><span class="app-nav-chevron" id="navchev-prod">›</span>
@@ -460,6 +481,16 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
         <div class="app-nav-sub" id="navsub-prod">
           <button class="app-nav-subitem" id="navsub-prod-kanban" onclick="irParaProd('kanban')">Kanban</button>
           <button class="app-nav-subitem" id="navsub-prod-dashboard" onclick="irParaProd('dashboard')">Dashboard</button>
+        </div>
+      </div>
+      <div class="app-nav-group">
+        <button class="app-nav-item" onclick="toggleNavGroup('calc')">
+          <span>Calculadoras</span><span class="app-nav-chevron" id="navchev-calc">›</span>
+        </button>
+        <div class="app-nav-sub" id="navsub-calc">
+          <button class="app-nav-subitem" id="navsub-calc-ml" onclick="irParaCalc('ml')">Mercado Livre</button>
+          <button class="app-nav-subitem" id="navsub-calc-sh" onclick="irParaCalc('sh')">Shopee</button>
+          <button class="app-nav-subitem" id="navsub-calc-az" onclick="irParaCalc('az')">Amazon</button>
         </div>
       </div>
       <div class="app-nav-group" id="navgroup-gestao" style="display:none">
@@ -486,9 +517,18 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
     </div>
 
   <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- TELA CALENDÁRIO (padrão ao abrir) -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="mkt-panel active" id="mp-calendario">
+    <div class="content" id="calendarioContent">
+      <div class="prod-empty">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
   <!-- TELA CALCULADORAS -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <div class="mkt-panel active" id="mp-calc">
+  <div class="mkt-panel" id="mp-calc">
 
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- PAINEL MERCADO LIVRE -->
@@ -1198,6 +1238,8 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 
 <div id="modalFeedbackContainer"></div>
 
+<div id="modalCalendarioContainer"></div>
+
 </div><!-- /hub -->
 <script>
 const META=0.15;
@@ -1241,7 +1283,8 @@ function aplicarSessaoLogada(user,senha){
   document.getElementById('mainScreen').style.display='block';
   document.body.classList.add('app-active');
   try{sessionStorage.setItem('aclon_session',JSON.stringify({usuario:user.usuario,senha}));}catch(e){}
-  ativarModulo('calc');
+  ativarModulo('calendario');
+  renderCalendario();
   atualizarSidebarAtiva();
 }
 
@@ -1303,7 +1346,7 @@ let navGroupsAbertos={calc:true,prod:false,gestao:false};
 let gestaoView='colaboradores';
 
 function ativarModulo(mod){
-  ['calc','prod','gestao'].forEach(m=>{
+  ['calendario','calc','prod','gestao'].forEach(m=>{
     const p=document.getElementById('mp-'+m);
     if(p) p.classList.toggle('active',m===mod);
   });
@@ -1314,11 +1357,15 @@ function switchMkt(mod){
   ativarModulo(mod);
   if(mod==='prod') renderProd();
   if(mod==='gestao') renderGestao();
+  if(mod==='calendario') renderCalendario();
   atualizarSidebarAtiva();
 }
 function toggleNavGroup(grupo){
   navGroupsAbertos[grupo]=!navGroupsAbertos[grupo];
   atualizarSidebarAtiva();
+}
+function irParaCalendario(){
+  switchMkt('calendario');
 }
 function irParaCalc(mkt){
   ativarModulo('calc');
@@ -1347,6 +1394,8 @@ function atualizarSidebarAtiva(){
     if(sub) sub.classList.toggle('open',navGroupsAbertos[g]);
     if(chev) chev.classList.toggle('open',navGroupsAbertos[g]);
   });
+  const calItem=document.getElementById('navitem-calendario');
+  if(calItem) calItem.classList.toggle('active',st.mod==='calendario');
   ['ml','sh','az'].forEach(m=>{
     const el=document.getElementById('navsub-calc-'+m);
     if(el) el.classList.toggle('active',st.mod==='calc'&&st.mkt===m);
@@ -1359,6 +1408,190 @@ function atualizarSidebarAtiva(){
     const el=document.getElementById('navsub-gestao-'+v);
     if(el) el.classList.toggle('active',st.mod==='gestao'&&gestaoView===v);
   });
+}
+
+/* ── CALENDÁRIO ── */
+let calendarioCache=[];
+let calAnoSelecionado=null;
+let calMesSelecionado=null; // 0-indexed
+const CAL_TIPO_LABEL={feriado:'Feriado',home_office:'Home Office',reuniao:'Reunião',reposicao:'Reposição de Material',ferias:'Férias'};
+const CAL_STATUS_LABEL={aguardando:'Aguardando',em_transito:'Em trânsito',chegou:'Chegou'};
+const CAL_MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const CAL_DIAS_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+async function fetchCalendario(){const d=await api('/api/calendario');calendarioCache=d.eventos||[];return calendarioCache;}
+
+function eventoVisivel(e){
+  if(st.isAdm||st.isLider) return true;
+  return e.setor==='geral'||e.setor===st.setor;
+}
+
+function feriasComoEventos(){
+  // Transforma os períodos de férias já cadastrados em Gestão de Pessoas
+  // em "eventos" de calendário — sem duplicar a informação em outro lugar.
+  const eventos=[];
+  usersCache.forEach(u=>{
+    (Array.isArray(u.ferias)?u.ferias:[]).forEach(f=>{
+      let d=new Date(f.inicio+'T00:00:00');
+      const fim=new Date(f.fim+'T00:00:00');
+      while(d<=fim){
+        eventos.push({id:'ferias_'+u.usuario+'_'+f.id+'_'+d.toISOString().slice(0,10),data:d.toISOString().slice(0,10),tipo:'ferias',titulo:u.nome,setor:'geral'});
+        d.setDate(d.getDate()+1);
+      }
+    });
+  });
+  return eventos;
+}
+
+async function irParaCalendario_carregarDados(){
+  await Promise.all([fetchCalendario(),fetchUsers()]);
+}
+
+async function renderCalendario(){
+  const el=document.getElementById('calendarioContent');
+  el.innerHTML='<div class="prod-empty">Carregando...</div>';
+  const hoje=new Date();
+  if(calAnoSelecionado===null){calAnoSelecionado=hoje.getFullYear();calMesSelecionado=hoje.getMonth();}
+  await irParaCalendario_carregarDados();
+
+  const podeGerir=st.isAdm||st.isLider;
+  const mesStr=calAnoSelecionado+'-'+String(calMesSelecionado+1).padStart(2,'0');
+  const todosEventos=calendarioCache.concat(feriasComoEventos()).filter(eventoVisivel);
+  const eventosDoMes=todosEventos.filter(e=>e.data.startsWith(mesStr)).sort((a,b)=>a.data.localeCompare(b.data));
+
+  const primeiroDia=new Date(calAnoSelecionado,calMesSelecionado,1);
+  const diasNoMes=new Date(calAnoSelecionado,calMesSelecionado+1,0).getDate();
+  const diaSemanaInicio=primeiroDia.getDay();
+  const hojeStr=hojeISO();
+
+  const celulas=[];
+  for(let i=0;i<diaSemanaInicio;i++) celulas.push(null);
+  for(let d=1;d<=diasNoMes;d++) celulas.push(d);
+
+  const gradeHtml=celulas.map(dia=>{
+    if(dia===null) return '<div class="cal-cel cal-cel-vazia"></div>';
+    const dataStr=mesStr+'-'+String(dia).padStart(2,'0');
+    const eventosDia=eventosDoMes.filter(e=>e.data===dataStr);
+    return `<div class="cal-cel${dataStr===hojeStr?' cal-cel-hoje':''}">
+      <div class="cal-cel-num">${dia}</div>
+      ${eventosDia.map(e=>`<div class="cal-evt cal-evt-${e.tipo}" title="${escHtml(e.titulo)}">${escHtml(e.titulo)}</div>`).join('')}
+    </div>`;
+  }).join('');
+
+  const listaHtml=eventosDoMes.length?eventosDoMes.map(e=>`
+    <div class="cal-evt-list-row">
+      <span class="data">${fmtDataCard(e.data)}</span>
+      <span class="badge-tipo cal-evt-${e.tipo}">${CAL_TIPO_LABEL[e.tipo]||e.tipo}</span>
+      <span class="titulo">${escHtml(e.titulo)}${e.setor&&e.setor!=='geral'?' — '+escHtml((SETOR_LB[e.setor]||[e.setor])[0]):''}</span>
+      ${e.tipo==='reposicao'?`<span class="status-repo">${CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao}</span>`:''}
+      ${podeGerir&&e.tipo==='reposicao'&&e.statusReposicao!=='chegou'?`<button class="demanda-mes-add" onclick="avancarStatusReposicao('${e.id}')">Avançar status</button>`:''}
+      ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="excluirEventoCalendario('${e.id}')">Excluir</button>`:''}
+    </div>
+  `).join(''):'<div class="prod-empty">Nenhum evento nesse mês.</div>';
+
+  el.innerHTML=`
+    <div class="cal-toolbar">
+      <div class="cal-mes-nav">
+        <button class="cal-nav-btn" onclick="mudarMesCalendario(-1)">‹</button>
+        <div class="cal-mes-label">${CAL_MESES[calMesSelecionado]} de ${calAnoSelecionado}</div>
+        <button class="cal-nav-btn" onclick="mudarMesCalendario(1)">›</button>
+      </div>
+      ${podeGerir?'<button class="btn-primary" onclick="abrirNovoEventoCalendario()">+ Evento</button>':''}
+    </div>
+    <div class="cal-legenda">
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--red);"></span>Feriado</div>
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--blue);"></span>Home Office</div>
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--green);"></span>Férias</div>
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--violet);"></span>Reunião</div>
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--orange);"></span>Reposição de Material</div>
+    </div>
+    <div class="cal-grid">
+      ${CAL_DIAS_SEMANA.map(d=>`<div class="cal-weekday">${d}</div>`).join('')}
+      ${gradeHtml}
+    </div>
+    <div class="section-label" style="margin-top:0;">Eventos de ${CAL_MESES[calMesSelecionado]}</div>
+    ${listaHtml}
+  `;
+}
+
+function mudarMesCalendario(delta){
+  calMesSelecionado+=delta;
+  if(calMesSelecionado<0){calMesSelecionado=11;calAnoSelecionado--;}
+  if(calMesSelecionado>11){calMesSelecionado=0;calAnoSelecionado++;}
+  renderCalendario();
+}
+
+function abrirNovoEventoCalendario(){
+  document.getElementById('modalCalendarioContainer').innerHTML=`
+    <div class="modal-overlay open" id="modalEventoCalendario">
+      <div class="modal">
+        <h3>Novo evento</h3>
+        <label>Tipo</label>
+        <select id="evTipo" onchange="document.getElementById('evStatusWrap').style.display=this.value==='reposicao'?'block':'none';">
+          <option value="feriado">Feriado</option>
+          <option value="home_office">Home Office</option>
+          <option value="reuniao">Reunião</option>
+          <option value="reposicao">Reposição de Material</option>
+        </select>
+        <label>Data</label>
+        <input id="evData" type="date" value="${hojeISO()}"/>
+        <label>Título</label>
+        <input id="evTitulo" type="text" placeholder="ex: Feriado municipal, Reunião de time, Chegada Clamper"/>
+        <label>Setor</label>
+        <select id="evSetor">
+          <option value="geral">Geral (todos os setores)</option>
+          ${SETORES_PROD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}
+        </select>
+        <div id="evStatusWrap" style="display:none;">
+          <label>Status</label>
+          <select id="evStatus">
+            <option value="aguardando">Aguardando</option>
+            <option value="em_transito">Em trânsito</option>
+            <option value="chegou">Chegou</option>
+          </select>
+        </div>
+        <label>Observação (opcional)</label>
+        <textarea id="evObservacao" rows="2"></textarea>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="fecharEventoCalendario()">Cancelar</button>
+          <button class="btn-confirm" onclick="salvarEventoCalendario()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharEventoCalendario(){document.getElementById('modalCalendarioContainer').innerHTML='';}
+async function salvarEventoCalendario(){
+  const tipo=document.getElementById('evTipo').value;
+  const data=document.getElementById('evData').value;
+  const titulo=document.getElementById('evTitulo').value.trim();
+  const setor=document.getElementById('evSetor').value;
+  const statusReposicao=tipo==='reposicao'?document.getElementById('evStatus').value:undefined;
+  const observacao=document.getElementById('evObservacao').value.trim();
+  if(!data||!titulo){alert('Preencha data e título.');return;}
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  const novo={data,tipo,titulo,setor,statusReposicao,observacao};
+  await api('/api/calendario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+  fecharEventoCalendario();
+  await fetchCalendario();
+  renderCalendario();
+}
+async function avancarStatusReposicao(id){
+  const proximo={aguardando:'em_transito',em_transito:'chegou'};
+  const ev=calendarioCache.find(e=>e.id===id);
+  if(!ev)return;
+  const novoStatus=proximo[ev.statusReposicao]||'chegou';
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  await api('/api/calendario',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id,statusReposicao:novoStatus})});
+  await fetchCalendario();
+  renderCalendario();
+}
+async function excluirEventoCalendario(id){
+  if(!confirm('Excluir este evento do calendário?'))return;
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+  await api('/api/calendario',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id})});
+  await fetchCalendario();
+  renderCalendario();
 }
 
 /* ── NAVEGAÇÃO DENTRO DE CALCULADORAS ── */
