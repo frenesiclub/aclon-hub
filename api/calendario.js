@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { data, tipo, titulo, setor, statusReposicao, observacao } = body.novo || {};
+      const { data, tipo, titulo, setores, statusReposicao, observacao } = body.novo || {};
       if (!data || !tipo || !titulo) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
         data,
         tipo, // feriado | home_office | reuniao | reposicao
         titulo,
-        setor: setor || 'geral',
+        setores: Array.isArray(setores) && setores.length ? setores : ['geral'],
         statusReposicao: tipo === 'reposicao' ? statusReposicao || 'aguardando' : null,
         observacao: observacao || '',
         criadoPor: auth.criadoPor,
@@ -72,14 +72,16 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'PATCH') {
-      // Só usado hoje pra avançar o status de um evento de reposição.
+      // Edição completa do evento (exceto tipo, que não muda depois de
+      // criado — se precisar trocar o tipo, exclui e cria de novo), e
+      // também usado pra avançar o status de um evento de reposição.
       const body = parseBody(req);
       const auth = await podeGerenciar(body);
       if (!auth.ok) {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { id, statusReposicao } = body;
+      const { id, data, titulo, setores, statusReposicao, observacao } = body;
       if (!id) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
@@ -90,7 +92,13 @@ module.exports = async (req, res) => {
         res.status(404).json({ error: 'evento não encontrado' });
         return;
       }
+      if (data !== undefined) eventos[idx].data = data;
+      if (titulo !== undefined) eventos[idx].titulo = titulo;
+      if (setores !== undefined) {
+        eventos[idx].setores = Array.isArray(setores) && setores.length ? setores : ['geral'];
+      }
       if (statusReposicao !== undefined) eventos[idx].statusReposicao = statusReposicao;
+      if (observacao !== undefined) eventos[idx].observacao = observacao;
       await redisSetJSON('aclon_calendario', eventos);
       res.status(200).json({ ok: true, eventos });
       return;
