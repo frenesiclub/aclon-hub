@@ -1421,9 +1421,13 @@ const CAL_DIAS_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 async function fetchCalendario(){const d=await api('/api/calendario');calendarioCache=d.eventos||[];return calendarioCache;}
 
+function setoresDoEvento(e){
+  return Array.isArray(e.setores)&&e.setores.length?e.setores:[e.setor||'geral'];
+}
 function eventoVisivel(e){
   if(st.isAdm||st.isLider) return true;
-  return e.setor==='geral'||e.setor===st.setor;
+  const setores=setoresDoEvento(e);
+  return setores.includes('geral')||setores.includes(st.setor);
 }
 
 function feriasComoEventos(){
@@ -1435,7 +1439,7 @@ function feriasComoEventos(){
       let d=new Date(f.inicio+'T00:00:00');
       const fim=new Date(f.fim+'T00:00:00');
       while(d<=fim){
-        eventos.push({id:'ferias_'+u.usuario+'_'+f.id+'_'+d.toISOString().slice(0,10),data:d.toISOString().slice(0,10),tipo:'ferias',titulo:u.nome,setor:'geral'});
+        eventos.push({id:'ferias_'+u.usuario+'_'+f.id+'_'+d.toISOString().slice(0,10),data:d.toISOString().slice(0,10),tipo:'ferias',titulo:u.nome,setores:['geral']});
         d.setDate(d.getDate()+1);
       }
     });
@@ -1478,16 +1482,20 @@ async function renderCalendario(){
     </div>`;
   }).join('');
 
-  const listaHtml=eventosDoMes.length?eventosDoMes.map(e=>`
+  const listaHtml=eventosDoMes.length?eventosDoMes.map(e=>{
+    const setoresLabel=setoresDoEvento(e).includes('geral')?'':setoresDoEvento(e).map(id=>(SETOR_LB[id]||[id])[0]).join(', ');
+    return `
     <div class="cal-evt-list-row">
       <span class="data">${fmtDataCard(e.data)}</span>
       <span class="badge-tipo cal-evt-${e.tipo}">${CAL_TIPO_LABEL[e.tipo]||e.tipo}</span>
-      <span class="titulo">${escHtml(e.titulo)}${e.setor&&e.setor!=='geral'?' — '+escHtml((SETOR_LB[e.setor]||[e.setor])[0]):''}</span>
+      <span class="titulo">${escHtml(e.titulo)}${setoresLabel?' — '+escHtml(setoresLabel):''}</span>
       ${e.tipo==='reposicao'?`<span class="status-repo">${CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao}</span>`:''}
       ${podeGerir&&e.tipo==='reposicao'&&e.statusReposicao!=='chegou'?`<button class="demanda-mes-add" onclick="avancarStatusReposicao('${e.id}')">Avançar status</button>`:''}
+      ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="editarEventoCalendario('${e.id}')">Editar</button>`:''}
       ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="excluirEventoCalendario('${e.id}')">Excluir</button>`:''}
     </div>
-  `).join(''):'<div class="prod-empty">Nenhum evento nesse mês.</div>';
+  `;
+  }).join(''):'<div class="prod-empty">Nenhum evento nesse mês.</div>';
 
   el.innerHTML=`
     <div class="cal-toolbar">
@@ -1521,37 +1529,76 @@ function mudarMesCalendario(delta){
   renderCalendario();
 }
 
+let evEditandoId=null;
+
 function abrirNovoEventoCalendario(){
+  evEditandoId=null;
+  renderModalEvento(null);
+}
+function editarEventoCalendario(id){
+  const ev=calendarioCache.find(e=>e.id===id);
+  if(!ev)return;
+  evEditandoId=id;
+  renderModalEvento(ev);
+}
+function renderModalEvento(ev){
+  const setoresAtuais=ev?setoresDoEvento(ev):['geral'];
+  const tiposDisponiveis=[
+    ['feriado','Feriado'],['home_office','Home Office'],['reuniao','Reunião'],['reposicao','Reposição de Material'],
+  ];
   document.getElementById('modalCalendarioContainer').innerHTML=`
     <div class="modal-overlay open" id="modalEventoCalendario">
       <div class="modal">
-        <h3>Novo evento</h3>
+        <h3>${ev?'Editar evento':'Novo evento'}</h3>
         <label>Tipo</label>
-        <select id="evTipo" onchange="document.getElementById('evStatusWrap').style.display=this.value==='reposicao'?'block':'none';">
-          <option value="feriado">Feriado</option>
-          <option value="home_office">Home Office</option>
-          <option value="reuniao">Reunião</option>
-          <option value="reposicao">Reposição de Material</option>
+        <select id="evTipo" onchange="atualizarFormularioEvento()" ${ev?'disabled':''}>
+          ${tiposDisponiveis.map(([v,l])=>`<option value="${v}"${ev&&ev.tipo===v?' selected':''}>${l}</option>`).join('')}
+          ${(!ev&&st.isAdm)?'<option value="ferias">Férias</option>':''}
         </select>
-        <label>Data</label>
-        <input id="evData" type="date" value="${hojeISO()}"/>
-        <label>Título</label>
-        <input id="evTitulo" type="text" placeholder="ex: Feriado municipal, Reunião de time, Chegada Clamper"/>
-        <label>Setor</label>
-        <select id="evSetor">
-          <option value="geral">Geral (todos os setores)</option>
-          ${SETORES_PROD.map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}
-        </select>
+
+        <div id="evCamposNormais">
+          <label>Data</label>
+          <input id="evData" type="date" value="${ev?ev.data:hojeISO()}"/>
+          <div id="evTituloWrap">
+            <label>Título</label>
+            <input id="evTitulo" type="text" value="${ev?escHtml(ev.titulo):''}" placeholder="ex: Feriado municipal, Reunião de time, Chegada Clamper"/>
+          </div>
+          <div id="evColaboradorWrap" style="display:none;">
+            <label>Colaborador</label>
+            <select id="evColaboradorHO">${usersCache.map(u=>`<option value="${u.usuario}"${ev&&ev.titulo===u.nome?' selected':''}>${escHtml(u.nome)}</option>`).join('')}</select>
+          </div>
+          <label>Setores</label>
+          <div style="margin-bottom:1rem;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:4px;">
+              <input type="checkbox" id="evSetorGeral" style="width:auto;margin:0;" onchange="toggleSetorGeral()" ${setoresAtuais.includes('geral')?'checked':''}/> Geral (todos os setores)
+            </label>
+            ${SETORES_PROD.map(s=>`
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:4px;">
+                <input type="checkbox" class="ev-setor-check" value="${s.id}" style="width:auto;margin:0;" ${setoresAtuais.includes(s.id)?'checked':''} ${setoresAtuais.includes('geral')?'disabled':''}/> ${s.label}
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <div id="evCamposFerias" style="display:none;">
+          <label>Colaborador</label>
+          <select id="evFeriasColaborador">${usersCache.map(u=>`<option value="${u.usuario}">${escHtml(u.nome)}</option>`).join('')}</select>
+          <label>Início</label>
+          <input id="evFeriasInicio" type="date"/>
+          <label>Fim</label>
+          <input id="evFeriasFim" type="date"/>
+        </div>
+
         <div id="evStatusWrap" style="display:none;">
           <label>Status</label>
           <select id="evStatus">
-            <option value="aguardando">Aguardando</option>
-            <option value="em_transito">Em trânsito</option>
-            <option value="chegou">Chegou</option>
+            <option value="aguardando"${ev&&ev.statusReposicao==='aguardando'?' selected':''}>Aguardando</option>
+            <option value="em_transito"${ev&&ev.statusReposicao==='em_transito'?' selected':''}>Em trânsito</option>
+            <option value="chegou"${ev&&ev.statusReposicao==='chegou'?' selected':''}>Chegou</option>
           </select>
         </div>
         <label>Observação (opcional)</label>
-        <textarea id="evObservacao" rows="2"></textarea>
+        <textarea id="evObservacao" rows="2">${ev?escHtml(ev.observacao||''):''}</textarea>
         <div class="modal-btns">
           <button class="btn-cancel" onclick="fecharEventoCalendario()">Cancelar</button>
           <button class="btn-confirm" onclick="salvarEventoCalendario()">Salvar</button>
@@ -1559,19 +1606,63 @@ function abrirNovoEventoCalendario(){
       </div>
     </div>
   `;
+  atualizarFormularioEvento();
+}
+function toggleSetorGeral(){
+  const geral=document.getElementById('evSetorGeral').checked;
+  document.querySelectorAll('.ev-setor-check').forEach(cb=>{cb.disabled=geral;if(geral)cb.checked=false;});
+}
+function lerSetoresSelecionados(){
+  const geral=document.getElementById('evSetorGeral').checked;
+  if(geral) return ['geral'];
+  const marcados=Array.from(document.querySelectorAll('.ev-setor-check:checked')).map(cb=>cb.value);
+  return marcados.length?marcados:['geral'];
+}
+function atualizarFormularioEvento(){
+  const tipo=document.getElementById('evTipo').value;
+  document.getElementById('evCamposNormais').style.display=tipo==='ferias'?'none':'block';
+  document.getElementById('evCamposFerias').style.display=tipo==='ferias'?'block':'none';
+  document.getElementById('evStatusWrap').style.display=tipo==='reposicao'?'block':'none';
+  document.getElementById('evTituloWrap').style.display=tipo==='home_office'?'none':'block';
+  document.getElementById('evColaboradorWrap').style.display=tipo==='home_office'?'block':'none';
 }
 function fecharEventoCalendario(){document.getElementById('modalCalendarioContainer').innerHTML='';}
 async function salvarEventoCalendario(){
   const tipo=document.getElementById('evTipo').value;
+  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
+
+  if(tipo==='ferias'){
+    const colaborador=document.getElementById('evFeriasColaborador').value;
+    const inicio=document.getElementById('evFeriasInicio').value;
+    const fim=document.getElementById('evFeriasFim').value;
+    if(!colaborador||!inicio||!fim){alert('Preencha colaborador, início e fim.');return;}
+    if(fim<inicio){alert('A data de fim não pode ser antes do início.');return;}
+    await api('/api/users',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,usuario:colaborador,feriasAdd:{inicio,fim}})});
+    fecharEventoCalendario();
+    await fetchUsers();
+    renderCalendario();
+    return;
+  }
+
+  let titulo;
+  if(tipo==='home_office'){
+    const u=usersCache.find(x=>x.usuario===document.getElementById('evColaboradorHO').value);
+    titulo=u?u.nome:'';
+  }else{
+    titulo=document.getElementById('evTitulo').value.trim();
+  }
   const data=document.getElementById('evData').value;
-  const titulo=document.getElementById('evTitulo').value.trim();
-  const setor=document.getElementById('evSetor').value;
+  const setores=lerSetoresSelecionados();
   const statusReposicao=tipo==='reposicao'?document.getElementById('evStatus').value:undefined;
   const observacao=document.getElementById('evObservacao').value.trim();
   if(!data||!titulo){alert('Preencha data e título.');return;}
-  const auth=st.isAdm?{senha_adm:st.senha}:{usuario:st.usuario,senha:st.senha};
-  const novo={data,tipo,titulo,setor,statusReposicao,observacao};
-  await api('/api/calendario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+
+  if(evEditandoId){
+    await api('/api/calendario',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,id:evEditandoId,data,titulo,setores,statusReposicao,observacao})});
+  }else{
+    const novo={data,tipo,titulo,setores,statusReposicao,observacao};
+    await api('/api/calendario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth,novo})});
+  }
   fecharEventoCalendario();
   await fetchCalendario();
   renderCalendario();
