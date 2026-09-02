@@ -1433,15 +1433,12 @@ function eventoVisivel(e){
 function feriasComoEventos(){
   // Transforma os períodos de férias já cadastrados em Gestão de Pessoas
   // em "eventos" de calendário — sem duplicar a informação em outro lugar.
+  // Um evento por período (não um por dia) — a data de início e a de fim
+  // ficam registradas nele, não expandidas dia a dia.
   const eventos=[];
   usersCache.forEach(u=>{
     (Array.isArray(u.ferias)?u.ferias:[]).forEach(f=>{
-      let d=new Date(f.inicio+'T00:00:00');
-      const fim=new Date(f.fim+'T00:00:00');
-      while(d<=fim){
-        eventos.push({id:'ferias_'+u.usuario+'_'+f.id+'_'+d.toISOString().slice(0,10),data:d.toISOString().slice(0,10),tipo:'ferias',titulo:u.nome,setores:['geral']});
-        d.setDate(d.getDate()+1);
-      }
+      eventos.push({id:'ferias_'+u.usuario+'_'+f.id,data:f.inicio,dataFim:f.fim,tipo:'ferias',titulo:u.nome,setores:['geral']});
     });
   });
   return eventos;
@@ -1461,7 +1458,9 @@ async function renderCalendario(){
   const podeGerir=st.isAdm||st.isLider;
   const mesStr=calAnoSelecionado+'-'+String(calMesSelecionado+1).padStart(2,'0');
   const todosEventos=calendarioCache.concat(feriasComoEventos()).filter(eventoVisivel);
-  const eventosDoMes=todosEventos.filter(e=>e.data.startsWith(mesStr)).sort((a,b)=>a.data.localeCompare(b.data));
+  const eventosDoMes=todosEventos
+    .filter(e=>e.data.startsWith(mesStr)||(e.dataFim&&e.dataFim.startsWith(mesStr)))
+    .sort((a,b)=>a.data.localeCompare(b.data));
 
   const primeiroDia=new Date(calAnoSelecionado,calMesSelecionado,1);
   const diasNoMes=new Date(calAnoSelecionado,calMesSelecionado+1,0).getDate();
@@ -1475,18 +1474,25 @@ async function renderCalendario(){
   const gradeHtml=celulas.map(dia=>{
     if(dia===null) return '<div class="cal-cel cal-cel-vazia"></div>';
     const dataStr=mesStr+'-'+String(dia).padStart(2,'0');
-    const eventosDia=eventosDoMes.filter(e=>e.data===dataStr);
+    const eventosDia=eventosDoMes.filter(e=>e.data===dataStr||(e.dataFim&&e.dataFim===dataStr));
     return `<div class="cal-cel${dataStr===hojeStr?' cal-cel-hoje':''}">
       <div class="cal-cel-num">${dia}</div>
-      ${eventosDia.map(e=>`<div class="cal-evt cal-evt-${e.tipo}" title="${escHtml(e.titulo)}">${escHtml(e.titulo)}</div>`).join('')}
+      ${eventosDia.map(e=>{
+        let label=e.titulo;
+        if(e.tipo==='ferias'&&e.dataFim&&e.dataFim!==e.data){
+          label=e.titulo+(dataStr===e.data?' (início)':' (fim)');
+        }
+        return `<div class="cal-evt cal-evt-${e.tipo}" title="${escHtml(label)}">${escHtml(label)}</div>`;
+      }).join('')}
     </div>`;
   }).join('');
 
   const listaHtml=eventosDoMes.length?eventosDoMes.map(e=>{
     const setoresLabel=setoresDoEvento(e).includes('geral')?'':setoresDoEvento(e).map(id=>(SETOR_LB[id]||[id])[0]).join(', ');
+    const dataLabel=(e.dataFim&&e.dataFim!==e.data)?fmtDataCard(e.data)+' → '+fmtDataCard(e.dataFim):fmtDataCard(e.data);
     return `
     <div class="cal-evt-list-row">
-      <span class="data">${fmtDataCard(e.data)}</span>
+      <span class="data">${dataLabel}</span>
       <span class="badge-tipo cal-evt-${e.tipo}">${CAL_TIPO_LABEL[e.tipo]||e.tipo}</span>
       <span class="titulo">${escHtml(e.titulo)}${setoresLabel?' — '+escHtml(setoresLabel):''}</span>
       ${e.tipo==='reposicao'?`<span class="status-repo">${CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao}</span>`:''}
