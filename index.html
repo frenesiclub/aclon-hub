@@ -392,6 +392,7 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .cal-evt-reuniao{background:var(--violet-bg);color:var(--violet);}
 .cal-evt-reposicao{background:var(--orange-bg);color:var(--orange);}
 .cal-evt-ferias{background:var(--green-bg);color:var(--green);}
+.cal-evt-acao_comercial{background:var(--amber-bg);color:var(--amber);}
 .cal-evt-list-row{display:flex;align-items:center;gap:10px;padding:.55rem .2rem;border-bottom:0.5px solid var(--border);font-size:12px;}
 .cal-evt-list-row .data{width:80px;flex-shrink:0;color:var(--text2);font-weight:600;}
 .cal-evt-list-row .badge-tipo{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;}
@@ -1414,7 +1415,7 @@ function atualizarSidebarAtiva(){
 let calendarioCache=[];
 let calAnoSelecionado=null;
 let calMesSelecionado=null; // 0-indexed
-const CAL_TIPO_LABEL={feriado:'Feriado',home_office:'Home Office',reuniao:'Reunião',reposicao:'Reposição de Material',ferias:'Férias'};
+const CAL_TIPO_LABEL={feriado:'Feriado',home_office:'Home Office',reuniao:'Reunião',reposicao:'Reposição de Material',ferias:'Férias',acao_comercial:'Ação Comercial'};
 const CAL_STATUS_LABEL={aguardando:'Aguardando',em_transito:'Em trânsito',chegou:'Chegou'};
 const CAL_MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const CAL_DIAS_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1510,7 +1511,10 @@ async function renderCalendario(){
         <div class="cal-mes-label">${CAL_MESES[calMesSelecionado]} de ${calAnoSelecionado}</div>
         <button class="cal-nav-btn" onclick="mudarMesCalendario(1)">›</button>
       </div>
-      ${podeGerir?'<button class="btn-primary" onclick="abrirNovoEventoCalendario()">+ Evento</button>':''}
+      <div style="display:flex;gap:8px;">
+        ${st.isAdm?'<button class="btn-sm" onclick="exportarCalendarioExcel()">Exportar Excel</button>':''}
+        ${podeGerir?'<button class="btn-primary" onclick="abrirNovoEventoCalendario()">+ Evento</button>':''}
+      </div>
     </div>
     <div class="cal-legenda">
       <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--red);"></span>Feriado</div>
@@ -1518,6 +1522,7 @@ async function renderCalendario(){
       <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--green);"></span>Férias</div>
       <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--violet);"></span>Reunião</div>
       <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--orange);"></span>Reposição de Material</div>
+      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--amber);"></span>Ação Comercial</div>
     </div>
     <div class="cal-grid">
       ${CAL_DIAS_SEMANA.map(d=>`<div class="cal-weekday">${d}</div>`).join('')}
@@ -1535,6 +1540,32 @@ function mudarMesCalendario(delta){
   renderCalendario();
 }
 
+function exportarCalendarioExcel(){
+  const mesStr=calAnoSelecionado+'-'+String(calMesSelecionado+1).padStart(2,'0');
+  const todosEventos=calendarioCache.concat(feriasComoEventos());
+  const eventosDoMes=todosEventos
+    .filter(e=>e.data.startsWith(mesStr)||(e.dataFim&&e.dataFim.startsWith(mesStr)))
+    .sort((a,b)=>a.data.localeCompare(b.data));
+  if(!eventosDoMes.length){alert('Nenhum evento nesse mês pra exportar.');return;}
+  const linhas=eventosDoMes.map(e=>{
+    const setoresLabel=setoresDoEvento(e).includes('geral')?'Geral':setoresDoEvento(e).map(id=>(SETOR_LB[id]||[id])[0]).join(', ');
+    return{
+      'Data início':fmtDataCompleta(e.data),
+      'Data fim':(e.dataFim&&e.dataFim!==e.data)?fmtDataCompleta(e.dataFim):'',
+      'Tipo':CAL_TIPO_LABEL[e.tipo]||e.tipo,
+      'Título':e.titulo,
+      'Setores':setoresLabel,
+      'Status':e.tipo==='reposicao'?(CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao):'',
+      'Observação':e.observacao||'',
+    };
+  });
+  const ws=XLSX.utils.json_to_sheet(linhas);
+  ws['!cols']=[{wch:13},{wch:13},{wch:18},{wch:32},{wch:24},{wch:14},{wch:32}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Calendário');
+  XLSX.writeFile(wb,`aclon-hub-calendario-${CAL_MESES[calMesSelecionado].toLowerCase()}-${calAnoSelecionado}.xlsx`);
+}
+
 let evEditandoId=null;
 
 function abrirNovoEventoCalendario(){
@@ -1550,7 +1581,7 @@ function editarEventoCalendario(id){
 function renderModalEvento(ev){
   const setoresAtuais=ev?setoresDoEvento(ev):['geral'];
   const tiposDisponiveis=[
-    ['feriado','Feriado'],['home_office','Home Office'],['reuniao','Reunião'],['reposicao','Reposição de Material'],
+    ['feriado','Feriado'],['home_office','Home Office'],['reuniao','Reunião'],['reposicao','Reposição de Material'],['acao_comercial','Ação Comercial'],
   ];
   document.getElementById('modalCalendarioContainer').innerHTML=`
     <div class="modal-overlay open" id="modalEventoCalendario">
