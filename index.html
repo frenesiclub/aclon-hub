@@ -377,8 +377,11 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .cal-mes-label{font-size:16px;font-weight:700;color:var(--text);min-width:170px;text-align:center;}
 .cal-nav-btn{background:var(--bg2);border:none;border-radius:8px;width:30px;height:30px;font-size:14px;color:var(--text2);cursor:pointer;}
 .cal-nav-btn:hover{background:var(--border2);}
-.cal-legenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:1.25rem;}
-.cal-legenda-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.cal-legenda{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem;}
+.cal-legenda-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);cursor:pointer;padding:3px 9px;border-radius:14px;transition:opacity .15s,background .15s;user-select:none;}
+.cal-legenda-item:hover{background:var(--bg2);}
+.cal-legenda-item.cal-legenda-ativa{background:var(--bg2);font-weight:700;color:var(--text);}
+.cal-legenda-item.cal-legenda-dim{opacity:.35;}
 .cal-legenda-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border2);border:0.5px solid var(--border2);border-radius:var(--radius-md);overflow:hidden;margin-bottom:2rem;}
 .cal-weekday{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:7px 0;background:var(--bg2);}
@@ -1415,6 +1418,7 @@ function atualizarSidebarAtiva(){
 let calendarioCache=[];
 let calAnoSelecionado=null;
 let calMesSelecionado=null; // 0-indexed
+let calFiltroTipos=new Set();
 const CAL_TIPO_LABEL={feriado:'Feriado',home_office:'Home Office',reuniao:'Reunião',reposicao:'Reposição de Material',ferias:'Férias',acao_comercial:'Ação Comercial'};
 const CAL_STATUS_LABEL={aguardando:'Aguardando',em_transito:'Em trânsito',chegou:'Chegou'};
 const CAL_MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -1458,7 +1462,8 @@ async function renderCalendario(){
 
   const podeGerir=st.isAdm||st.isLider;
   const mesStr=calAnoSelecionado+'-'+String(calMesSelecionado+1).padStart(2,'0');
-  const todosEventos=calendarioCache.concat(feriasComoEventos()).filter(eventoVisivel);
+  const passaFiltro=e=>calFiltroTipos.size===0||calFiltroTipos.has(e.tipo);
+  const todosEventos=calendarioCache.concat(feriasComoEventos()).filter(eventoVisivel).filter(passaFiltro);
   const eventosDoMes=todosEventos
     .filter(e=>e.data.startsWith(mesStr)||(e.dataFim&&e.dataFim.startsWith(mesStr)))
     .sort((a,b)=>a.data.localeCompare(b.data));
@@ -1517,12 +1522,12 @@ async function renderCalendario(){
       </div>
     </div>
     <div class="cal-legenda">
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--red);"></span>Feriado</div>
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--blue);"></span>Home Office</div>
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--green);"></span>Férias</div>
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--violet);"></span>Reunião</div>
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--orange);"></span>Reposição de Material</div>
-      <div class="cal-legenda-item"><span class="cal-legenda-dot" style="background:var(--amber);"></span>Ação Comercial</div>
+      ${[['feriado','Feriado','--red'],['home_office','Home Office','--blue'],['ferias','Férias','--green'],['reuniao','Reunião','--violet'],['reposicao','Reposição de Material','--orange'],['acao_comercial','Ação Comercial','--amber']].map(([tipo,label,cor])=>{
+        const ativa=calFiltroTipos.has(tipo);
+        const dim=calFiltroTipos.size>0&&!ativa;
+        return `<div class="cal-legenda-item${ativa?' cal-legenda-ativa':''}${dim?' cal-legenda-dim':''}" onclick="toggleFiltroTipoCalendario('${tipo}')"><span class="cal-legenda-dot" style="background:var(${cor});"></span>${label}</div>`;
+      }).join('')}
+      ${calFiltroTipos.size?'<span class="demanda-mes-add" style="cursor:pointer;" onclick="limparFiltroCalendario()">Mostrar tudo</span>':''}
     </div>
     <div class="cal-grid">
       ${CAL_DIAS_SEMANA.map(d=>`<div class="cal-weekday">${d}</div>`).join('')}
@@ -1539,10 +1544,20 @@ function mudarMesCalendario(delta){
   if(calMesSelecionado>11){calMesSelecionado=0;calAnoSelecionado++;}
   renderCalendario();
 }
+function toggleFiltroTipoCalendario(tipo){
+  if(calFiltroTipos.has(tipo)) calFiltroTipos.delete(tipo);
+  else calFiltroTipos.add(tipo);
+  renderCalendario();
+}
+function limparFiltroCalendario(){
+  calFiltroTipos.clear();
+  renderCalendario();
+}
 
 function exportarCalendarioExcel(){
   const mesStr=calAnoSelecionado+'-'+String(calMesSelecionado+1).padStart(2,'0');
-  const todosEventos=calendarioCache.concat(feriasComoEventos());
+  const passaFiltro=e=>calFiltroTipos.size===0||calFiltroTipos.has(e.tipo);
+  const todosEventos=calendarioCache.concat(feriasComoEventos()).filter(passaFiltro);
   const eventosDoMes=todosEventos
     .filter(e=>e.data.startsWith(mesStr)||(e.dataFim&&e.dataFim.startsWith(mesStr)))
     .sort((a,b)=>a.data.localeCompare(b.data));
