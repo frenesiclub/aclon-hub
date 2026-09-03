@@ -35,13 +35,21 @@ module.exports = async (req, res) => {
         res.status(401).json({ error: 'não autorizado' });
         return;
       }
-      const { colaborador, texto } = body.novo || {};
-      if (!colaborador || !texto) {
+      const { colaborador, pontosFortes, gargalo, categoriaGargalo, causaGestora } = body.novo || {};
+      if (!colaborador || !(pontosFortes || gargalo || categoriaGargalo || causaGestora)) {
         res.status(400).json({ error: 'dados incompletos' });
         return;
       }
       const notas = await redisGetJSON('aclon_notas_feedback', []);
-      const novo = { id: genId(), colaborador, texto, criadoEm: new Date().toISOString() };
+      const novo = {
+        id: genId(),
+        colaborador,
+        pontosFortes: pontosFortes || '',
+        gargalo: gargalo || '',
+        categoriaGargalo: categoriaGargalo || '',
+        causaGestora: causaGestora || '',
+        criadoEm: new Date().toISOString(),
+      };
       notas.push(novo);
       await redisSetJSON('aclon_notas_feedback', notas);
       res.status(200).json({ ok: true, notas });
