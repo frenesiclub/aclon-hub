@@ -2949,7 +2949,8 @@ function renderKanbanAdmin(setorInfo){
   const cards=cardsCache.filter(c=>c.setor===setorInfo.id);
   const cols=STATUS_COLS.map(col=>{
     const colCards=cards.filter(c=>c.status===col.id);
-    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')">${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
+    const colCardsOrdenados=ordenarPorPrioridade(colCards);
+    return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')">${colCardsOrdenados.length?colCardsOrdenados.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
   return `
     <div class="prod-toolbar">
@@ -2964,7 +2965,7 @@ function renderKanbanAdmin(setorInfo){
 }
 
 function renderDemandaMesCol(setorId,podeGerir){
-  const templates=templatesCache.filter(t=>t.setor===setorId);
+  const templates=ordenarPorPrioridade(templatesCache.filter(t=>t.setor===setorId));
   const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'};
   const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'};
   const cardsHtml=templates.length?templates.map(t=>`
@@ -3329,6 +3330,16 @@ async function dragCardDrop(e,status){
 }
 
 const PRIO_RANK={urgente:4,alta:3,media:2,baixa:1};
+function ordenarPorPrioridade(cards){
+  return cards.slice().sort((a,b)=>{
+    const rp=(PRIO_RANK[b.prioridade]||0)-(PRIO_RANK[a.prioridade]||0);
+    if(rp!==0)return rp;
+    if(a.prazo&&b.prazo)return a.prazo.localeCompare(b.prazo);
+    if(a.prazo)return -1;
+    if(b.prazo)return 1;
+    return 0;
+  });
+}
 const PRIO_COR={urgente:'var(--red)',alta:'var(--orange)',media:'var(--amber)',baixa:'var(--blue)'};
 function proximaPrioridade(cards){
   const abertos=cards.filter(c=>c.status!=='concluido');
@@ -3433,7 +3444,7 @@ function renderProdColaborador(el){
 
   const cards=cardsCache.filter(c=>c.responsavel===prodFiltroColaborador);
   const cols=STATUS_COLS.map(col=>{
-    const colCards=cards.filter(c=>c.status===col.id);
+    const colCards=ordenarPorPrioridade(cards.filter(c=>c.status===col.id));
     const dropAttrs=souEu?`ondragover="event.preventDefault()" ondrop="dragCardDrop(event,'${col.id}')"`:'';
     return `<div><div class="kanban-col-title">${col.label} <span class="count">${colCards.length}</span></div><div class="kanban-cards" ${dropAttrs}>${colCards.length?colCards.map(c=>renderKcard(c)).join(''):'<div class="prod-empty">Vazio</div>'}</div></div>`;
   }).join('');
