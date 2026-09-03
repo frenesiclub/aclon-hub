@@ -322,7 +322,8 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .kcard-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;}
 .kcard-desc{font-size:12px;color:var(--text2);margin-bottom:6px;}
 .kcard-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px;}
-.kcard-resp{font-size:11px;color:var(--text2);}
+.kcard-resp{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;}
+.kcard-resp-avatar{width:16px;height:16px;border-radius:50%;background:var(--prod);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .kcard-prazo{font-size:11px;color:var(--text3);margin-top:2px;}
 .kcard-prazo.late{color:var(--red);font-weight:600;}
 .prio{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;}
@@ -358,6 +359,16 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .prod-alert-row .are-titulo{flex:1;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .prod-alert-row .are-resp{color:var(--text2);font-size:11px;width:84px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .prod-alert-row .are-prazo{color:var(--text3);font-size:11px;width:36px;flex-shrink:0;}
+.cal-cat-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;}
+.cal-cat-header{display:flex;align-items:center;gap:9px;padding:.7rem .9rem;cursor:pointer;}
+.cal-cat-header:hover{background:var(--bg2);}
+.cal-cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cal-cat-label{font-size:13px;font-weight:700;color:var(--text);flex:1;}
+.cal-cat-count{font-size:11px;color:var(--text2);background:var(--bg2);border-radius:20px;padding:1px 8px;}
+.cal-cat-chevron{font-size:10px;color:var(--text3);transition:transform .15s;}
+.cal-cat-chevron.open{transform:rotate(90deg);}
+.cal-cat-body{max-height:0;overflow:hidden;transition:max-height .2s ease;}
+.cal-cat-body.open{max-height:400px;overflow-y:auto;}
 .prod-placeholder{padding:3rem 1rem;text-align:center;color:var(--text2);font-size:13px;}
 .mini-rank{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
 .mini-rank .name{font-size:12px;color:var(--text2);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1501,20 +1512,35 @@ async function renderCalendario(){
     </div>`;
   }).join('');
 
-  const listaHtml=eventosDoMes.length?eventosDoMes.map(e=>{
-    const setoresLabel=setoresDoEvento(e).includes('geral')?'':setoresDoEvento(e).map(id=>(SETOR_LB[id]||[id])[0]).join(', ');
-    const dataLabel=(e.dataFim&&e.dataFim!==e.data)?fmtDataCard(e.data)+' → '+fmtDataCard(e.dataFim):fmtDataCard(e.data);
+  const categoriasPresentes=[...new Set(eventosDoMes.map(e=>e.tipo))];
+  const categoriasHtml=categoriasPresentes.length?categoriasPresentes.map(tipo=>{
+    const eventosCategoria=eventosDoMes.filter(e=>e.tipo===tipo);
+    const aberto=!!calCategoriasAbertas[tipo];
+    const linhasCategoria=eventosCategoria.map(e=>{
+      const setoresLabel=setoresDoEvento(e).includes('geral')?'':setoresDoEvento(e).map(id=>(SETOR_LB[id]||[id])[0]).join(', ');
+      const dataLabel=(e.dataFim&&e.dataFim!==e.data)?fmtDataCard(e.data)+' → '+fmtDataCard(e.dataFim):fmtDataCard(e.data);
+      return `
+      <div class="cal-evt-list-row">
+        <span class="data">${dataLabel}</span>
+        <span class="titulo">${escHtml(e.titulo)}${setoresLabel?' — '+escHtml(setoresLabel):''}</span>
+        ${e.tipo==='reposicao'?`<span class="status-repo">${CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao}</span>`:''}
+        ${podeGerir&&e.tipo==='reposicao'&&e.statusReposicao!=='chegou'?`<button class="demanda-mes-add" onclick="avancarStatusReposicao('${e.id}')">Avançar status</button>`:''}
+        ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="editarEventoCalendario('${e.id}')">Editar</button>`:''}
+        ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="excluirEventoCalendario('${e.id}')">Excluir</button>`:''}
+      </div>
+    `;
+    }).join('');
     return `
-    <div class="cal-evt-list-row">
-      <span class="data">${dataLabel}</span>
-      <span class="badge-tipo cal-evt-${e.tipo}">${CAL_TIPO_LABEL[e.tipo]||e.tipo}</span>
-      <span class="titulo">${escHtml(e.titulo)}${setoresLabel?' — '+escHtml(setoresLabel):''}</span>
-      ${e.tipo==='reposicao'?`<span class="status-repo">${CAL_STATUS_LABEL[e.statusReposicao]||e.statusReposicao}</span>`:''}
-      ${podeGerir&&e.tipo==='reposicao'&&e.statusReposicao!=='chegou'?`<button class="demanda-mes-add" onclick="avancarStatusReposicao('${e.id}')">Avançar status</button>`:''}
-      ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="editarEventoCalendario('${e.id}')">Editar</button>`:''}
-      ${podeGerir&&e.tipo!=='ferias'?`<button class="demanda-mes-add" onclick="excluirEventoCalendario('${e.id}')">Excluir</button>`:''}
-    </div>
-  `;
+      <div class="cal-cat-card">
+        <div class="cal-cat-header" onclick="toggleCategoriaCalendario('${tipo}')">
+          <span class="cal-cat-dot cal-evt-${tipo}"></span>
+          <span class="cal-cat-label">${CAL_TIPO_LABEL[tipo]||tipo}</span>
+          <span class="cal-cat-count">${eventosCategoria.length}</span>
+          <span class="cal-cat-chevron${aberto?' open':''}">›</span>
+        </div>
+        <div class="cal-cat-body${aberto?' open':''}">${linhasCategoria}</div>
+      </div>
+    `;
   }).join(''):'<div class="prod-empty">Nenhum evento nesse mês.</div>';
 
   el.innerHTML=`
@@ -1542,8 +1568,14 @@ async function renderCalendario(){
       ${gradeHtml}
     </div>
     <div class="section-label" style="margin-top:0;">Eventos de ${CAL_MESES[calMesSelecionado]}</div>
-    ${listaHtml}
+    ${categoriasHtml}
   `;
+}
+
+let calCategoriasAbertas={};
+function toggleCategoriaCalendario(tipo){
+  calCategoriasAbertas[tipo]=!calCategoriasAbertas[tipo];
+  renderCalendario();
 }
 
 function mudarMesCalendario(delta){
@@ -3104,7 +3136,7 @@ function renderKcard(c){
     ${c.descricao?`<div class="kcard-desc">${escHtml(c.descricao)}</div>`:''}
     ${linksHtml}
     <div class="kcard-foot">
-      <div><div class="kcard-resp">${resp?resp.nome:'—'}</div>${prazoHtml}</div>
+      <div><div class="kcard-resp">${resp?`<span class="kcard-resp-avatar">${escHtml(resp.nome.charAt(0).toUpperCase())}</span>${escHtml(resp.nome)}`:'—'}</div>${prazoHtml}</div>
     </div>
     ${obsHtml}
   </div>`;
