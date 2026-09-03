@@ -274,6 +274,7 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:320px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-md);}
+.modal-lg{width:560px;}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:1.25rem;}
 .modal label{font-size:10px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
 .modal input,.modal select,.modal textarea{width:100%;margin-bottom:1rem;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);outline:none;font-family:inherit;resize:vertical;}
@@ -2578,7 +2579,7 @@ function abrirNovoFeedback(colaboradorPreSelecionado){
   const inicial=colaboradorPreSelecionado||(colaboradores[0]?colaboradores[0].usuario:'');
   document.getElementById('modalFeedbackContainer').innerHTML=`
     <div class="modal-overlay open" id="modalFeedback">
-      <div class="modal">
+      <div class="modal modal-lg">
         <h3>Nova rodada de feedback</h3>
         <label>Colaborador</label>
         <select id="fbColaborador" onchange="atualizarFormularioRodada()">${colaboradores.map(u=>`<option value="${u.usuario}"${u.usuario===inicial?' selected':''}>${escHtml(u.nome)}</option>`).join('')}</select>
