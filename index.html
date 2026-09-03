@@ -1362,6 +1362,11 @@ function doLogout(){
   document.getElementById('loginUser').value='';
   try{sessionStorage.removeItem('aclon_session');}catch(e){}
   st.senha=null;
+  // Limpa seleções que ficam presas ao usuário da sessão anterior, pra
+  // quem logar em seguida na mesma aba não herdar o que ficou selecionado.
+  dashColaboradorSelecionado=null;
+  dashSubView='geral';
+  prodFiltroColaborador=null;
 }
 
 /* ── NAVEGAÇÃO TELAS PRINCIPAIS (sidebar) ── */
