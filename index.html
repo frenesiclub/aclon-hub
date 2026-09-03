@@ -338,6 +338,13 @@ body.app-active .hub{max-width:none;min-height:100vh;border-radius:0;box-shadow:
 .kcard-obs-btn{font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;margin-top:6px;text-decoration:underline;}
 .prod-empty{color:var(--text3);font-size:12px;padding:1.5rem 0;text-align:center;}
 .prod-alert{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);margin-bottom:.7rem;overflow:hidden;}
+.dash-novas{background:var(--prod-bg);border:0.5px solid var(--prod);border-radius:var(--radius-md);padding:.9rem 1rem;margin-bottom:1.25rem;}
+.dash-novas-title{font-size:12px;font-weight:700;color:var(--prod-dark);margin-bottom:.6rem;}
+.dash-prioridade{border-radius:var(--radius-md);padding:1rem 1.1rem;margin-bottom:1.5rem;background:var(--bg2);cursor:pointer;transition:background .15s;}
+.dash-prioridade:hover{background:var(--border);}
+.dash-prioridade-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;}
+.dash-prioridade-titulo{font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.dash-prioridade-meta{font-size:12px;color:var(--text2);}
 .prod-alert-red{background:var(--red-bg);border-color:var(--red);}
 .prod-alert-red .prod-alert-header{color:var(--red);}
 .prod-alert-red .prod-alert-row{border-top-color:var(--red);}
@@ -3321,6 +3328,27 @@ async function dragCardDrop(e,status){
   await moverCard(id,status);
 }
 
+const PRIO_RANK={urgente:4,alta:3,media:2,baixa:1};
+const PRIO_COR={urgente:'var(--red)',alta:'var(--orange)',media:'var(--amber)',baixa:'var(--blue)'};
+function proximaPrioridade(cards){
+  const abertos=cards.filter(c=>c.status!=='concluido');
+  if(!abertos.length)return null;
+  return abertos.slice().sort((a,b)=>{
+    const rp=(PRIO_RANK[b.prioridade]||0)-(PRIO_RANK[a.prioridade]||0);
+    if(rp!==0)return rp;
+    if(a.prazo&&b.prazo)return a.prazo.localeCompare(b.prazo);
+    if(a.prazo)return -1;
+    if(b.prazo)return 1;
+    return 0;
+  })[0];
+}
+function cardsNovos(cards){
+  const limite=new Date();
+  limite.setDate(limite.getDate()-3);
+  const limiteISO=limite.toISOString();
+  return cards.filter(c=>c.status==='a_fazer'&&c.criadoEm&&c.criadoEm>=limiteISO);
+}
+
 function renderDashboardColaborador(setorInfo){
   const meus=cardsCache.filter(c=>c.responsavel===st.usuario);
   const mes=inicioMesISO();
@@ -3336,7 +3364,32 @@ function renderDashboardColaborador(setorInfo){
   const vencendoEmBreve=cardsVencendoEmBreve(meus);
   const alertaAtraso=renderAlertaVencendo(atrasadas,`demanda${atrasadas.length===1?'':'s'} sua${atrasadas.length===1?'':'s'} em atraso`,'colab-atraso','red');
   const alertaVencendo=renderAlertaVencendo(vencendoEmBreve,`demanda${vencendoEmBreve.length===1?'':'s'} sua${vencendoEmBreve.length===1?'':'s'} vencendo nos próximos 3 dias`,'colab-vencendo');
+
+  const novasDemandas=cardsNovos(meus);
+  const novasHtml=novasDemandas.length?`
+    <div class="dash-novas">
+      <div class="dash-novas-title">🆕 ${novasDemandas.length} nova${novasDemandas.length===1?'':'s'} demanda${novasDemandas.length===1?'':'s'} pra você</div>
+      <div class="kanban-cards">${novasDemandas.map(c=>renderKcard(c)).join('')}</div>
+    </div>
+  `:'';
+
+  const proxima=proximaPrioridade(meus);
+  const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'};
+  const prioridadeHtml=proxima?`
+    <div class="dash-prioridade" style="border-left:4px solid ${PRIO_COR[proxima.prioridade]||'var(--border2)'};" onclick="abrirDetalheCard('${proxima.id}')">
+      <div class="dash-prioridade-label">Sua próxima prioridade</div>
+      <div class="dash-prioridade-titulo">${escHtml(proxima.titulo)}</div>
+      <div class="dash-prioridade-meta">
+        <span class="prio prio-${proxima.prioridade}">${prioLabel[proxima.prioridade]||proxima.prioridade}</span>
+        ${proxima.prazo?' · Prazo '+fmtDataCard(proxima.prazo):''}
+        ${proxima.status==='fazendo'?' · Já em andamento':' · Ainda não iniciada'}
+      </div>
+    </div>
+  `:'';
+
   return `
+    ${novasHtml}
+    ${prioridadeHtml}
     <div class="prod-kpis">
       <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
       <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
