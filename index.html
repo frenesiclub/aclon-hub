@@ -2745,10 +2745,10 @@ function renderAlertaVencendo(cards,label,key,cor){
   if(!cards.length)return'';
   const aberto=!!alertasAbertos[key];
   const rows=cards.map(c=>{
-    const resp=usersCache.find(u=>u.usuario===c.responsavel);
+    const respLabel=c.responsavel?nomeDoUsuario(c.responsavel):'';
     return `<div class="prod-alert-row" onclick="abrirDetalheCard('${c.id}')">
       <span class="are-titulo">${escHtml(c.titulo)}</span>
-      <span class="are-resp">${resp?escHtml(resp.nome):'—'}</span>
+      <span class="are-resp">${respLabel?escHtml(respLabel):'—'}</span>
       <span class="are-prazo">${c.prazo?fmtDataCard(c.prazo):''}</span>
     </div>`;
   }).join('');
@@ -2780,11 +2780,23 @@ function prodViewTabsHtml(){
   </div>`;
 }
 
+let dashSubView='geral';
+function mudarDashSubView(v){dashSubView=v;renderProd();}
+
 function renderProdAdmin(el){
   if(prodView==='dashboard'){
+    let corpo;
+    if(dashSubView==='colaborador') corpo=renderDashboardPorColaborador();
+    else if(dashSubView==='setor') corpo=renderDashboardPorSetor();
+    else corpo=renderDashboardGeral();
     el.innerHTML=`
       <div class="adm-title" style="border:none;padding:0;margin-bottom:1rem;">Produtividade da equipe</div>
-      ${renderDashboardAdmin()}
+      <div class="prod-sub-tabs" style="margin-bottom:1.5rem;">
+        <button class="prod-sub-tab${dashSubView==='geral'?' active':''}" onclick="mudarDashSubView('geral')">Visão Geral</button>
+        <button class="prod-sub-tab${dashSubView==='colaborador'?' active':''}" onclick="mudarDashSubView('colaborador')">Por Colaborador</button>
+        <button class="prod-sub-tab${dashSubView==='setor'?' active':''}" onclick="mudarDashSubView('setor')">Por Setor</button>
+      </div>
+      ${corpo}
     `;
     return;
   }
@@ -2804,7 +2816,7 @@ function renderProdAdmin(el){
   `;
 }
 
-function renderDashboardAdmin(){
+function renderDashboardGeral(){
   const hoje=hojeISO();
   const mes=inicioMesISO();
   const abertos=cardsCache.filter(c=>c.status!=='concluido');
@@ -2856,6 +2868,105 @@ function renderDashboardAdmin(){
   `;
 }
 
+let dashColaboradorSelecionado=null;
+function mudarDashColaborador(usuario){dashColaboradorSelecionado=usuario;renderProd();}
+
+function renderDashboardPorColaborador(){
+  if(!dashColaboradorSelecionado) dashColaboradorSelecionado=st.usuario;
+  const pessoas=pessoasAtribuiveis();
+  const meus=cardsCache.filter(c=>c.responsavel===dashColaboradorSelecionado);
+  const mes=inicioMesISO();
+  const hoje=hojeISO();
+  const pendentes=meus.filter(c=>c.status==='a_fazer');
+  const andamento=meus.filter(c=>c.status==='fazendo');
+  const concluidasMes=meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes);
+  const atrasadas=meus.filter(c=>c.prazo&&c.prazo<hoje&&c.status!=='concluido');
+  const vencendoEmBreve=cardsVencendoEmBreve(meus);
+  const novasDemandas=cardsNovos(meus);
+  const proxima=proximaPrioridade(meus);
+  const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'};
+
+  const novasHtml=novasDemandas.length?`
+    <div class="dash-novas">
+      <div class="dash-novas-title">🆕 ${novasDemandas.length} nova${novasDemandas.length===1?'':'s'} demanda${novasDemandas.length===1?'':'s'}</div>
+      <div class="kanban-cards">${novasDemandas.map(c=>renderKcard(c)).join('')}</div>
+    </div>
+  `:'';
+  const prioridadeHtml=proxima?`
+    <div class="dash-prioridade" style="border-left:4px solid ${PRIO_COR[proxima.prioridade]||'var(--border2)'};" onclick="abrirDetalheCard('${proxima.id}')">
+      <div class="dash-prioridade-label">Próxima prioridade</div>
+      <div class="dash-prioridade-titulo">${escHtml(proxima.titulo)}</div>
+      <div class="dash-prioridade-meta">
+        <span class="prio prio-${proxima.prioridade}">${prioLabel[proxima.prioridade]||proxima.prioridade}</span>
+        ${proxima.prazo?' · Prazo '+fmtDataCard(proxima.prazo):''}
+      </div>
+    </div>
+  `:'';
+  const listaHtml=concluidasMes.length?`
+    <div class="section-label">Concluídas em ${nomeMesAtual()}</div>
+    <div class="kanban-cards">${concluidasMes.map(c=>renderKcard(c)).join('')}</div>
+  `:'';
+  const alertaAtraso=renderAlertaVencendo(atrasadas,`demanda${atrasadas.length===1?'':'s'} em atraso`,'porcolab-atraso','red');
+  const alertaVencendo=renderAlertaVencendo(vencendoEmBreve,`demanda${vencendoEmBreve.length===1?'':'s'} vencendo nos próximos 3 dias`,'porcolab-vencendo');
+
+  return `
+    <div style="margin-bottom:1.25rem;">
+      <label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;">Colaborador</label>
+      <select onchange="mudarDashColaborador(this.value)" style="padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-md);font-size:13px;">
+        ${pessoas.map(p=>`<option value="${p.usuario}"${p.usuario===dashColaboradorSelecionado?' selected':''}>${escHtml(p.nome)}${p.usuario===st.usuario?' (você)':''}</option>`).join('')}
+      </select>
+    </div>
+    ${novasHtml}
+    ${prioridadeHtml}
+    <div class="prod-kpis">
+      <div class="prod-kpi"><div class="n">${pendentes.length}</div><div class="l">Pendentes</div></div>
+      <div class="prod-kpi"><div class="n">${andamento.length}</div><div class="l">Em andamento</div></div>
+      <div class="prod-kpi"><div class="n">${concluidasMes.length}</div><div class="l">Concluídas em ${nomeMesAtual()}</div></div>
+      <div class="prod-kpi"><div class="n">${atrasadas.length}</div><div class="l">Em atraso</div></div>
+    </div>
+    ${listaHtml}
+    ${(atrasadas.length||vencendoEmBreve.length)?'<div class="section-label">Atenção</div>':''}
+    ${alertaAtraso}
+    ${alertaVencendo}
+  `;
+}
+
+let dashSetoresAbertos={};
+function toggleDashSetor(id){dashSetoresAbertos[id]=!dashSetoresAbertos[id];renderProd();}
+
+function renderDashboardPorSetor(){
+  const mes=inicioMesISO();
+  const blocos=SETORES_PROD.map(s=>{
+    const pessoasSetor=usersCache.filter(u=>u.setor===s.id);
+    const cardsSetor=cardsCache.filter(c=>c.setor===s.id);
+    const pendentes=cardsSetor.filter(c=>c.status==='a_fazer').length;
+    const andamento=cardsSetor.filter(c=>c.status==='fazendo').length;
+    const concluidas=cardsSetor.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes).length;
+    const aberto=!!dashSetoresAbertos[s.id];
+    const linhasPessoas=pessoasSetor.length?pessoasSetor.map(u=>{
+      const meus=cardsSetor.filter(c=>c.responsavel===u.usuario);
+      return `<tr><td>${escHtml(u.nome)}</td><td style="text-align:center;">${meus.filter(c=>c.status==='a_fazer').length}</td><td style="text-align:center;">${meus.filter(c=>c.status==='fazendo').length}</td><td style="text-align:center;">${meus.filter(c=>c.status==='concluido'&&c.concluidoEm&&c.concluidoEm>=mes).length}</td></tr>`;
+    }).join(''):'';
+    const corpoTabela=pessoasSetor.length?`
+      <table class="user-table" style="margin-top:.5rem;">
+        <thead><tr><th>Colaborador</th><th style="text-align:center;">Pendente</th><th style="text-align:center;">Andamento</th><th style="text-align:center;">Concluído</th></tr></thead>
+        <tbody>${linhasPessoas}</tbody>
+      </table>
+    `:'<div class="prod-empty">Nenhum colaborador nesse setor ainda.</div>';
+    return `
+      <div class="cal-cat-card">
+        <div class="cal-cat-header" onclick="toggleDashSetor('${s.id}')">
+          <span class="cal-cat-label">${s.label}</span>
+          <span class="cal-cat-count">${pendentes} pendente${pendentes===1?'':'s'} · ${concluidas} concluída${concluidas===1?'':'s'} no mês</span>
+          <span class="cal-cat-chevron${aberto?' open':''}">›</span>
+        </div>
+        <div class="cal-cat-body${aberto?' open':''}" style="padding:0 .9rem .9rem;">${corpoTabela}</div>
+      </div>
+    `;
+  }).join('');
+  return `<div class="section-label" style="margin-top:0;">Produtividade por setor — ${nomeMesAtual()}</div>${blocos}`;
+}
+
 /* ── EXPORTAÇÃO (só admin) ── */
 let exportTipoAtual=null;
 
@@ -2903,7 +3014,7 @@ function exportarExcel(de,ate){
     });
   }
   const linhas=cards.map(c=>{
-    const resp=usersCache.find(u=>u.usuario===c.responsavel);
+    const respNome=c.responsavel?nomeDoUsuario(c.responsavel):'';
     const setorLabel=(SETOR_LB[c.setor]||[c.setor])[0];
     return{
       'Título':c.titulo,
@@ -2912,7 +3023,7 @@ function exportarExcel(de,ate){
       'Setor':setorLabel,
       'Tipo':{diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo,
       'Prioridade':{urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade,
-      'Responsável':resp?resp.nome:c.responsavel,
+      'Responsável':respNome||c.responsavel,
       'Status':{a_fazer:'A Fazer',fazendo:'Fazendo',concluido:'Concluído'}[c.status]||c.status,
       'Prazo de início':c.prazoInicio||'',
       'Prazo de término':c.prazo||'',
@@ -3122,8 +3233,23 @@ async function excluirDemandaMes(id){
 
 function escHtml(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+/* ── PESSOAS ATRIBUÍVEIS (inclui ADM, que não é um "usuário" comum) ── */
+function pessoasAtribuiveis(){
+  return [{usuario:'adm',nome:'ADM (Ana)',setor:null,lider:false},...usersCache];
+}
+function equipeAtribuivelParaSetor(setorId){
+  const doSetor=usersCache.filter(u=>u.setor===setorId);
+  const lideresFora=usersCache.filter(u=>u.lider&&u.setor!==setorId);
+  return [{usuario:'adm',nome:'ADM (Ana)'},...doSetor,...lideresFora];
+}
+function nomeDoUsuario(usuario){
+  if(usuario==='adm')return 'ADM (Ana)';
+  const u=usersCache.find(x=>x.usuario===usuario);
+  return u?u.nome:usuario;
+}
+
 function renderKcard(c){
-  const resp=usersCache.find(u=>u.usuario===c.responsavel);
+  const respNome=nomeDoUsuario(c.responsavel);
   const atrasado=c.prazo&&c.prazo<hojeISO()&&c.status!=='concluido';
   const prioLabel={urgente:'Urgente',alta:'Alta',media:'Média',baixa:'Baixa'}[c.prioridade]||c.prioridade;
   const tipoLabel={diario:'Diário',semanal:'Semanal',quinzenal:'Quinzenal',esporadica:'Esporádica'}[c.tipo]||c.tipo;
@@ -3136,7 +3262,7 @@ function renderKcard(c){
     ${c.descricao?`<div class="kcard-desc">${escHtml(c.descricao)}</div>`:''}
     ${linksHtml}
     <div class="kcard-foot">
-      <div><div class="kcard-resp">${resp?`<span class="kcard-resp-avatar">${escHtml(resp.nome.charAt(0).toUpperCase())}</span>${escHtml(resp.nome)}`:'—'}</div>${prazoHtml}</div>
+      <div><div class="kcard-resp">${c.responsavel?`<span class="kcard-resp-avatar">${escHtml(respNome.charAt(0).toUpperCase())}</span>${escHtml(respNome)}`:'—'}</div>${prazoHtml}</div>
     </div>
     ${obsHtml}
   </div>`;
@@ -3151,8 +3277,8 @@ function abrirDetalheCard(id){
   if(!c)return;
   const podeGerir=st.isAdm||st.isLider;
   const podeAgir=podeGerir||c.responsavel===st.usuario;
-  const resp=usersCache.find(u=>u.usuario===c.responsavel);
-  const equipeSetor=usersCache.filter(u=>u.setor===c.setor);
+  const respNome=nomeDoUsuario(c.responsavel);
+  const equipeSetor=equipeAtribuivelParaSetor(c.setor);
   const next={a_fazer:'fazendo',fazendo:'concluido',concluido:null}[c.status];
   const nextLabel={a_fazer:'Iniciar',fazendo:'Concluir'}[c.status];
   const prev={fazendo:'a_fazer',concluido:'fazendo',a_fazer:null}[c.status];
@@ -3171,7 +3297,7 @@ function abrirDetalheCard(id){
     <select id="ddPrioridade">${PRIO_OPTS.map(([v,l])=>`<option value="${v}"${v===c.prioridade?' selected':''}>${l}</option>`).join('')}</select>
     ${podeGerir?`
     <label>Responsável</label>
-    <select id="ddResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}"${u.usuario===c.responsavel?' selected':''}>${u.nome}</option>`).join('')}</select>
+    <select id="ddResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}"${u.usuario===c.responsavel?' selected':''}>${escHtml(u.nome)}</option>`).join('')}</select>
     `:''}
     <label>Prazo de início</label>
     <input id="ddPrazoInicio" type="date" value="${c.prazoInicio||''}"/>
@@ -3181,7 +3307,7 @@ function abrirDetalheCard(id){
     ${c.descricao?`<div class="kcard-desc" style="margin-bottom:.75rem;">${escHtml(c.descricao)}</div>`:''}
     ${c.links?`<div class="kcard-links" style="margin-bottom:.75rem;">${c.links.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<a href="${escHtml(l)}" target="_blank" rel="noopener">${escHtml(l)}</a>`).join('')}</div>`:''}
     <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;">
-      <span class="prio prio-${c.prioridade}">${prioLabel}</span> · Responsável: ${resp?resp.nome:'—'}
+      <span class="prio prio-${c.prioridade}">${prioLabel}</span> · Responsável: ${c.responsavel?escHtml(respNome):'—'}
       ${c.prazoInicio?` · Início: ${fmtDataCard(c.prazoInicio)}`:''}
       ${c.prazo?` · Prazo: ${fmtDataCard(c.prazo)}`:''}
     </div>
@@ -3259,10 +3385,10 @@ function abrirNovaDemanda(setorId,responsavelFixo){
   ndSetorAlvo=setorId;
   ndResponsavelFixo=responsavelFixo||null;
   const setorInfo=SETORES_PROD.find(s=>s.id===setorId)||{label:'Meu setor'};
-  const equipeSetor=usersCache.filter(u=>u.setor===setorId);
+  const equipeSetor=equipeAtribuivelParaSetor(setorId);
   const campoResponsavel=ndResponsavelFixo?'':`
     <label>Responsável</label>
-    <select id="ndResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}">${u.nome}</option>`).join('')}</select>
+    <select id="ndResponsavel">${equipeSetor.map(u=>`<option value="${u.usuario}">${escHtml(u.nome)}</option>`).join('')}</select>
   `;
   document.getElementById('modalNovaDemandaContainer').innerHTML=`
     <div class="modal-overlay open" id="modalNovaDemanda">
